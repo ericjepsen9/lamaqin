@@ -1,0 +1,43 @@
+name: db-rls-tests
+
+# 每次改 supabase/(迁移或测试)自动跑 v2.0 schema 的 RLS 测试。
+# 纯起一个一次性 Postgres 服务，不碰 sss-dev/生产、不用任何线上凭据。
+# 分工：本 workflow 专跑 DB/RLS（supabase/**）；App 层 lint/tsc/jest 由 app-checks.yml 覆盖。
+
+on:
+  push:
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/db-rls-tests.yml'
+  pull_request:
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/db-rls-tests.yml'
+  workflow_dispatch: {}
+
+jobs:
+  rls:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client (psql / createdb / dropdb)
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: v2.0 schema + RLS test harness
+        run: bash supabase/tests/run.sh

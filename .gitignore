@@ -1,0 +1,57 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# build artifacts (web export zips for Netlify Drop 等)
+*.zip
+
+# native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+ios/
+android/
+
+# metro
+.metro-health-check*
+
+# environment variables
+.env
+.env*.local
+
+# logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+
+# jetbrains / vscode local
+.idea/
+
+# typescript
+*.tsbuildinfo
+
+# android kotlin
+.kotlin/
+
+# supabase cli
+supabase/.temp/
+supabase/.branches/
+supabase/.migrations-prod-only/
+.env.local.supabase
+
+# playwright e2e(本地Docker栈跑;需先 bash scripts/supabase-local.sh start,见 e2e/global-setup.ts)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

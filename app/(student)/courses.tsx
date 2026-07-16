@@ -1,0 +1,216 @@
+import { LinearGradient } from 'expo-linear-gradient';
+import { Link } from 'expo-router';
+import { useState } from 'react';
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { ScrollTitleBar, useScrollTitleBar } from '@/components/scroll-title-bar';
+import { Text } from '@/components/ui/text';
+import { useCourses, type CourseListItem } from '@/lib/queries/courses';
+import { CRIMSON } from '@/lib/theme';
+
+// 闻思 Tab = 课程列表主体(采觉学 能力3/37/39 骨架 · 守 2.0)。
+// 布局: 本周课时 + 全部闻思课程(按专业分组的书封网格,含自学读物=大学演讲格;useCourses inline,无须跳 /catalog)。
+// 课程三层(CLAUDE.md §4):course → course_lessons → lesson_resources;点封面 → /course/[id] 详情 → /lesson/[id] 学修。
+// 已加入判定:同 catalog.tsx(我的专业 program_courses ∩ 本课·决策126);封面色 hash·同书永远同色(觉学 CourseCover)。
+const SAFFRON = '#e07856';
+const SAFFRON_DARK = '#b35535';
+const INK = '#2b2218';
+const INK3 = '#7e6d5b';
+// 闻思页头(PM 2026-06-30):蓝色渐变(加大)+ 海螺(法螺=闻法之声)。蓝渐变淡入奶白底,配深蓝字(画报头·同 当日/修持)。
+const WENSI_GRAD = ['#BED3E9', '#CFE0EE', '#E7EFF4', '#FBF4E9'] as const;
+const WENSI_TITLE = '#2f4c67';
+const WENSI_SUB = '#5d7d97';
+// PM 2026-06-28:「已加入/未加入」师兄看不懂 → 改「正在学习 / 未加入学习」(语义=我班级在学的课 / 其他可浏览的课)。
+const FILTERS = ['全部', '正在学习', '未加入学习'] as const;
+// 分类分组顺序(PM 2026-06-26):大学演讲 → 基础 → 入行论 → 净土 → 前行 → 学经 → 中观班。
+// key = DB 专业名;label = 师兄端显示名(加行→前行、入行→入行论)。大学演讲(自学读物)单列排第一,不在此表。
+const CATS = [
+  { key: '基础', label: '基础' },
+  { key: '入行', label: '入行论' },
+  { key: '净土', label: '净土' },
+  { key: '加行', label: '前行' },
+  { key: '学经', label: '学经' },
+  { key: '中观班', label: '中观班' },
+] as const;
+// 一课多专业 → 取优先级最高(CATS 最靠前)的那组;未匹配 → 末尾「其他」。
+function courseCatIndex(programs: { name: string }[]): number {
+  let best: number = CATS.length;
+  for (const p of programs) {
+    const i = CATS.findIndex((cat) => cat.key === p.name);
+    if (i >= 0 && i < best) best = i;
+  }
+  return best;
+}
+
+// 觉学 CourseCover 6 套配色(同 catalog.tsx,同书永远同色)
+const COVER_PALETTES = [
+  { g: ['#F4D6B8', '#E8B98A'] as const, fg: '#5A3A1F', spine: '#C99563' },
+  { g: ['#D9E5C8', '#B6C9A0'] as const, fg: '#3F4F2D', spine: '#8AA170' },
+  { g: ['#E8D4D0', '#C99B92'] as const, fg: '#5A2D24', spine: '#A56F65' },
+  { g: ['#D9DAE6', '#A8AAC4'] as const, fg: '#2E2F4A', spine: '#7A7C9C' },
+  { g: ['#F1E0BD', '#DBBF85'] as const, fg: '#5A4220', spine: '#B5945C' },
+  { g: ['#C9DDD9', '#8FB4AC'] as const, fg: '#1F3F3A', spine: '#5F8B82' },
+];
+function pickPalette(seed: string) {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0;
+  return COVER_PALETTES[Math.abs(h) % COVER_PALETTES.length];
+}
+function BookCover({ title }: { title: string }) {
+  const p = pickPalette(title);
+  return (
+    <>
+      <LinearGradient colors={p.g} style={StyleSheet.absoluteFill} start={{ x: 0.2, y: 0 }} end={{ x: 0, y: 1 }} />
+      <View style={[styles.spine, { backgroundColor: p.spine }]} />
+      <Text className="font-serif" numberOfLines={3} style={[styles.coverTitle, { color: p.fg }]}>{title}</Text>
+      <RNText style={styles.coverEmoji}>📖</RNText>
+    </>
+  );
+}
+
+export default function Courses() {
+  const { data: courses = [], isLoading: coursesLoading, error: coursesError } = useCourses();
+  // 浏览:全部 / 正在学习 / 未加入学习(PM 2026-06-26)。搜索框已去(PM 2026-06-30);「类别」筛选暂不做(课程在 DB 无分类维度)。
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]>('全部');
+  const list = courses.filter((c) => (filter === '正在学习' ? c.joined : filter === '未加入学习' ? !c.joined : true));
+  // 分类分组:大学演讲排第一(仅「全部」类),其后各专业按 CATS 序;未匹配→「其他」。
+  const showSelfStudy = filter === '全部';
+  const groups = CATS.map((cat, i) => ({ key: cat.key, label: cat.label, courses: list.filter((c) => courseCatIndex(c.programs) === i) }));
+  const others = list.filter((c) => courseCatIndex(c.programs) === CATS.length);
+  const nothing = !showSelfStudy && list.length === 0;
+  const bar = useScrollTitleBar(); // 头图滚出后顶部淡入细标题栏(PM 2026-07-02)
+
+  return (
+    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 120 }} onScroll={bar.onScroll} scrollEventThrottle={16}>
+
+        {/* 蓝色渐变头 + 海螺(法螺·闻法之声遍十方)·PM 2026-06-30 */}
+        <View onLayout={bar.onHeaderLayout}>
+          <LinearGradient colors={WENSI_GRAD} style={StyleSheet.absoluteFill} />
+          <View style={styles.headRow}>
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text className="font-serif" style={styles.headTitle}>闻思</Text>
+              <RNText style={styles.headSub}>听闻正法 · 如理思维</RNText>
+            </View>
+            <Image source={require('../../assets/images/conch.png')} resizeMode="contain" style={styles.conch} />
+          </View>
+        </View>
+
+        {/* 本周课时已移除(PM 2026-06-30):闻思页专做课程浏览;本周要学的内容看「当日功课」页 */}
+
+        {/* 课程浏览:全部 / 正在学习 / 未加入学习;自学读物(大学演讲)并入下方网格(搜索框已去·PM 2026-06-30) */}
+        <View style={styles.filterRow}>
+          {FILTERS.map((f) => (
+            <Pressable key={f} onPress={() => setFilter(f)} style={{ alignItems: 'center' }}>
+              <RNText style={{ fontSize: 14, fontWeight: f === filter ? '700' : '500', color: f === filter ? SAFFRON_DARK : INK3 }}>{f}</RNText>
+              <View style={{ marginTop: 4, height: 2, width: 18, borderRadius: 1, backgroundColor: f === filter ? SAFFRON : 'transparent' }} />
+            </Pressable>
+          ))}
+        </View>
+        {/* error 分支(2026-07-11 一致性调研发现:此前查询失败会静默走"全部"tab 的固定大学演讲
+            兜底、或非"全部"tab 的"暂无课程",都看不出是加载失败——加真实错误态,优先级高于
+            上述两种"正常但没内容"的情形)。 */}
+        {coursesLoading ? (
+          <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+            <ActivityIndicator color={SAFFRON_DARK} />
+          </View>
+        ) : coursesError ? (
+          <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+            <RNText style={{ fontSize: 13, color: CRIMSON }}>加载失败,请检查网络后重试。</RNText>
+          </View>
+        ) : nothing ? (
+          <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+            <RNText style={{ fontSize: 13, color: INK3 }}>暂无课程</RNText>
+          </View>
+        ) : (
+          <>
+            {/* 大学演讲(自学读物)—— 排第一 */}
+            {showSelfStudy ? (
+              <View>
+                <RNText style={styles.catLabel}>大学演讲</RNText>
+                <View style={styles.grid}><SelfStudyCell /></View>
+              </View>
+            ) : null}
+            {/* 各专业分组(空组不显) */}
+            {groups.filter((g) => g.courses.length > 0).map((g) => (
+              <View key={g.key}>
+                <RNText style={styles.catLabel}>{g.label}</RNText>
+                <View style={styles.grid}>
+                  {g.courses.map((c) => <CourseCell key={c.id} c={c} />)}
+                </View>
+              </View>
+            ))}
+            {/* 「其他」(未挂专业课程)v1 隐藏(D-11·2026-07-02):宝性论/经庄严论两族 6 门全平台无归属
+                (生产库已查证),裸露会让师兄起疑;待 PM 问教务/查总清单挂上专业后自然回到对应分组。
+                恢复:去掉下面的 false && 即可。 */}
+            {false && others.length > 0 ? (
+              <View>
+                <RNText style={styles.catLabel}>其他</RNText>
+                <View style={styles.grid}>
+                  {others.map((c) => <CourseCell key={c.id} c={c} />)}
+                </View>
+              </View>
+            ) : null}
+          </>
+        )}
+
+      </ScrollView>
+      <ScrollTitleBar title="闻思" shown={bar.shown} />
+    </SafeAreaView>
+  );
+}
+
+function CourseCell({ c }: { c: CourseListItem }) {
+  return (
+    <Link href={`/course/${c.id}`} asChild>
+      <Pressable style={styles.cell}>
+        <View style={styles.coverWrap}>
+          {c.coverImageUrl ? (
+            <Image source={{ uri: c.coverImageUrl }} resizeMode="cover" style={StyleSheet.absoluteFill} />
+          ) : (
+            <BookCover title={c.name} />
+          )}
+          {c.joined ? (
+            <View style={styles.joinedBadge}>
+              <RNText style={{ fontSize: 10, fontWeight: '700', color: SAFFRON_DARK, letterSpacing: 1 }}>在学</RNText>
+            </View>
+          ) : null}
+        </View>
+        <Text className="font-serif" numberOfLines={2} style={styles.bookTitle}>{c.name}</Text>
+      </Pressable>
+    </Link>
+  );
+}
+function SelfStudyCell() {
+  return (
+    <Link href="/speech" asChild>
+      <Pressable style={styles.cell}>
+        <View style={styles.coverWrap}>
+          <LinearGradient colors={['#F1E0BD', '#DBBF85']} style={StyleSheet.absoluteFill} start={{ x: 0.2, y: 0 }} end={{ x: 0, y: 1 }} />
+          <View style={[styles.spine, { backgroundColor: '#B5945C' }]} />
+          <Text className="font-serif" numberOfLines={3} style={[styles.coverTitle, { color: '#5A4220' }]}>大学演讲</Text>
+          <RNText style={styles.coverEmoji}>🎓</RNText>
+        </View>
+        <Text className="font-serif" numberOfLines={2} style={styles.bookTitle}>大学演讲</Text>
+      </Pressable>
+    </Link>
+  );
+}
+
+const styles = StyleSheet.create({
+  headRow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 22, paddingTop: 30, paddingBottom: 40 },
+  headTitle: { fontSize: 28, fontWeight: '700', color: WENSI_TITLE, lineHeight: 32 },
+  headSub: { fontSize: 14.5, color: WENSI_SUB, fontWeight: '600', marginTop: 12 },
+  conch: { width: 84, height: 84, flexShrink: 0 },
+  catLabel: { fontSize: 12, color: INK3, letterSpacing: 1, paddingHorizontal: 20, paddingTop: 6, paddingBottom: 10 },
+  filterRow: { flexDirection: 'row', alignItems: 'center', gap: 18, paddingHorizontal: 20, paddingTop: 18, paddingBottom: 16 },
+  spine: { position: 'absolute', top: 0, bottom: 0, left: 0, width: 4 },
+  coverTitle: { fontSize: 14, fontWeight: '700', textAlign: 'center', letterSpacing: 1, lineHeight: 19 },
+  coverEmoji: { fontSize: 22, lineHeight: 24, opacity: 0.85 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', paddingHorizontal: 16 },
+  cell: { width: '31%', marginBottom: 22 },
+  coverWrap: { width: '100%', aspectRatio: 2 / 3, borderRadius: 8, overflow: 'hidden', alignItems: 'center', justifyContent: 'space-between', paddingTop: 26, paddingHorizontal: 12, paddingBottom: 12, shadowColor: '#2b2218', shadowOpacity: 0.22, shadowRadius: 10, shadowOffset: { width: 0, height: 8 }, elevation: 4 },
+  joinedBadge: { position: 'absolute', top: 6, right: 6, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.92)' },
+  bookTitle: { marginTop: 10, fontSize: 13, fontWeight: '600', color: INK, letterSpacing: 1, textAlign: 'center', lineHeight: 18 },
+});

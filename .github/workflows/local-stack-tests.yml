@@ -1,0 +1,65 @@
+name: local-stack-tests
+
+# Web E2E(Playwright)+ JWT/API 集成测试(tests/integration)——两者都要真起一套本地 Docker
+# Supabase 栈(supabase CLI:postgres/auth/rest/kong…全套,比 db-rls-tests.yml 裸 postgres:16
+# 容器重),合并成一个 workflow 只起一次栈、跑两套测试,避免重复起停。
+# 此前(TESTING.md §2·2026-07-09建套件时)两套测试都写好了但只能本地手动跑,未接CI——
+# db-rls-tests.yml 已证明这个仓库能在 GitHub-hosted runner 里起容器,技术上无障碍,纯粹是
+# 第三个 workflow 一直没人写(2026-07-10 审计发现后补齐)。
+#
+# 分工:app-checks.yml 管 tsc/jest/lint(不需要栈,几分钟);db-rls-tests.yml 管纯 SQL/RLS
+# harness(裸 postgres,不需要 Supabase CLI);本 workflow 专管"需要真实登录路径 + 真实 Web
+# 渲染"的这两层,较慢、较重,失败不阻断上面两个快路径。
+
+on:
+  push:
+    paths:
+      - 'e2e/**'
+      - 'tests/integration/**'
+      - 'playwright.config.ts'
+      - 'jest.integration.config.js'
+      - 'app/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'supabase/migrations/**'
+      - 'package.json'
+      - '.github/workflows/local-stack-tests.yml'
+  pull_request:
+    paths:
+      - 'e2e/**'
+      - 'tests/integration/**'
+      - 'playwright.config.ts'
+      - 'jest.integration.config.js'
+      - 'app/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'supabase/migrations/**'
+      - 'package.json'
+      - '.github/workflows/local-stack-tests.yml'
+  workflow_dispatch: {}
+
+jobs:
+  local-stack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Install deps
+        run: npm ci
+      - name: Install Playwright browser (chromium only)
+        run: npx playwright install --with-deps chromium
+      - name: Start local Supabase stack(起套件用,不碰 sss-dev/生产)
+        run: bash scripts/supabase-local.sh start
+      - name: Export local stack connection info(JWT 集成测试读它·见 tests/integration/helpers.ts)
+        run: npx supabase status -o env > .env.local.supabase
+      - name: JWT/API 集成测试(真实 PostgREST + JWT 校验路径)
+        run: npm run test:integration
+      - name: Web E2E(Playwright · 决策4 Web 层轻量回归)
+        run: npm run e2e
+      - name: Stop local Supabase stack
+        if: always()
+        run: bash scripts/supabase-local.sh stop

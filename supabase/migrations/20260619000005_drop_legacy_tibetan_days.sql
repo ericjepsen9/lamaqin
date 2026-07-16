@@ -1,0 +1,12 @@
+-- ───────────────────────────────────────────────────────────────
+-- App 迁移登记 · 2026-06-20 · App Claude(收口 §400 重放漂移;PM 定方案 b)
+--   收口决策137 孤儿表:基线快照 20260618000090_aux.sql 建的【合并表 tibetan_days】
+--   已被 20260619000000_tibetan_calendar_final 推翻(改两表 tibetan_calendar+buddhist_days)、
+--   且【从未上 prod/dev】。
+--   应用矩阵 : 生产 sss = no-op · sss-dev = no-op(两库本就无 tibetan_days)。
+--   作用     : 仅在【空白库整链重放】时清掉快照建出的孤儿表,使 end state == 两表。
+--   不改已登记文件(aux.sql / home_posters.sql 保持原样,过期注释留待将来 v2.0 squash 一并清)。
+-- ───────────────────────────────────────────────────────────────
+-- 幂等 drop:prod/dev = no-op;空白重放 = 清残留,end state == 两表。
+-- 已核全链无 FK/视图/函数引用 tibetan_days,cascade 仅回收其自有索引/RLS/策略。
+drop table if exists public.tibetan_days cascade;

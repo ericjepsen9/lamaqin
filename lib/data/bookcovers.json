@@ -1,0 +1,2273 @@
+{
+  "_about": "明光网(mingguang.im)书系封面图,索达吉堪布著译/讲解系列。公开 R2 静态资源,可直接在 App 用 url 加载。",
+  "source": "https://mingguang.im",
+  "r2_base": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers",
+  "generated": "2026-06-28",
+  "count": 282,
+  "categories": {
+    "yz": "论著译释",
+    "zz": "杂著·传记",
+    "kc": "课程讲解",
+    "ks": "开示文集",
+    "dx": "大学演讲"
+  },
+  "course_cover_note": "其中 course_slug 非空的 29 张已对应站内课程;数据库 courses.cover_image_url 用的是 covers/{course_slug}.jpg(与本表 bookcovers/{code}.jpg 同图、不同 key)。做课卡封面优先读 DB 的 cover_image_url,本表用于全量书系/存档。",
+  "covers": [
+    {
+      "code": "dx001z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "佛教眼中的物质世界",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx001z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx002z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "新时代需要心灵教育",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx002z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx003z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "怎样面对痛苦",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx003z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx004z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "佛教的真理观",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx004z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx005z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "问佛陀情为何物",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx005z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx006z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "幸福的根本是心",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx006z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx007z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "减轻压力的智慧",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx007z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx008z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "把握心灵的方法",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx008z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx009z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "藏地幸福密码",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx009z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx010z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "关于人性的探索",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx010z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx011z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "神秘的修心之路",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx011z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx012z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "怎样变成有福报的人",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx012z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx013z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "喧嚣中的宁静之道",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx013z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx014z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "藏密宇宙观",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx014z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx015z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "红尘中的净土",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx015z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx016z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "贫非佛教",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx016z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx017z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "佛教如何面对灾难",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx017z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx018z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "藏传佛教的本来面目",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx018z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx019z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "生命中的偶遇",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx019z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx020z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "走出人际关系的雾霾",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx020z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx021z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "碎片时代的彷徨",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx021z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx022z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "向内看 向外走",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx022z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx023z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "如何理解自我慈悲",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx023z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx024z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "你的快乐，从何而来",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx024z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx025z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "是约束还是自由",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx025z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx026z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "浅淡佛教与科学",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx026z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx027z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "你也可以是菩萨",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx027z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx028z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "生死与幸福",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx028z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx029z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "叩问我们的时代",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx029z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "dx030z",
+      "category": "dx",
+      "category_label": "大学演讲",
+      "name": "兴衰的幻剧",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/dx030z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "115",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "教言精髓讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/115.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc001z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "赞戒论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc001z.jpg",
+      "course_slug": "zhanjielun"
+    },
+    {
+      "code": "kc002z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "沙弥五十颂讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc002z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc003z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "三戒论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc003z.jpg",
+      "course_slug": "sanjieyaojie"
+    },
+    {
+      "code": "kc004z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "事师五十颂讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc004z.jpg",
+      "course_slug": "shishiwushisong"
+    },
+    {
+      "code": "kc005z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "俱舍讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc005z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc006z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "俱舍问答",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc006z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc007z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "解义慧剑讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc007z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc008z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "量理宝藏论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc008z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc009z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "释量论·成量品讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc009z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc010z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "中观四百论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc010z.jpg",
+      "course_slug": "zhongguansibailun"
+    },
+    {
+      "code": "kc011z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "定解宝灯论讲解（1994年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc011z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc012z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "定解宝灯论讲解（2003年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc012z.jpg",
+      "course_slug": "dingjiebaodenglun"
+    },
+    {
+      "code": "kc013z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "中论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc013z.jpg",
+      "course_slug": "zhonglun"
+    },
+    {
+      "code": "kc014z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "中观庄严论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc014z.jpg",
+      "course_slug": "zhongguanzhuangyanlunshi"
+    },
+    {
+      "code": "kc015z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "缘起赞讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc015z.jpg",
+      "course_slug": "yuanqizan"
+    },
+    {
+      "code": "kc017z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "中观零散教言讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc017z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc018z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "现观略义讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc018z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc019z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "现观总义讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc019z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc020z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "现观庄严论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc020z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc022z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "入菩萨行论讲解（1999年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc022z.jpg",
+      "course_slug": "ruxinglunyuanwen"
+    },
+    {
+      "code": "kc023z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "入行论讲解（2003年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc023z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc024z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "入行论讲解（2006年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc024z.jpg",
+      "course_slug": "ruxinglunguangjie"
+    },
+    {
+      "code": "kc025z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "入行论ㆍ菩提心利益品讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc025z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc027z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "大圆满前行讲解（2004年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc027z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc028z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "大圆满前行讲解（2008年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc028z.jpg",
+      "course_slug": "qianxingguangshi"
+    },
+    {
+      "code": "kc029z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "前行实修法",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc029z.jpg",
+      "course_slug": "qianxingshixiufa"
+    },
+    {
+      "code": "kc030z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "开显解脱道讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc030z.jpg",
+      "course_slug": "kaixianjietuodao"
+    },
+    {
+      "code": "kc031z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "加行教言合集",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc031z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc032z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "大圆满心性休息讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc032z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc033z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "佛子行讲解（2007年）&快乐之歌讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc033z.jpg",
+      "course_slug": "fozixingjiangji"
+    },
+    {
+      "code": "kc034z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "佛子行释讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc034z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc035z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "格言宝藏论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc035z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc036z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "水木格言讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc036z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc037z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "君规教言论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc037z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc038z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "二规教言论讲解（2003年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc038z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc039z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "二规教言论讲解（2006年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc039z.jpg",
+      "course_slug": "erguijiaoyanlun"
+    },
+    {
+      "code": "kc040z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "亲友书讲解（1997年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc040z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc041z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "亲友书讲解（2008年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc041z.jpg",
+      "course_slug": "qinyoushujiangji"
+    },
+    {
+      "code": "kc042z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "弟子规讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc042z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc043z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "孝经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc043z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc044z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "论语讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc044z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc045z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "净土教言讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc045z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc046z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "极乐愿文大疏讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc046z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc047z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "阿弥陀经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc047z.jpg",
+      "course_slug": "foshuoamituojingshi"
+    },
+    {
+      "code": "kc048z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "大势至菩萨念佛圆通章讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc048z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc049z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "无量寿经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc049z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc050z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "观经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc050z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc051z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "普贤行愿品讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc051z.jpg",
+      "course_slug": "puxianxingyuanpinshi"
+    },
+    {
+      "code": "kc052z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "心经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc052z.jpg",
+      "course_slug": "xinjingshi"
+    },
+    {
+      "code": "kc053z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "金刚经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc053z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc054z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "般若摄颂讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc054z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc055z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "六祖坛经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc055z.jpg",
+      "course_slug": "liuzutanjingshi"
+    },
+    {
+      "code": "kc056z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "药师七佛经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc056z.jpg",
+      "course_slug": "yaoshiqifogongdejingshi"
+    },
+    {
+      "code": "kc057z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "维摩诘经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc057z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc058z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "法华经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc058z.jpg",
+      "course_slug": "miaofalianhuajingshi"
+    },
+    {
+      "code": "kc059z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "地藏经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc059z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc060z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "圣大解脱经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc060z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc061z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "佛遗教经",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc061z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc062z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "十善业道经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc062z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc063z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "善生经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc063z.jpg",
+      "course_slug": "shanshengjingshi"
+    },
+    {
+      "code": "kc064z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "赞僧功德经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc064z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc065z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "大乘方广总持经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc065z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc066z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "发起菩萨殊胜志乐经",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc066z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc067z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "大乘庄严宝王经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc067z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc068z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "楞严经讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc068z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc069z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "佛经讲解合集",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc069z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc070z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "二十一度母赞讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc070z.jpg",
+      "course_slug": "ershiyidumuzanshi"
+    },
+    {
+      "code": "kc071z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "十六罗汉礼供文讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc071z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc072z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "忏悔窍诀",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc072z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc073z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "仪轨讲解合集",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc073z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc074z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "功德与过患",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc074z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc075z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "菩提道次第摄颂讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc075z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc076z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "不凡讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc076z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc077z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "开启修心门扉讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc077z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc078z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "山法宝鬘论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc078z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc079z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "修心七要耳传略释讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc079z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc080z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "四法宝鬘论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc080z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc081z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "华智仁波切教言讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc081z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc082z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "修心利刃轮讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc082z.jpg",
+      "course_slug": "xiuxinlirenlunshi"
+    },
+    {
+      "code": "kc083z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "当日教言讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc083z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc084z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "胜道宝鬘论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc084z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc085z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "苦乐道用讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc085z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc086z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "菩提道灯论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc086z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc087z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "自我教言讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc087z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc088z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "菩萨宝鬘论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc088z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc089z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "解脱道总要讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc089z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc090z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "三十忠告论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc090z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc092z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "根登群佩修行教言讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc092z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc093z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "治病甘露流讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc093z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc094z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "胜出天神赞讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc094z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc095z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "殊胜赞",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc095z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc096z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "初中末善语讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc096z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc097z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "教言讲解合集",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc097z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc098z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "禅修教言讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc098z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc099z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "法王教言讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc099z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc100z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "莲师金刚七句讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc100z.jpg",
+      "course_slug": "lianshiqiju"
+    },
+    {
+      "code": "kc101z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "莲师教言讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc101z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc102z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "大乘经庄严论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc102z.jpg",
+      "course_slug": "jingzhuangyanlunjiangjie"
+    },
+    {
+      "code": "kc103z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "宝性论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc103z.jpg",
+      "course_slug": "baoxinglunjiangjie"
+    },
+    {
+      "code": "kc104z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "智慧百论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc104z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc105z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "大圆满心性休息讲解（1995年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc105z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc106z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "大圆满心性休息讲解（2001年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc106z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc107z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "大圆满心性休息讲解（2004年版，密法部分）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc107z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc109z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "禅定休息讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc109z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc113z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "六中阴法讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc113z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc116z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "文殊静修大圆满讲解（2011年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc116z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc119z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "入大乘论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc119z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc120z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "窍诀宝藏论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc120z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc122z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "如意宝藏论讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc122z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc123z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "文殊静修大圆满讲解（2023年版）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc123z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "kc124z",
+      "category": "kc",
+      "category_label": "课程讲解",
+      "name": "入行论ㆍ安忍品讲解",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/kc124z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks001z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "觉悟的智慧",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks001z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks002z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "转角遇到了佛",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks002z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks003z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "无”明“的时代",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks003z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks004z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "幻乐一场",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks004z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks005z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "一切都好，只缺烦恼",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks005z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks006z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "看穿人生的把戏",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks006z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks007z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "改变命运的方法",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks007z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks008z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "人生很贵，请别浪费",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks008z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks009z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "你会选择什么",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks009z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks010z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "灵修的力量",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks010z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks011z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "冥想与健康",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks011z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks012z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "在慈心中绽放",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks012z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks013z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "现代化的清醒",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks013z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks014z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "你并没有失去自由——监狱开示1",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks014z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks016z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "少有人走的路",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks016z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks017z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "堪布下山",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks017z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks019z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "闲谈问答录",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks019z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks020z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "离幸福很近",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks020z.jpg",
+      "course_slug": "lixingfuhenjin"
+    },
+    {
+      "code": "ks021z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "最珍贵的是什么",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks021z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks022z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "放过自己-人生格言合集",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks022z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks023z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "梦中佛事",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks023z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks024z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "遇见喜悦——全球直播合集",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks024z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks025z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "仁者无敌：慈慧开示合集",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks025z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks027z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "一切加持的源泉",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks027z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks028z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "活着是一种修行",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks028z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks029z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "学佛是一门技术活",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks029z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks030z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "平凡中的不平凡",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks030z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks031z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "让生命成为一本正经",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks031z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks032z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "不能不知的那些事",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks032z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks033z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "你是一个特殊的人",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks033z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks034z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "痛苦如何转为快乐",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks034z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks035z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "无成本的喜乐",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks035z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "ks036z",
+      "category": "ks",
+      "category_label": "开示文集",
+      "name": "对准幸福的方向",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/ks036z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz001z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大圆满前行引导文",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz001z.jpg",
+      "course_slug": "qianxingyuanwen"
+    },
+    {
+      "code": "yz002z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "前行备忘录",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz002z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz003z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "入行论释·善说海",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz003z.jpg",
+      "course_slug": "shanshuohai"
+    },
+    {
+      "code": "yz004z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "入行论·智慧品释——澄清宝珠论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz004z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz005z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "佛子行释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz005z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz006z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "亲友书释·白莲鬘",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz006z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz007z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "开启修心门扉",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz007z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz008z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "山法宝鬘论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz008z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz009z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "365颗钻石",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz009z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz010z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "格言合集",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz010z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz011z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "教言合集",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz011z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz012z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "诸佛菩萨名号集",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz012z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz013z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "净除业障百咒功德",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz013z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz014z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "占卜法类",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz014z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz015z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "极乐愿文大疏",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz015z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz016z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "净土教言",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz016z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz017z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "喇荣课诵",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz017z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz019z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "仪轨合集",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz019z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz020z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "事师五十颂释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz020z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz021z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "沙弥五十颂释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz021z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz022z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大乘斋戒功德",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz022z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz023z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "赞戒论浅释·智者走向解脱之教言",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz023z.jpg",
+      "course_slug": "zhanjielunyuanwen"
+    },
+    {
+      "code": "yz024z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "三戒论释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz024z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz026z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "俱舍论释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz026z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz027z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "智者入门论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz027z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz028z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "解义慧剑论释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz028z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz029z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "量理宝藏论释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz029z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz030z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "释量论·成量品释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz030z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz031z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "前世今生论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz031z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz032z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "定解宝灯论浅释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz032z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz033z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "中论释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz033z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz034z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "中观庄严论释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz034z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz035z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "中观宝鬘论广释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz035z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz036z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "中论释·显句论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz036z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz039z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "现观庄严论释·白莲花之璎珞",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz039z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz040z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "现观庄严论疏",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz040z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz041z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "现观庄严论略义",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz041z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz042z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "现观庄严论总义",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz042z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz043z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "般若摄颂释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz043z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz044z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "宝性论释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz044z.jpg",
+      "course_slug": "shanshuoriguang"
+    },
+    {
+      "code": "yz045z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大乘经庄严论释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz045z.jpg",
+      "course_slug": "jingzhuangyanmiyishu"
+    },
+    {
+      "code": "yz046z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "百业经",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz046z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz047z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "释迦牟尼佛广传·白莲花论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz047z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz048z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "八大菩萨传",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz048z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz049z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "密宗大成就者奇传",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz049z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz050z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "一世敦珠法王自传",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz050z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz051z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "藏密佛教史",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz051z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz052z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "传记合集1",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz052z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz053z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "色拉康卓自传",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz053z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz054z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大圆满心性休息（显宗）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz054z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz055z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大圆满心性休息（密法）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz055z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz056z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "心性休息实修法",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz056z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz057z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大圆满虚幻休息",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz057z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz058z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大圆满禅定休息",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz058z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz060z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "窍诀宝藏论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz060z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz061z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "实相宝藏论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz061z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz062z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "法界宝藏论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz062z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz063z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "如意宝藏论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz063z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz066z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "上师心滴如意宝",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz066z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz067z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "光明藏论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz067z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz068z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "七句祈祷文释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz068z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz069z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "文殊大圆满愿文释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz069z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz070z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大圆胜慧",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz070z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz071z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "入大乘论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz071z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz072z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "六中阴法",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz072z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz073z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大鹏展翅",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz073z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz074z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大圆满教言合集",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz074z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz076z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "文殊静修大圆满",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz076z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz079z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大圆满心性自解脱",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz079z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz080z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大圆满法性自解脱",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz080z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz081z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "大圆满等性自解脱",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz081z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz082z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "佛一子续释",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz082z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz083z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "八十口诀",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz083z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz084z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "无垢光尊者零散教言",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz084z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz085z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "麦彭仁波切零散教言",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz085z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz086z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "不离",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz086z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz087z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "不忘",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz087z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz088z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "不凡",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz088z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "yz090z",
+      "category": "yz",
+      "category_label": "论著译释",
+      "name": "二百世的回忆",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/yz090z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz001z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "法王晋美彭措传",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz001z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz002z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "佛教科学论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz002z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz003z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "密宗断惑论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz003z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz004z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "儿童佛教课",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz004z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz005z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "悲惨世界",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz005z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz006z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "藏密问答录",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz006z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz007z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "藏密素食观",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz007z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz008z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "破除邪说论",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz008z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz009z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "红尘中的出离",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz009z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz010z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "博士访谈录",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz010z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz011z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "泰国游记",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz011z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz012z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "旅途脚印",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz012z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz013z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "警钟",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz013z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz014z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "生死救度",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz014z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz015z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "传记合集2",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz015z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz016z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "积微成博（2010年）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz016z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz017z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "积微成博（2011年）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz017z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz018z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "积微成博（2012年）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz018z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz019z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "积微成博（2013年）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz019z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz020z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "积微成博（2014年）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz020z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz021z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "积微成博（2015年）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz021z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz022z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "积微成博（2016年）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz022z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz023z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "积微成博（2017年）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz023z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz024z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "积微成博（2018年）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz024z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz025z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "积微成博（2019年）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz025z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz026z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "积微成博（2020-2023年）",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz026z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz033z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "梦尘回忆录",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz033z.jpg",
+      "course_slug": null
+    },
+    {
+      "code": "zz034z",
+      "category": "zz",
+      "category_label": "杂著·传记",
+      "name": "西游回忆录",
+      "url": "https://pub-be36fdddbab249e29a1991dda041d9e5.r2.dev/bookcovers/zz034z.jpg",
+      "course_slug": null
+    }
+  ]
+}

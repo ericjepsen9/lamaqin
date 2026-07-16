@@ -1,0 +1,18 @@
+-- ───────────────────────────────────────────────────────────────
+-- App 迁移登记 · 2026-06-20 · App Claude(收口 §400 迁移漂移)
+--   源       : BICW-NY/sss · Planning/migration_drop_buddhist_days_multiplier_2026-06-20.sql(byte-faithful)
+--   应用矩阵  : 生产 sss ✅ · sss-dev ✅(实测 buddhist_days 已无 multiplier 列)
+--   净效果   : buddhist_days 现【无】multiplier 列(20260619000000 仍建出该列,本迁移随即删)——勿再加回。
+--   依赖     : buddhist_days(来自 20260619000000_tibetan_calendar_final)。
+-- ───────────────────────────────────────────────────────────────
+-- ============================================================
+-- 迁移:删除 buddhist_days.multiplier(PM 2026-06-20「不用了」)
+--
+-- 背景:multiplier(藏传功德倍数)此前随藏历 FINAL 迁移加入生产 sss,但 PM 定不展示、
+--   公开视图一直剔除它;实测生产 749 行 multiplier 全为默认 1(从未真正使用)。PM 拍板移除。
+-- 安全:已查证生产无任何视图/函数引用 buddhist_days.multiplier → DROP 不级联、零依赖破坏。
+-- 应用:生产 sss + 开发 sss-dev(psql 直连,与藏历 FINAL 同套路)。幂等(if exists)。
+-- 善后(非阻塞):schema_phase1 §11.2 去掉 multiplier 描述;export-calendar/v_public 视图里
+--   "剔除 multiplier" 的逻辑变成无操作可日后清理;App 侧补登记进 sss-app/migrations(承 §400 漂移收口)。
+-- ============================================================
+alter table public.buddhist_days drop column if exists multiplier;

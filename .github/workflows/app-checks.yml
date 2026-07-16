@@ -1,0 +1,55 @@
+name: app-checks
+
+# 快路径 PR 门禁：类型检查 + lint + 单元/组件测试（jest）。
+# 不需要 Docker/Supabase 栈，几分钟出结果。DB/RLS 测试走独立的 db-rls-tests.yml。
+# JWT 集成测试（tests/integration，需本地 Supabase 栈）不在此跑，另建 workflow 或本地跑。
+
+on:
+  push:
+    paths:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - 'jest.config.js'
+      - 'supabase/migrations/**'
+      - 'scripts/check-orphan-rpcs.mjs'
+      - '.github/workflows/app-checks.yml'
+  pull_request:
+    paths:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - 'jest.config.js'
+      - 'supabase/migrations/**'
+      - 'scripts/check-orphan-rpcs.mjs'
+      - '.github/workflows/app-checks.yml'
+  workflow_dispatch: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Install deps
+        run: npm ci
+      - name: Typecheck (tsc --noEmit)
+        run: npm run typecheck
+      - name: Unit & component tests (jest)
+        run: npm test -- --ci
+      # 三易·易维护护栏：揪出"授权给 App 却没接入 rpc、也没被 SQL 内部引用"的孤儿函数
+      # （防 care.ts / get_cohort_today_active 这类"写了没接"复发；有意暂不接的登记进脚本 WHITELIST）。
+      - name: Orphan RPC check
+        run: npm run check:orphans
+      # lint 暂为告警（不阻断）：现有 app 代码有 18 处既有 lint error（转义字符 / effect 内 setState 等），
+      # 与测试搭建无关、修复涉及产品逻辑需 PM 定夺。清理后把 continue-on-error 去掉即转硬门禁。
+      - name: Lint (expo lint · advisory)
+        run: npm run lint
+        continue-on-error: true

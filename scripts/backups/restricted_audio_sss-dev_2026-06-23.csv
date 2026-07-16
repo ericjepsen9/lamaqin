@@ -1,0 +1,119 @@
+id,course_slug,course_title,teacher,lesson_number,title,secondary_title,r2_key,recorded_date,duration_seconds,course_sort,is_published,created_at
+1,qianxing,大圆满前行,堪布吉祥金刚,1,null,null,qianxing/01.m4a,2026-02-19,null,1,true,2026-06-09 05:16:14.326912+00
+2,qianxing,大圆满前行,堪布吉祥金刚,2,null,null,qianxing/02.m4a,2026-02-21,null,1,true,2026-06-09 05:16:14.326912+00
+3,qianxing,大圆满前行,堪布吉祥金刚,3,null,null,qianxing/03.m4a,2026-02-24,null,1,true,2026-06-09 05:16:14.326912+00
+4,qianxing,大圆满前行,堪布吉祥金刚,4,null,null,qianxing/04.m4a,2026-02-26,null,1,true,2026-06-09 05:16:14.326912+00
+5,qianxing,大圆满前行,堪布吉祥金刚,5,null,null,qianxing/05.m4a,2026-02-28,null,1,true,2026-06-09 05:16:14.326912+00
+6,qianxing,大圆满前行,堪布吉祥金刚,6,null,《中观总义》第1课,qianxing/06.m4a,2026-03-03,null,1,true,2026-06-09 05:16:14.326912+00
+7,qianxing,大圆满前行,堪布吉祥金刚,7,null,《中观总义》第2课,qianxing/07.m4a,2026-03-05,null,1,true,2026-06-09 05:16:14.326912+00
+8,qianxing,大圆满前行,堪布吉祥金刚,8,null,null,qianxing/08.m4a,2026-03-07,null,1,true,2026-06-09 05:16:14.326912+00
+9,qianxing,大圆满前行,堪布吉祥金刚,9,null,《中观总义》第3课,qianxing/09.m4a,2026-03-10,null,1,true,2026-06-09 05:16:14.326912+00
+10,qianxing,大圆满前行,堪布吉祥金刚,10,null,《中观总义》第4课,qianxing/10.m4a,2026-03-12,null,1,true,2026-06-09 05:16:14.326912+00
+11,qianxing,大圆满前行,堪布吉祥金刚,11,null,null,qianxing/11.m4a,2026-03-14,null,1,true,2026-06-09 05:16:14.326912+00
+12,qianxing,大圆满前行,堪布吉祥金刚,12,null,《中观总义》第5课,qianxing/12.m4a,2026-03-17,null,1,true,2026-06-09 05:16:14.326912+00
+13,qianxing,大圆满前行,堪布吉祥金刚,13,null,《中观总义》第6课,qianxing/13.m4a,2026-03-19,null,1,true,2026-06-09 05:16:14.326912+00
+14,qianxing,大圆满前行,堪布吉祥金刚,14,null,null,qianxing/14.m4a,2026-03-21,null,1,true,2026-06-09 05:16:14.326912+00
+15,qianxing,大圆满前行,堪布吉祥金刚,15,null,《中观总义》第7课,qianxing/15.m4a,2026-03-23,null,1,true,2026-06-09 05:16:14.326912+00
+16,qianxing,大圆满前行,堪布吉祥金刚,16,null,《中观总义》第8课,qianxing/16.m4a,2026-03-26,null,1,true,2026-06-09 05:16:14.326912+00
+17,qianxing,大圆满前行,堪布吉祥金刚,17,null,null,qianxing/17.m4a,2026-03-28,null,1,true,2026-06-09 05:16:14.326912+00
+18,qianxing,大圆满前行,堪布吉祥金刚,18,null,《中观总义》第9课,qianxing/18.m4a,2026-03-31,null,1,true,2026-06-09 05:16:14.326912+00
+19,qianxing,大圆满前行,堪布吉祥金刚,19,null,《中观总义》第10课,qianxing/19.m4a,2026-04-02,null,1,true,2026-06-09 05:16:14.326912+00
+20,qianxing,大圆满前行,堪布吉祥金刚,20,null,null,qianxing/20.m4a,2026-04-04,null,1,true,2026-06-09 05:16:14.326912+00
+21,qianxing,大圆满前行,堪布吉祥金刚,21,null,《中观总义》第11课,qianxing/21.m4a,2026-04-07,null,1,true,2026-06-09 05:16:14.326912+00
+22,qianxing,大圆满前行,堪布吉祥金刚,22,null,《中观总义》第12课,qianxing/22.m4a,2026-04-09,null,1,true,2026-06-09 05:16:14.326912+00
+23,qianxing,大圆满前行,堪布吉祥金刚,23,null,《中观总义》第13课,qianxing/23.m4a,2026-04-12,null,1,true,2026-06-09 05:16:14.326912+00
+24,qianxing,大圆满前行,堪布吉祥金刚,24,null,《中观总义》第14课,qianxing/24.m4a,2026-04-14,null,1,true,2026-06-09 05:16:14.326912+00
+25,qianxing,大圆满前行,堪布吉祥金刚,25,null,《中观总义》第15课,qianxing/25.m4a,2026-04-16,null,1,true,2026-06-09 05:16:14.326912+00
+26,qianxing,大圆满前行,堪布吉祥金刚,26,null,《中观总义》第16课,qianxing/26.m4a,2026-04-18,null,1,true,2026-06-09 05:16:14.326912+00
+27,qianxing,大圆满前行,堪布吉祥金刚,27,null,《中观总义》第17课,qianxing/27.m4a,2026-04-21,null,1,true,2026-06-09 05:16:14.326912+00
+28,qianxing,大圆满前行,堪布吉祥金刚,28,null,《中观总义》第18课,qianxing/28.m4a,2026-04-23,null,1,true,2026-06-09 05:16:14.326912+00
+29,qianxing,大圆满前行,堪布吉祥金刚,29,null,《中观总义》第19课,qianxing/29.m4a,2026-04-25,null,1,true,2026-06-09 05:16:14.326912+00
+30,qianxing,大圆满前行,堪布吉祥金刚,30,null,《中观总义》第20课,qianxing/30.m4a,2026-04-28,null,1,true,2026-06-09 05:16:14.326912+00
+31,qianxing,大圆满前行,堪布吉祥金刚,31,null,《中观总义》第21课,qianxing/31.m4a,2026-04-30,null,1,true,2026-06-09 05:16:14.326912+00
+32,qianxing,大圆满前行,堪布吉祥金刚,32,null,《中观总义》第22课,qianxing/32.m4a,2026-05-02,null,1,true,2026-06-09 05:16:14.326912+00
+33,qianxing,大圆满前行,堪布吉祥金刚,33,null,《中观总义》第23课,qianxing/33.m4a,2026-05-05,null,1,true,2026-06-09 05:16:14.326912+00
+34,qianxing,大圆满前行,堪布吉祥金刚,34,null,《中观总义》第24课,qianxing/34.m4a,2026-05-07,null,1,true,2026-06-09 05:16:14.326912+00
+35,qianxing,大圆满前行,堪布吉祥金刚,35,null,《中观总义》第25课,qianxing/35.m4a,2026-05-09,null,1,true,2026-06-09 05:16:14.326912+00
+36,qianxing,大圆满前行,堪布吉祥金刚,36,null,《中观总义》第26课,qianxing/36.m4a,2026-05-12,null,1,true,2026-06-09 05:16:14.326912+00
+37,qianxing,大圆满前行,堪布吉祥金刚,37,null,《中观总义》第27课,qianxing/37.m4a,2026-05-14,null,1,true,2026-06-09 05:16:14.326912+00
+38,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,1,null,null,ruxinglunshi/01.m4a,2026-02-20,null,2,true,2026-06-09 05:16:14.326912+00
+39,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,2,null,null,ruxinglunshi/02.m4a,2026-02-23,null,2,true,2026-06-09 05:16:14.326912+00
+40,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,3,null,null,ruxinglunshi/03.m4a,2026-02-25,null,2,true,2026-06-09 05:16:14.326912+00
+41,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,4,null,null,ruxinglunshi/04.m4a,2026-02-27,null,2,true,2026-06-09 05:16:14.326912+00
+42,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,5,null,《金刚经》第1课,ruxinglunshi/05.m4a,2026-03-02,null,2,true,2026-06-09 05:16:14.326912+00
+43,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,6,null,《金刚经》第2课,ruxinglunshi/06.m4a,2026-03-04,null,2,true,2026-06-09 05:16:14.326912+00
+44,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,7,null,null,ruxinglunshi/07.m4a,null,null,2,true,2026-06-09 05:16:14.326912+00
+45,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,8,null,《金刚经》第3课,ruxinglunshi/08.m4a,2026-03-09,null,2,true,2026-06-09 05:16:14.326912+00
+46,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,9,null,《金刚经》第4课,ruxinglunshi/09.m4a,2026-03-11,null,2,true,2026-06-09 05:16:14.326912+00
+47,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,10,null,null,ruxinglunshi/10.m4a,null,null,2,true,2026-06-09 05:16:14.326912+00
+48,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,11,null,《金刚经》第5课,ruxinglunshi/11.m4a,2026-03-16,null,2,true,2026-06-09 05:16:14.326912+00
+49,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,12,null,《金刚经》第6课,ruxinglunshi/12.m4a,2026-03-18,null,2,true,2026-06-09 05:16:14.326912+00
+50,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,13,null,null,ruxinglunshi/13.m4a,null,null,2,true,2026-06-09 05:16:14.326912+00
+51,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,14,null,《金刚经》第7课,ruxinglunshi/14.m4a,2026-03-23,null,2,true,2026-06-09 05:16:14.326912+00
+52,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,15,null,《金刚经》第8课,ruxinglunshi/15.m4a,2026-03-25,null,2,true,2026-06-09 05:16:14.326912+00
+53,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,16,null,null,ruxinglunshi/16.m4a,2026-03-27,null,2,true,2026-06-09 05:16:14.326912+00
+54,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,17,null,《金刚经》第9课,ruxinglunshi/17.m4a,2026-03-30,null,2,true,2026-06-09 05:16:14.326912+00
+55,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,18,null,《金刚经》第10课,ruxinglunshi/18.m4a,2026-04-01,null,2,true,2026-06-09 05:16:14.326912+00
+56,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,19,null,《金刚经》第11课,ruxinglunshi/19.m4a,2026-04-03,null,2,true,2026-06-09 05:16:14.326912+00
+57,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,20,null,《金刚经》第12课,ruxinglunshi/20.m4a,2026-04-06,null,2,true,2026-06-09 05:16:14.326912+00
+58,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,21,null,《金刚经》第13课,ruxinglunshi/21.m4a,2026-04-08,null,2,true,2026-06-09 05:16:14.326912+00
+59,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,22,null,null,ruxinglunshi/22.m4a,2026-04-10,null,2,true,2026-06-09 05:16:14.326912+00
+60,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,23,null,《金刚经》第14课,ruxinglunshi/23.m4a,null,null,2,true,2026-06-09 05:16:14.326912+00
+61,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,24,null,《金刚经》第15课,ruxinglunshi/24.m4a,2026-04-15,null,2,true,2026-06-09 05:16:14.326912+00
+62,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,25,null,《金刚经》第16课,ruxinglunshi/25.m4a,2026-04-17,null,2,true,2026-06-09 05:16:14.326912+00
+63,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,26,null,《金刚经》第17课,ruxinglunshi/26.m4a,2026-04-20,null,2,true,2026-06-09 05:16:14.326912+00
+64,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,27,null,《金刚经》第18课,ruxinglunshi/27.m4a,2026-04-22,null,2,true,2026-06-09 05:16:14.326912+00
+65,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,28,null,《金刚经》第19课,ruxinglunshi/28.m4a,2026-04-24,null,2,true,2026-06-09 05:16:14.326912+00
+66,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,29,null,《金刚经》第20课,ruxinglunshi/29.m4a,2026-04-27,null,2,true,2026-06-09 05:16:14.326912+00
+67,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,30,null,《金刚经》第21课,ruxinglunshi/30.m4a,2026-04-29,null,2,true,2026-06-09 05:16:14.326912+00
+68,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,31,null,《金刚经》第22课,ruxinglunshi/31.m4a,2026-05-01,null,2,true,2026-06-09 05:16:14.326912+00
+69,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,32,null,《金刚经》第23课,ruxinglunshi/32.m4a,2026-05-04,null,2,true,2026-06-09 05:16:14.326912+00
+70,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,33,null,《金刚经》第24课,ruxinglunshi/33.m4a,2026-05-06,null,2,true,2026-06-09 05:16:14.326912+00
+71,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,34,null,《金刚经》第25课,ruxinglunshi/34.m4a,2026-05-08,null,2,true,2026-06-09 05:16:14.326912+00
+72,ruxinglunshi,入行论释 善说海,堪布吉祥金刚,35,null,《金刚经》第26课,ruxinglunshi/35.m4a,2026-05-11,null,2,true,2026-06-09 05:16:14.326912+00
+73,shenglidaoge,胜利道歌,堪布吉祥贤,1,null,null,shenglidaoge/01.m4a,2025-12-21,null,3,true,2026-06-09 05:16:14.326912+00
+74,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,1,null,null,qijuqidaowen/01.m4a,2025-12-22,null,4,true,2026-06-09 05:16:14.326912+00
+75,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,2,null,null,qijuqidaowen/02.m4a,2025-12-26,null,4,true,2026-06-09 05:16:14.326912+00
+76,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,3,null,null,qijuqidaowen/03.m4a,2025-12-29,null,4,true,2026-06-09 05:16:14.326912+00
+77,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,4,null,null,qijuqidaowen/04.m4a,2025-12-31,null,4,true,2026-06-09 05:16:14.326912+00
+78,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,5,null,null,qijuqidaowen/05.m4a,2026-01-02,null,4,true,2026-06-09 05:16:14.326912+00
+79,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,6,null,null,qijuqidaowen/06.m4a,2026-01-05,null,4,true,2026-06-09 05:16:14.326912+00
+80,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,7,null,null,qijuqidaowen/07.m4a,2026-01-07,null,4,true,2026-06-09 05:16:14.326912+00
+81,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,8,null,null,qijuqidaowen/08.m4a,2026-01-09,null,4,true,2026-06-09 05:16:14.326912+00
+82,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,9,null,null,qijuqidaowen/09.m4a,2026-01-12,null,4,true,2026-06-09 05:16:14.326912+00
+83,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,10,null,null,qijuqidaowen/10.m4a,2026-01-14,null,4,true,2026-06-09 05:16:14.326912+00
+84,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,11,null,null,qijuqidaowen/11.m4a,2026-01-16,null,4,true,2026-06-09 05:16:14.326912+00
+85,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,12,null,null,qijuqidaowen/12.m4a,2026-01-19,null,4,true,2026-06-09 05:16:14.326912+00
+86,qijuqidaowen,七句祈祷文释 白莲花,堪布吉祥金刚,13,null,null,qijuqidaowen/13.m4a,2026-01-21,null,4,true,2026-06-09 05:16:14.326912+00
+87,fozixing,佛子行释,堪布吉祥贤,1,null,null,fozixing/01.m4a,2025-12-23,null,5,true,2026-06-09 05:16:14.326912+00
+88,fozixing,佛子行释,堪布吉祥贤,2,null,null,fozixing/02.m4a,2025-12-27,null,5,true,2026-06-09 05:16:14.326912+00
+89,fozixing,佛子行释,堪布吉祥贤,3,null,null,fozixing/03.m4a,2025-12-30,null,5,true,2026-06-09 05:16:14.326912+00
+90,fozixing,佛子行释,堪布吉祥贤,4,null,null,fozixing/04.m4a,2026-01-03,null,5,true,2026-06-09 05:16:14.326912+00
+91,fozixing,佛子行释,堪布吉祥贤,5,null,null,fozixing/05.m4a,2026-01-06,null,5,true,2026-06-09 05:16:14.326912+00
+92,fozixing,佛子行释,堪布吉祥贤,6,null,null,fozixing/06.m4a,2026-01-08,null,5,true,2026-06-09 05:16:14.326912+00
+93,fozixing,佛子行释,堪布吉祥贤,7,null,null,fozixing/07.m4a,2026-01-10,null,5,true,2026-06-09 05:16:14.326912+00
+94,fozixing,佛子行释,堪布吉祥贤,8,null,null,fozixing/08.m4a,2026-01-13,null,5,true,2026-06-09 05:16:14.326912+00
+95,fozixing,佛子行释,堪布吉祥贤,9,null,null,fozixing/09.m4a,2026-01-15,null,5,true,2026-06-09 05:16:14.326912+00
+96,fozixing,佛子行释,堪布吉祥贤,10,null,null,fozixing/10.m4a,2026-01-17,null,5,true,2026-06-09 05:16:14.326912+00
+97,fozixing,佛子行释,堪布吉祥贤,11,null,null,fozixing/11.m4a,2026-01-20,null,5,true,2026-06-09 05:16:14.326912+00
+98,fozixing,佛子行释,堪布吉祥贤,12,null,null,fozixing/12.m4a,2026-01-22,null,5,true,2026-06-09 05:16:14.326912+00
+99,fozixing,佛子行释,堪布吉祥贤,13,null,null,fozixing/13.m4a,2026-01-24,null,5,true,2026-06-09 05:16:14.326912+00
+100,fozixing,佛子行释,堪布吉祥贤,14,null,null,fozixing/14.m4a,2026-01-27,null,5,true,2026-06-09 05:16:14.326912+00
+101,fozixing,佛子行释,堪布吉祥贤,15,null,null,fozixing/15.m4a,2026-01-29,null,5,true,2026-06-09 05:16:14.326912+00
+102,fozixing,佛子行释,堪布吉祥贤,16,null,null,fozixing/16.m4a,2026-01-31,null,5,true,2026-06-09 05:16:14.326912+00
+103,xiuxinqiyao,〈修心七要〉耳传略释,堪布吉祥金刚,1,null,null,xiuxinqiyao/01.m4a,2026-01-23,null,6,true,2026-06-09 05:16:14.326912+00
+104,xiuxinqiyao,〈修心七要〉耳传略释,堪布吉祥金刚,2,null,null,xiuxinqiyao/02.m4a,2026-01-26,null,6,true,2026-06-09 05:16:14.326912+00
+105,xiuxinqiyao,〈修心七要〉耳传略释,堪布吉祥金刚,3,null,null,xiuxinqiyao/03.m4a,2026-01-28,null,6,true,2026-06-09 05:16:14.326912+00
+106,xiuxinqiyao,〈修心七要〉耳传略释,堪布吉祥金刚,4,null,null,xiuxinqiyao/04.m4a,2026-01-30,null,6,true,2026-06-09 05:16:14.326912+00
+107,xiuxinqiyao,〈修心七要〉耳传略释,堪布吉祥金刚,5,null,null,xiuxinqiyao/05.m4a,2026-02-02,null,6,true,2026-06-09 05:16:14.326912+00
+108,xiuxinqiyao,〈修心七要〉耳传略释,堪布吉祥金刚,6,null,null,xiuxinqiyao/06.m4a,2026-02-04,null,6,true,2026-06-09 05:16:14.326912+00
+109,xiuxinqiyao,〈修心七要〉耳传略释,堪布吉祥金刚,7,null,null,xiuxinqiyao/07.m4a,2026-02-06,null,6,true,2026-06-09 05:16:14.326912+00
+110,xiuxinqiyao,〈修心七要〉耳传略释,堪布吉祥金刚,8,null,null,xiuxinqiyao/08.m4a,2026-02-09,null,6,true,2026-06-09 05:16:14.326912+00
+111,xiuxinqiyao,〈修心七要〉耳传略释,堪布吉祥金刚,9,null,null,xiuxinqiyao/09.m4a,2026-02-11,null,6,true,2026-06-09 05:16:14.326912+00
+112,xiuxinqiyao,〈修心七要〉耳传略释,堪布吉祥金刚,10,null,null,xiuxinqiyao/10.m4a,2026-02-13,null,6,true,2026-06-09 05:16:14.326912+00
+113,xiuxinbasong,修心八颂,堪布吉祥贤,1,null,null,xiuxinbasong/01.m4a,2026-02-03,null,7,true,2026-06-09 05:16:14.326912+00
+114,sanzhuyaodao,三主要道论,堪布吉祥贤,1,null,null,sanzhuyaodao/01.m4a,2026-02-05,null,8,true,2026-06-09 05:16:14.326912+00
+115,sanzhuyaodao,三主要道论,堪布吉祥贤,2,null,null,sanzhuyaodao/02.m4a,2026-02-07,null,8,true,2026-06-09 05:16:14.326912+00
+116,lianshixinzhou,莲师心咒之功德,堪布吉祥贤,1,null,null,lianshixinzhou/01.m4a,2026-02-10,null,9,true,2026-06-09 05:16:14.326912+00
+117,lianshixinzhou,莲师心咒之功德,堪布吉祥贤,2,null,null,lianshixinzhou/02.m4a,2026-02-12,null,9,true,2026-06-09 05:16:14.326912+00
+118,shangshiyujia,上师瑜伽 速赐加持,堪布吉祥贤,1,null,null,shangshiyujia/01.m4a,2026-02-14,null,10,true,2026-06-09 05:16:14.326912+00

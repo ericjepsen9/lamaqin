@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 觉学 Design Tokens（移植自 juexue ui规范/styles/tokens.css·决策138「样式沿用觉学」）。
+   暖色藏式调:saffron 藏红 / sage 竹叶绿 / crimson 深绛红 / gold 禅金 / ink 暖墨 + 玻璃系统。
+   语义名(background/foreground/primary…)重映射到觉学色,使 RN Reusables 组件自动套觉学皮。 */
+@layer base {
+  :root {
+    /* Brand */
+    --saffron: #e07856;
+    --saffron-dark: #b35535;
+    --saffron-light: #fbe5da;
+    --saffron-pale: #fdf4ee;
+    --sage: #a8bc9a;
+    --sage-dark: #7d9a6c;
+    --sage-light: #e5efdf;
+    --sage-pale: #f1f6ec;
+    --crimson: #a13c2e;
+    --crimson-dark: #822e21;
+    --crimson-light: #f5d9d3;
+    --crimson-pale: #fbedea;
+    --gold: #d4a574;
+    --gold-dark: #b88956;
+    --gold-light: #f5e3ce;
+    --gold-pale: #fbf3e8;
+    /* Ink 暖墨 */
+    --ink: #2b2218;
+    --ink-2: #55463a;
+    --ink-3: #7e6d5b;
+    --ink-4: #b5a99a;
+    --ink-5: #ddd3ca;
+    /* Surface / glass */
+    --surface: #f7f2ec;
+    --glass: rgba(255, 255, 255, 0.55);
+    --glass-thick: rgba(255, 255, 255, 0.78);
+    --glass-border: rgba(255, 255, 255, 0.88);
+    --border-light: rgba(43, 34, 24, 0.06);
+
+    /* 语义名 → 觉学（RNR 组件经此套皮）*/
+    --background: #f7f2ec;
+    --foreground: #2b2218;
+    --card: #ffffff;
+    --card-foreground: #2b2218;
+    --popover: #ffffff;
+    --popover-foreground: #2b2218;
+    --primary: #e07856;
+    --primary-foreground: #ffffff;
+    --secondary: #fbf3e8;
+    --secondary-foreground: #55463a;
+    --muted: #f7f2ec;
+    --muted-foreground: #7e6d5b;
+    --accent: #fdf4ee;
+    --accent-foreground: #b35535;
+    --destructive: #a13c2e;
+    --destructive-foreground: #ffffff;
+    --border: rgba(43, 34, 24, 0.1);
+    --input: rgba(43, 34, 24, 0.1);
+    --ring: #e07856;
+    --radius: 12px;
+  }
+
+  .dark:root {
+    --saffron: #f09472;
+    --saffron-dark: #e07856;
+    --saffron-light: rgba(224, 120, 86, 0.22);
+    --saffron-pale: rgba(224, 120, 86, 0.1);
+    --sage: #b8ccaa;
+    --sage-dark: #93b07f;
+    --sage-light: rgba(168, 188, 154, 0.18);
+    --sage-pale: rgba(168, 188, 154, 0.1);
+    --crimson: #e07566;
+    --crimson-dark: #c25647;
+    --crimson-light: rgba(225, 90, 76, 0.2);
+    --crimson-pale: rgba(225, 90, 76, 0.1);
+    --gold: #e0bd92;
+    --gold-dark: #c49e70;
+    --gold-light: rgba(212, 165, 116, 0.22);
+    --gold-pale: rgba(212, 165, 116, 0.1);
+    --ink: #f2eae0;
+    --ink-2: #d9ccbc;
+    --ink-3: #a89888;
+    --ink-4: #786c5e;
+    --ink-5: #463c32;
+    --surface: #221a12;
+    --glass: rgba(60, 46, 32, 0.5);
+    --glass-thick: rgba(60, 46, 32, 0.78);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --border-light: rgba(255, 255, 255, 0.06);
+
+    --background: #221a12;
+    --foreground: #f2eae0;
+    --card: #2a2118;
+    --card-foreground: #f2eae0;
+    --popover: #2a2118;
+    --popover-foreground: #f2eae0;
+    --primary: #f09472;
+    --primary-foreground: #221a12;
+    --secondary: rgba(212, 165, 116, 0.22);
+    --secondary-foreground: #d9ccbc;
+    --muted: rgba(255, 255, 255, 0.05);
+    --muted-foreground: #a89888;
+    --accent: rgba(224, 120, 86, 0.1);
+    --accent-foreground: #f09472;
+    --destructive: #e07566;
+    --destructive-foreground: #221a12;
+    --border: rgba(255, 255, 255, 0.1);
+    --input: rgba(255, 255, 255, 0.05);
+    --ring: #f09472;
+  }
+}
+
+/* A7无障碍扫描2026-07-14排查:Tailwind Preflight(@tailwind base已展开)自带
+   input::placeholder{color:#9ca3af}重置,跟react-native-web的TextInput给每个
+   input实例生成的--placeholderTextColor CSS变量规则选择器优先级/顺序打架、
+   Preflight赢了——导致各页TextInput传的placeholderTextColor prop在web端从未生效。
+   同层(@layer base)内、写在@tailwind base之后=层内声明顺序更靠后会覆盖Preflight;
+   var()兜底沿用Preflight原色,没设placeholderTextColor的输入框行为不变。 */
+@layer base {
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--placeholderTextColor, #9ca3af);
+  }
+}

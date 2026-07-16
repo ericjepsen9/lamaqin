@@ -1,0 +1,26 @@
+# Netlify 配置(连仓库即自动构建网页版;每次推送自动重新部署)。Cloudflare Pages 用同样命令/输出目录(在其后台填)。
+# 见 docs/preview_deploy.md。生产分支在托管后台设为当前开发分支(claude/focused-hamilton-000nc8)。
+[build]
+  command = "npx expo export --platform web"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # 关预览:走真实登录闸门(根 / 跳登录页),不再跳过登录直开首页。要纯 UI、无登录预览改回 "1"。
+  EXPO_PUBLIC_PREVIEW = "0"
+  # 连 sss-dev(此 URL 非密、已在 .env.example,可写在仓库)。生产构建时在后台改成 sss 的值。
+  EXPO_PUBLIC_SUPABASE_URL = "https://ubyzyadlzmtgxvbxanbr.supabase.co"
+  # sss-dev 的 publishable key —— Supabase 标注「safe to share publicly」(公开 key,防线靠 RLS),
+  #   且本就会内联进网页包。直接写此处以保证进构建(dashboard 变量的 Builds scope 易踩坑)。
+  #   ⚠️ 这是 publishable(公开)key,不是 secret key;secret key(sb_secret_…)永不可入仓库/客户端。
+  #   生产库 sss 上线时用各自的 key,在生产托管后台另配。
+  EXPO_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_LZSguUyNEItdNDYxUevMqQ_DGwmMNOU"
+
+# web.output = "single"(SPA):导出单个 index.html 壳 + 客户端路由。
+#   原因:static 每路由 .html 会在导出期于 Node 端预渲染各路由 → 执行 lib/supabase.ts(createClient)
+#   → Node 20 报「无原生 WebSocket」而构建失败(自托管 Oracle 为 Node 20)。SPA 把 supabase 纯放客户端跑,
+#   构建期不执行,任何 Node 版本都能导出。代价:需 SPA 回退把所有路径重写到 index.html(下方 redirects)。
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
