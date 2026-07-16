@@ -2,7 +2,7 @@
   "expo": {
     "name": "三殊胜",
     "slug": "sss-app",
-    "owner": "bicwny",
+    "owner": "lamaqin",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,7 +10,7 @@
     "userInterfaceStyle": "automatic",
     "runtimeVersion": { "policy": "appVersion" },
     "updates": {
-      "url": "https://u.expo.dev/90587b86-baa9-4315-8407-744b15406f56"
+      "url": "https://u.expo.dev/5d9fac88-ffa1-4a50-976a-1fd220fb6471"
     },
     "ios": {
       "bundleIdentifier": "com.bicwny.sssapp",
@@ -53,7 +53,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "90587b86-baa9-4315-8407-744b15406f56"
+        "projectId": "5d9fac88-ffa1-4a50-976a-1fd220fb6471"
       }
     }
   }
