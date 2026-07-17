@@ -15,7 +15,7 @@
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
     "expo": "~56.0.16",
-    "expo-av": "^16.0.8",
+    "expo-audio": "~56.0.12",
     "expo-blur": "~56.0.4",
     "expo-clipboard": "~56.0.4",
     "expo-constants": "~56.0.18",

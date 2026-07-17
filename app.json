@@ -8,7 +8,9 @@
     "icon": "./assets/images/icon.png",
     "scheme": "sanshusheng",
     "userInterfaceStyle": "automatic",
-    "runtimeVersion": { "policy": "appVersion" },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "updates": {
       "url": "https://u.expo.dev/5d9fac88-ffa1-4a50-976a-1fd220fb6471"
     },
@@ -44,7 +46,8 @@
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,
