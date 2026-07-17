@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -37,32 +37,32 @@ export default function WelcomeBack() {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FBF4E9' }}>
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 32, paddingTop: 56, paddingBottom: 24 }}>
         <Text className="font-serif" style={{ fontSize: 26, fontWeight: '700', color: INK }}>欢迎回来{me?.fullName ? `,${me.fullName}` : ''}</Text>
-        <RNText style={{ fontSize: 14, color: INK3, marginTop: 8, lineHeight: 22 }}>你此前的学修记录已经带过来了,继续从这里学修吧。</RNText>
+        <Text style={{ fontSize: 14, color: INK3, marginTop: 8, lineHeight: 22 }}>你此前的学修记录已经带过来了,继续从这里学修吧。</Text>
 
         <View style={{ marginTop: 28, gap: 14 }}>
           {me?.studentId ? (
             <View style={styles.row}>
-              <RNText style={styles.rowLabel}>学号</RNText>
-              <RNText style={styles.rowVal}>{me.studentId}</RNText>
+              <Text style={styles.rowLabel}>学号</Text>
+              <Text style={styles.rowVal}>{me.studentId}</Text>
             </View>
           ) : null}
           {primary ? (
             <View style={styles.row}>
-              <RNText style={styles.rowLabel}>主班</RNText>
-              <RNText style={styles.rowVal}>{primary.programName ? `${primary.programName} · ` : ''}{primary.cohortName}</RNText>
+              <Text style={styles.rowLabel}>主班</Text>
+              <Text style={styles.rowVal}>{primary.programName ? `${primary.programName} · ` : ''}{primary.cohortName}</Text>
             </View>
           ) : null}
           {cohorts.length > 1 ? (
             <View style={styles.row}>
-              <RNText style={styles.rowLabel}>已加入班</RNText>
-              <RNText style={styles.rowVal}>{cohorts.map((c) => c.cohortName).join('、')}</RNText>
+              <Text style={styles.rowLabel}>已加入班</Text>
+              <Text style={styles.rowVal}>{cohorts.map((c) => c.cohortName).join('、')}</Text>
             </View>
           ) : null}
         </View>
 
         <View style={{ flex: 1 }} />
         <Pressable style={[styles.primary, busy && { opacity: 0.6 }]} disabled={busy} onPress={enter}>
-          {busy ? <ActivityIndicator color="#fff" /> : <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>进入App</RNText>}
+          {busy ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>进入App</Text>}
         </Pressable>
       </ScrollView>
     </SafeAreaView>

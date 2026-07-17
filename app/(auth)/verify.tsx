@@ -1,13 +1,14 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
 import { supabase } from '@/lib/supabase';
 import { testIds } from '@/lib/testids';
 
+import { TextInput } from '@/components/ui/text-input';
 // 登录 / 注册 第 2 步:密码 或 验证码(决策168·一页一操作)。
 // 接 Supabase Auth:密码=signInWithPassword;验证码=signInWithOtp 发码 + verifyOtp 校验。
 // 密码登录成功 → router.replace('/') 直接走入口闸门(index)按 session + profiles.status 分流。
@@ -63,9 +64,9 @@ export default function Verify() {
       </View>
       <View style={{ flex: 1, alignItems: 'center', paddingHorizontal: 32, paddingTop: 24 }}>
         <Text className="font-serif" style={{ fontSize: 22, fontWeight: '700', color: INK, alignSelf: 'flex-start' }}>{mode === 'code' ? '输入验证码' : '输入密码'}</Text>
-        <RNText style={{ fontSize: 13, color: INK3, alignSelf: 'flex-start', marginTop: 6 }}>
+        <Text style={{ fontSize: 13, color: INK3, alignSelf: 'flex-start', marginTop: 6 }}>
           {mode === 'code' ? `验证码已发送至 ${email ?? '你的邮箱'}` : `账号 ${email ?? ''}`}
-        </RNText>
+        </Text>
 
         <View style={{ width: '100%', gap: 12, marginTop: 24 }}>
           <View style={styles.field}>
@@ -82,17 +83,17 @@ export default function Verify() {
               style={[styles.input, mode === 'code' && { letterSpacing: 6, fontSize: 20 }]}
             />
           </View>
-          {err ? <RNText style={{ fontSize: 13, color: CRIMSON }}>{err}</RNText> : null}
+          {err ? <Text style={{ fontSize: 13, color: CRIMSON }}>{err}</Text> : null}
           <Pressable testID={testIds.verify.submitButton} style={[styles.primary, (val.trim().length === 0 || busy) && { opacity: 0.4 }]} disabled={val.trim().length === 0 || busy} onPress={submit}>
-            <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{busy ? '登录中…' : '登录'}</RNText>
+            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{busy ? '登录中…' : '登录'}</Text>
           </Pressable>
         </View>
 
         <View className="flex-row items-center justify-between" style={{ width: '100%', marginTop: 16 }}>
           <Pressable onPress={() => { setMode((m) => (m === 'code' ? 'pwd' : 'code')); setVal(''); setErr(null); }}>
-            <RNText style={{ fontSize: 13, color: SAFFRON_DARK, fontWeight: '700' }}>{mode === 'code' ? '用密码登录' : '忘记密码?用验证码登录'}</RNText>
+            <Text style={{ fontSize: 13, color: SAFFRON_DARK, fontWeight: '700' }}>{mode === 'code' ? '用密码登录' : '忘记密码?用验证码登录'}</Text>
           </Pressable>
-          {mode === 'code' ? <Pressable onPress={resend} hitSlop={6}><RNText style={{ fontSize: 13, color: INK3 }}>重新发送</RNText></Pressable> : null}
+          {mode === 'code' ? <Pressable onPress={resend} hitSlop={6}><Text style={{ fontSize: 13, color: INK3 }}>重新发送</Text></Pressable> : null}
         </View>
       </View>
     </SafeAreaView>

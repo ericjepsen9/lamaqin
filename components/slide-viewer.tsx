@@ -1,10 +1,10 @@
 import { Maximize2, X } from 'lucide-react-native';
 import { useState } from 'react';
-import { Image, LayoutChangeEvent, Modal, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text as RNText, useWindowDimensions, View } from 'react-native';
-
+import { Image, LayoutChangeEvent, Modal, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { DownloadGroupButton } from '@/components/download-button';
 import { useDownloadStore } from '@/lib/download-store';
 
+import { Text } from '@/components/ui/text';
 // 课件(PPT)幻灯浏览器 = 觉学 SlideViewer 图片版(决策161·Q2「参考觉学」)。
 // PPT 由运营导出成图片(imageUrls);App 横向翻页 + 页码 + 全屏(性能优于 PDF.js)。
 // 离线第二层(PM 2026-07-12):逐页图片当一组整体下载(DownloadGroupButton),
@@ -31,8 +31,8 @@ export function SlideViewer({ imageUrls, title }: { imageUrls: string[]; title?:
             {localUrls.map((u, i) => <Image key={i} source={{ uri: u }} style={{ width: w, height: (w * 9) / 16 }} resizeMode="contain" />)}
           </ScrollView>
         ) : null}
-        <View style={styles.pageTag}><RNText style={styles.pageTxt}>{page} / {N}</RNText></View>
-        <Pressable style={styles.fsBtn} onPress={() => setFull(true)}><Maximize2 size={13} color="#fff" /><RNText style={styles.fsTxt}>全屏</RNText></Pressable>
+        <View style={styles.pageTag}><Text style={styles.pageTxt}>{page} / {N}</Text></View>
+        <Pressable style={styles.fsBtn} onPress={() => setFull(true)}><Maximize2 size={13} color="#fff" /><Text style={styles.fsTxt}>全屏</Text></Pressable>
       </View>
       <View style={{ marginTop: 8 }}>
         <DownloadGroupButton urls={imageUrls} kind="slide" labelPrefix={title ?? '课件'} />
@@ -47,7 +47,7 @@ export function SlideViewer({ imageUrls, title }: { imageUrls: string[]; title?:
               </View>
             ))}
           </ScrollView>
-          {title ? <RNText style={styles.modalTitle}>{title}</RNText> : null}
+          {title ? <Text style={styles.modalTitle}>{title}</Text> : null}
           <Pressable style={styles.close} hitSlop={10} onPress={() => setFull(false)}><X size={22} color="#fff" /></Pressable>
         </View>
       </Modal>

@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, ChevronRight, Info, RotateCcw } from 'lucide-react-native';
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ScrollTitleBar, useScrollTitleBar } from '@/components/scroll-title-bar';
@@ -54,16 +54,16 @@ export default function Calendar() {
       <View style={styles.seg}>
         {(['week', 'month'] as const).map((m) => (
           <Pressable key={m} onPress={() => { setMode(m); bar.reset(); }} style={[styles.segBtn, mode === m && styles.segOn]}>
-            <RNText style={{ fontSize: 12.5, fontWeight: '700', color: mode === m ? SAFFRON : INK3 }}>{m === 'week' ? '周' : '月'}</RNText>
+            <Text style={{ fontSize: 12.5, fontWeight: '700', color: mode === m ? SAFFRON : INK3 }}>{m === 'week' ? '周' : '月'}</Text>
           </Pressable>
         ))}
       </View>
       <View style={styles.clinks}>
         <Pressable hitSlop={8} onPress={() => setLegend(true)} style={styles.clink}>
-          <Info size={13} color={INK3} /><RNText style={{ fontSize: 12, color: INK3 }}>图例</RNText>
+          <Info size={13} color={INK3} /><Text style={{ fontSize: 12, color: INK3 }}>图例</Text>
         </Pressable>
         <Pressable hitSlop={8} onPress={() => setSelected(today)} style={styles.todayBtn}>
-          <RotateCcw size={12} color="#fff" /><RNText style={{ fontSize: 12, color: '#fff', fontWeight: '700' }}>今日</RNText>
+          <RotateCcw size={12} color="#fff" /><Text style={{ fontSize: 12, color: '#fff', fontWeight: '700' }}>今日</Text>
         </Pressable>
       </View>
     </View>
@@ -79,7 +79,7 @@ export default function Calendar() {
           <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 24 }} showsVerticalScrollIndicator={false} onScroll={bar.onScroll} scrollEventThrottle={16}>
             <View onLayout={bar.onHeaderLayout} style={styles.weekHead}>
               <Pressable hitSlop={10} onPress={() => router.back()} style={styles.backCircle}><ChevronLeft size={22} color={INK} /></Pressable>
-              <RNText className="font-serif" style={styles.hero}>{heroMonth}</RNText>
+              <Text className="font-serif" style={styles.hero}>{heroMonth}</Text>
             </View>
             {rings}
             <View style={[styles.card, styles.weekCard]}>
@@ -98,7 +98,7 @@ export default function Calendar() {
           <View style={{ flex: 1 }}>
             <View style={styles.titlebar}>
               <Pressable hitSlop={10} onPress={() => router.back()} style={styles.backCircle}><ChevronLeft size={22} color={INK} /></Pressable>
-              <RNText className="font-serif" style={styles.titlebarTitle}>{heroMonth}</RNText>
+              <Text className="font-serif" style={styles.titlebarTitle}>{heroMonth}</Text>
             </View>
             {rings}
             <View style={[styles.card, styles.monthCard]}>
@@ -143,10 +143,10 @@ function DayDetail({ day, month }: { day?: TibetanDay; month?: boolean }) {
     return (
       <View>
         <View style={[styles.badge, kind === 'fa' && styles.badgeFa, kind === 'plain' && styles.badgePlain]}>
-          <RNText style={[styles.badgeTxt, kind === 'fa' && { color: '#fff' }, kind === 'plain' && { color: INK3 }]}>{emoji} {label}</RNText>
+          <Text style={[styles.badgeTxt, kind === 'fa' && { color: '#fff' }, kind === 'plain' && { color: INK3 }]}>{emoji} {label}</Text>
         </View>
         <Text className="font-serif" style={styles.themeLeft}>{theme}</Text>
-        <RNText style={styles.sigLeft}>{descReal}</RNText>
+        <Text style={styles.sigLeft}>{descReal}</Text>
         {factList}
       </View>
     );
@@ -155,11 +155,11 @@ function DayDetail({ day, month }: { day?: TibetanDay; month?: boolean }) {
   return (
     <View style={{ alignItems: 'center' }}>
       <View style={[styles.medal, kind === 'gong' && styles.medalGold, kind === 'fa' && styles.medalFa]}>
-        <RNText style={{ fontSize: 30 }}>{emoji}</RNText>
-        {kind !== 'plain' ? <RNText style={[styles.medalLb, kind === 'fa' && { color: '#fff' }]}>{label}</RNText> : null}
+        <Text style={{ fontSize: 30 }}>{emoji}</Text>
+        {kind !== 'plain' ? <Text style={[styles.medalLb, kind === 'fa' && { color: '#fff' }]}>{label}</Text> : null}
       </View>
       <Text className="font-serif" style={styles.theme}>{theme}</Text>
-      <RNText style={styles.sig}>{descReal}</RNText>
+      <Text style={styles.sig}>{descReal}</Text>
       {factList}
     </View>
   );
@@ -168,13 +168,13 @@ function DayDetail({ day, month }: { day?: TibetanDay; month?: boolean }) {
 function FactRow({ k, v, chips, muted, last }: Fact & { last?: boolean }) {
   return (
     <View style={[styles.factRow, last && { borderBottomWidth: 0 }]}>
-      <RNText style={styles.factK}>{k}</RNText>
+      <Text style={styles.factK}>{k}</Text>
       {chips ? (
         <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-          {chips.map((c) => <View key={c} style={styles.chipGold}><RNText style={{ fontSize: 11, color: '#7a5a16', fontWeight: '700' }}>{c}</RNText></View>)}
+          {chips.map((c) => <View key={c} style={styles.chipGold}><Text style={{ fontSize: 11, color: '#7a5a16', fontWeight: '700' }}>{c}</Text></View>)}
         </View>
       ) : (
-        <RNText style={[styles.factV, muted && { color: INK3 }]}>{v}</RNText>
+        <Text style={[styles.factV, muted && { color: INK3 }]}>{v}</Text>
       )}
     </View>
   );
@@ -196,9 +196,9 @@ function WeekStrip({ selected, today, onPick, onShift }: { selected: string; tod
           const dotColor = k === 'fa' ? CRIMSON : k === 'gong' ? GOLD : 'transparent';
           return (
             <Pressable key={ymd} onPress={() => onPick(ymd)} style={[styles.wcell, sel && styles.wcellSel]}>
-              <RNText style={[styles.wWd, sel && { color: 'rgba(255,255,255,0.85)' }]}>{WEEKDAYS[dow(ymd)]}</RNText>
+              <Text style={[styles.wWd, sel && { color: 'rgba(255,255,255,0.85)' }]}>{WEEKDAYS[dow(ymd)]}</Text>
               <Text className="font-serif" style={[styles.wDn, { color: sel ? '#fff' : isToday ? SAFFRON_DARK : INK }]}>{Number(ymd.slice(8))}</Text>
-              <RNText numberOfLines={1} style={[styles.wTb, sel && { color: 'rgba(255,255,255,0.8)' }]}>{tibDay(d?.tibetan)}</RNText>
+              <Text numberOfLines={1} style={[styles.wTb, sel && { color: 'rgba(255,255,255,0.8)' }]}>{tibDay(d?.tibetan)}</Text>
               <View style={[styles.wDot, { backgroundColor: sel ? 'rgba(255,255,255,0.9)' : dotColor }]} />
             </Pressable>
           );
@@ -223,7 +223,7 @@ function MonthGrid({ selected, today, onPick, onShift }: { selected: string; tod
         <Pressable hitSlop={8} onPress={() => onShift(1)}><ChevronRight size={20} color={INK3} /></Pressable>
       </View>
       <View className="flex-row">
-        {WEEKDAYS.map((w) => <RNText key={w} style={{ flex: 1, textAlign: 'center', fontSize: 10.5, color: INK3, paddingBottom: 2 }}>{w}</RNText>)}
+        {WEEKDAYS.map((w) => <Text key={w} style={{ flex: 1, textAlign: 'center', fontSize: 10.5, color: INK3, paddingBottom: 2 }}>{w}</Text>)}
       </View>
       <View className="flex-row" style={{ flexWrap: 'wrap' }}>
         {cells.map((ymd, i) => {
@@ -238,7 +238,7 @@ function MonthGrid({ selected, today, onPick, onShift }: { selected: string; tod
               <View style={[styles.gnum, sel && styles.gnumSel]}>
                 <Text className="font-serif" style={{ fontSize: 14, fontWeight: '700', color: sel ? '#fff' : isToday ? SAFFRON_DARK : INK }}>{Number(ymd.slice(8))}</Text>
               </View>
-              <RNText numberOfLines={1} style={{ fontSize: 8, color: INK3 }}>{tibDay(d?.tibetan)}</RNText>
+              <Text numberOfLines={1} style={{ fontSize: 8, color: INK3 }}>{tibDay(d?.tibetan)}</Text>
               <View style={[styles.gDot, { backgroundColor: dotColor }]} />
             </Pressable>
           );
@@ -258,7 +258,7 @@ function LegendModal({ open, onClose }: { open: boolean; onClose: () => void }) 
           <LegendRow color={GOLD} text="功德日 · 善恶增上(🌺)" />
           <LegendRow color={CRIMSON} text="法会日(绛红)" />
           <LegendRow color={SAFFRON} text="今日 / 选中" />
-          <RNText style={{ fontSize: 12, color: INK3, marginTop: 10, lineHeight: 18 }}>十斋日 / 八吉同聚 等标记在当日「斋戒」行显示。藏历按 UTC+8 取「今天」(全球同观)。民俗黄历(理发吉日)灰显。</RNText>
+          <Text style={{ fontSize: 12, color: INK3, marginTop: 10, lineHeight: 18 }}>十斋日 / 八吉同聚 等标记在当日「斋戒」行显示。藏历按 UTC+8 取「今天」(全球同观)。民俗黄历(理发吉日)灰显。</Text>
         </Pressable>
       </Pressable>
     </Modal>
@@ -268,7 +268,7 @@ function LegendRow({ color, text }: { color: string; text: string }) {
   return (
     <View className="flex-row items-center" style={{ gap: 10, paddingVertical: 5 }}>
       <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: color }} />
-      <RNText style={{ fontSize: 14, color: INK2 }}>{text}</RNText>
+      <Text style={{ fontSize: 14, color: INK2 }}>{text}</Text>
     </View>
   );
 }

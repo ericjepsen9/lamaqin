@@ -2,8 +2,8 @@ import { Play } from 'lucide-react-native';
 import { memo, useState } from 'react';
 // @ts-expect-error react-dom 无类型声明(@types/react-dom 未装);flushSync 运行时存在、web 构建正常
 import { flushSync } from 'react-dom';
-import { Image, Pressable, StyleSheet, Text as RNText, View } from 'react-native';
-
+import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 // YouTube facade 的 **web 版**(Metro 自动按平台取此文件,原生走 youtube-facade.tsx)。
 // 原生版用 react-native-youtube-iframe(走 webview);该库 web 入口会 require
 //   `react-native-web-webview`(未装)——会打断 `expo export --platform web`。故 web 直接用原生 <iframe>。
@@ -44,9 +44,9 @@ export const YouTubeFacade = memo(function YouTubeFacade({ videoId, cover, title
       {videoId ? (
         <View style={styles.playCircle}><Play size={26} color="#b35535" fill="#b35535" /></View>
       ) : (
-        <RNText style={styles.noVideo}>暂无视频</RNText>
+        <Text style={styles.noVideo}>暂无视频</Text>
       )}
-      {title ? <RNText style={styles.title} numberOfLines={1}>{title}</RNText> : null}
+      {title ? <Text style={styles.title} numberOfLines={1}>{title}</Text> : null}
     </Pressable>
   );
 });

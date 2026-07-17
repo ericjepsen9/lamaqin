@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
-
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { AdminButton } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
 import { notify } from '@/lib/dialog';
@@ -11,6 +10,7 @@ import { testIds } from '@/lib/testids';
 import { INK, INK2, INK3, INK4, SAFFRON, SAFFRON_DARK, SAFFRON_LIGHT } from '@/lib/theme';
 import { bookTitle, genClientToken } from '@/lib/utils';
 
+import { TextInput } from '@/components/ui/text-input';
 const CREAM = '#FBF4E9';
 
 const fmtSessionDate = (iso: string) => {

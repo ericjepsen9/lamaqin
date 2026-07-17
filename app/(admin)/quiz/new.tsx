@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { QuestionPayloadEditor, isPayloadComplete } from '@/components/admin/question-payload-editor';
@@ -13,6 +13,7 @@ import { testIds } from '@/lib/testids';
 import { GOLD_DARK as GOLD, GOLD_PALE, INK, INK3, INK4, SAFFRON, SAFFRON_DARK } from '@/lib/theme';
 import { useAdminLayout } from '../_layout';
 
+import { TextInput } from '@/components/ui/text-input';
 const TYPES: { k: QuestionType; label: string }[] = [
   { k: 'open', label: '问答' }, { k: 'single', label: '单选' }, { k: 'judge', label: '判断' },
   { k: 'fill', label: '填空' }, { k: 'flip', label: '记忆卡' }, { k: 'verse', label: '颂词组句' }, { k: 'chain', label: '颂词续接' },

@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { BookOpen, CalendarClock, ChevronDown, Sparkles, Video } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { ActivityIndicator, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LessonStatusBadge } from '@/components/lesson-status-badge';
@@ -86,7 +86,7 @@ export default function ClassTab() {
   if (cohortsError) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#FBF4E9', alignItems: 'center', justifyContent: 'center' }} edges={['left', 'right']}>
-        <RNText style={{ fontSize: 13, color: INK3, textAlign: 'center', paddingHorizontal: 32, lineHeight: 20 }}>加载失败,请检查网络后重试</RNText>
+        <Text style={{ fontSize: 13, color: INK3, textAlign: 'center', paddingHorizontal: 32, lineHeight: 20 }}>加载失败,请检查网络后重试</Text>
       </SafeAreaView>
     );
   }
@@ -102,7 +102,7 @@ export default function ClassTab() {
           {/* 班级预告(D-10 文案·PM 拍板) */}
           <View style={styles.comingCard}>
             <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: SAFFRON_DARK }}>班级共修 · 即将开放</Text>
-            <RNText style={{ fontSize: 12.5, color: INK2, marginTop: 4, lineHeight: 19 }}>入班后可与同班师兄共修、同学同一进度、互相增上。</RNText>
+            <Text style={{ fontSize: 12.5, color: INK2, marginTop: 4, lineHeight: 19 }}>入班后可与同班师兄共修、同学同一进度、互相增上。</Text>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -137,32 +137,32 @@ export default function ClassTab() {
                 <View className="flex-row items-center justify-between" style={{ gap: 10 }}>
                   <View className="flex-row items-center" style={{ gap: 6, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
                     <Text className="font-serif" style={{ fontSize: 23, fontWeight: '700', color: INK }}>{primary.cohortName}</Text>
-                    {primary.isPrimary ? <View style={styles.mainTag}><RNText style={{ fontSize: 10, fontWeight: '700', color: SAFFRON_DARK }}>主班</RNText></View> : null}
+                    {primary.isPrimary ? <View style={styles.mainTag}><Text style={{ fontSize: 10, fontWeight: '700', color: SAFFRON_DARK }}>主班</Text></View> : null}
                   </View>
                   {myCohorts.length > 1 ? (
                     <Pressable style={styles.switchChip} onPress={() => setSwitchOpen(true)}>
-                      <RNText style={{ fontSize: 13, fontWeight: '700', color: SAFFRON_DARK }}>{primary.programName ?? '切换'}</RNText>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: SAFFRON_DARK }}>{primary.programName ?? '切换'}</Text>
                       <ChevronDown size={15} color={SAFFRON_DARK} />
                     </Pressable>
                   ) : null}
                 </View>
-                {coachLine ? <RNText style={{ fontSize: 12, color: INK2, marginTop: 5 }}>{(primary.programName ? primary.programName + ' · ' : '') + coachLine}</RNText> : null}
+                {coachLine ? <Text style={{ fontSize: 12, color: INK2, marginTop: 5 }}>{(primary.programName ? primary.programName + ' · ' : '') + coachLine}</Text> : null}
                 {/* 全班本周共修(实时·3C·PM 2026-07-01 改版):去卡片,大数字撑分量;移入左侧内容块内,供图标整体居中对齐;只出总数不出个人(#193) */}
                 {weekTotals && weekTotals.reciteTotal > 0 ? (
                   <View style={{ flexDirection: 'row', gap: 36, marginTop: 14 }}>
                     <View>
                       <Text className="font-serif" style={{ fontSize: 36, fontWeight: '800', color: SAFFRON_DARK, lineHeight: 40 }}>{weekTotals.reciteTotal.toLocaleString()}</Text>
-                      <RNText style={{ fontSize: 11.5, color: INK2, fontWeight: '600', marginTop: 4 }}>本周全班念诵(遍)</RNText>
+                      <Text style={{ fontSize: 11.5, color: INK2, fontWeight: '600', marginTop: 4 }}>本周全班念诵(遍)</Text>
                     </View>
                     <View>
                       <Text className="font-serif" style={{ fontSize: 36, fontWeight: '800', color: SAFFRON_DARK, lineHeight: 40 }}>{weekTotals.activeMembers}</Text>
-                      <RNText style={{ fontSize: 11.5, color: INK2, fontWeight: '600', marginTop: 4 }}>位同学共修</RNText>
+                      <Text style={{ fontSize: 11.5, color: INK2, fontWeight: '600', marginTop: 4 }}>位同学共修</Text>
                     </View>
                     {/* 当日在修人数(RA-1·2026-07-11 接线):跟本周 2 个数字并排;当天 0 人在修不显示(同本周口径,不挂空「0」) */}
                     {todayActive != null && todayActive > 0 ? (
                       <View>
                         <Text className="font-serif" style={{ fontSize: 36, fontWeight: '800', color: SAFFRON_DARK, lineHeight: 40 }}>{todayActive}</Text>
-                        <RNText style={{ fontSize: 11.5, color: INK2, fontWeight: '600', marginTop: 4 }}>今日在修</RNText>
+                        <Text style={{ fontSize: 11.5, color: INK2, fontWeight: '600', marginTop: 4 }}>今日在修</Text>
                       </View>
                     ) : null}
                   </View>
@@ -177,7 +177,7 @@ export default function ClassTab() {
         <Section icon={<BookOpen size={18} color={SAFFRON} />} title="本周课程" sub={weekLessons.length > 0 ? `本周 ${weekLessons.length} 节` : undefined}>
           {weekLessons.length === 0 ? (
             <View style={styles.card}>
-              <RNText style={{ fontSize: 13, color: INK3 }}>本周暂无安排课程（或正值休息周）</RNText>
+              <Text style={{ fontSize: 13, color: INK3 }}>本周暂无安排课程（或正值休息周）</Text>
             </View>
           ) : (
             <View style={styles.card}>
@@ -188,14 +188,14 @@ export default function ClassTab() {
                     <Pressable testID={testIds.class.weekLessonRow(l.lessonId)} style={StyleSheet.flatten([styles.weekLessonRow, i > 0 && styles.weekLessonRowBordered])}>
                       <View style={{ flex: 1 }}>
                         <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: INK }}>{bookTitle(l.courseName)}第 {l.lessonNumber} 课</Text>
-                        <RNText style={{ fontSize: 13, color: INK2, marginTop: 2 }}>{l.lessonTitle}</RNText>
+                        <Text style={{ fontSize: 13, color: INK2, marginTop: 2 }}>{l.lessonTitle}</Text>
                         {comp && comp.totalMembers > 0 ? (
-                          <RNText style={{ fontSize: 11.5, color: INK3, marginTop: 3 }}>全班 {comp.completeCount}/{comp.totalMembers} 人已圆满</RNText>
+                          <Text style={{ fontSize: 11.5, color: INK3, marginTop: 3 }}>全班 {comp.completeCount}/{comp.totalMembers} 人已圆满</Text>
                         ) : null}
                       </View>
                       <View style={{ alignItems: 'flex-end', gap: 2 }}>
                         <LessonStatusBadge st={weekLessonStatus?.get(l.lessonId)} />
-                        <RNText style={{ fontSize: 12, fontWeight: '700', color: SAFFRON_DARK }}>去学习 ›</RNText>
+                        <Text style={{ fontSize: 12, fontWeight: '700', color: SAFFRON_DARK }}>去学习 ›</Text>
                       </View>
                     </Pressable>
                   </Link>
@@ -209,20 +209,20 @@ export default function ClassTab() {
         <Section icon={<Sparkles size={18} color={SAFFRON} />} title="班级功课" sub="入班自动建 · 项目/周期锁定、节奏可调">
           <View style={styles.card}>
             {classVows.length === 0 ? (
-              <RNText style={{ fontSize: 13, color: INK3 }}>本班暂无自动指派的功课</RNText>
+              <Text style={{ fontSize: 13, color: INK3 }}>本班暂无自动指派的功课</Text>
             ) : (
               classVows.map((v, i) => (
                 <Link key={v.vowId} href={`/vow/${v.vowId}` as never} asChild>
                   <Pressable style={StyleSheet.flatten([styles.weekLessonRow, i > 0 && styles.weekLessonRowBordered])}>
                     <View style={{ flex: 1 }}>
                       <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: INK }}>{v.name}</Text>
-                      <RNText style={{ fontSize: 12, color: INK2, marginTop: 2 }}>
+                      <Text style={{ fontSize: 12, color: INK2, marginTop: 2 }}>
                         {v.measurement === 'duration'
                           ? `累计 ${v.currentSessions} 座${v.targetCount ? ` / ${v.targetCount}` : ''}`
                           : `累计 ${v.currentCount.toLocaleString()}${v.targetCount ? ` / ${v.targetCount.toLocaleString()}` : ''} ${v.unit}`}
-                      </RNText>
+                      </Text>
                     </View>
-                    <RNText style={{ fontSize: 12, fontWeight: '700', color: SAFFRON_DARK }}>详情 ›</RNText>
+                    <Text style={{ fontSize: 12, fontWeight: '700', color: SAFFRON_DARK }}>详情 ›</Text>
                   </Pressable>
                 </Link>
               ))
@@ -237,7 +237,7 @@ export default function ClassTab() {
             {/* 今天锚点(参照行,用「过去」态灰点表达"仅作时间参照、非可点项") */}
             <View style={styles.tlRow}>
               <View style={styles.dateCol}>
-                <RNText style={styles.dMonth}>今天</RNText>
+                <Text style={styles.dMonth}>今天</Text>
                 <Text className="font-serif" style={styles.dDay}>{now.getDate()}</Text>
               </View>
               <View style={styles.railCol}>
@@ -245,7 +245,7 @@ export default function ClassTab() {
                 <View style={[styles.dot, styles.dotPast]} />
               </View>
               <View style={[styles.sessionCard, styles.sessionCardMute]}>
-                <RNText style={{ fontSize: 12, color: INK3 }}>{sessions.length === 0 ? '近期暂无安排 · 安心闻思' : '安心闻思'}</RNText>
+                <Text style={{ fontSize: 12, color: INK3 }}>{sessions.length === 0 ? '近期暂无安排 · 安心闻思' : '安心闻思'}</Text>
               </View>
             </View>
             {sessions.map((s, i) => {
@@ -253,9 +253,9 @@ export default function ClassTab() {
               return (
                 <View key={s.id} style={styles.tlRow}>
                   <View style={styles.dateCol}>
-                    <RNText style={styles.dMonth}>{parts.month}</RNText>
+                    <Text style={styles.dMonth}>{parts.month}</Text>
                     <Text className="font-serif" style={styles.dDay}>{parts.day}</Text>
-                    <RNText style={styles.dTime}>{parts.time}</RNText>
+                    <Text style={styles.dTime}>{parts.time}</Text>
                   </View>
                   <View style={styles.railCol}>
                     <View style={[styles.railLine, i === sessions.length - 1 ? { top: 0, height: 24 } : { top: 0, bottom: 0 }]} />
@@ -264,16 +264,16 @@ export default function ClassTab() {
                   <View style={styles.sessionCard}>
                     <View style={styles.badges}>
                       <View style={[styles.tag, { backgroundColor: 'rgba(111,154,134,0.16)' }]}>
-                        <RNText style={{ fontSize: 10, fontWeight: '700', color: SAGE }}>共修 · {s.kind === 'practice' ? '实修' : '常规'}</RNText>
+                        <Text style={{ fontSize: 10, fontWeight: '700', color: SAGE }}>共修 · {s.kind === 'practice' ? '实修' : '常规'}</Text>
                       </View>
                     </View>
                     <Text className="font-serif" style={styles.title}>{s.kind === 'practice' ? '实修共修' : '常规共修'}</Text>
-                    <RNText style={styles.sub}>
+                    <Text style={styles.sub}>
                       {s.courseName ? bookTitle(s.courseName) : ''}{s.lessonTitle ?? ''}{s.location ? ` · ${s.location}` : (s.zoomUrl ? ' · 线上 Zoom' : '')}
-                    </RNText>
+                    </Text>
                     {s.zoomUrl ? (
                       <Pressable style={styles.joinMeetBtn} onPress={() => Linking.openURL(s.zoomUrl!)}>
-                        <Video size={13} color="#fff" /><RNText style={{ fontSize: 12, fontWeight: '700', color: '#fff' }}>进入会议</RNText>
+                        <Video size={13} color="#fff" /><Text style={{ fontSize: 12, fontWeight: '700', color: '#fff' }}>进入会议</Text>
                       </Pressable>
                     ) : null}
                   </View>
@@ -281,7 +281,7 @@ export default function ClassTab() {
               );
             })}
           </View>
-          <RNText style={{ fontSize: 11, color: INK3, paddingHorizontal: 2, marginTop: 4 }}>我的出勤后台录入、仅展示;讲考为升学人工参考、不计分。</RNText>
+          <Text style={{ fontSize: 11, color: INK3, paddingHorizontal: 2, marginTop: 4 }}>我的出勤后台录入、仅展示;讲考为升学人工参考、不计分。</Text>
         </Section>
       </ScrollView>
       <ScrollTitleBar title={primary.cohortName} shown={bar.shown} topInset={insets.top} />
@@ -291,7 +291,7 @@ export default function ClassTab() {
         <Pressable style={styles.switchBackdrop} onPress={() => setSwitchOpen(false)}>
           <Pressable style={styles.switchCard} onPress={() => {}}>
             <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>切换主班</Text>
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 4, marginBottom: 12 }}>主班决定「班级」页显示哪个班;学修记录不受影响。</RNText>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 4, marginBottom: 12 }}>主班决定「班级」页显示哪个班;学修记录不受影响。</Text>
             <View style={{ gap: 8 }}>
               {myCohorts.map((c) => (
                 <Pressable
@@ -311,14 +311,14 @@ export default function ClassTab() {
                   }}
                 >
                   <View style={{ flex: 1 }}>
-                    <RNText style={{ fontSize: 15, fontWeight: '600', color: INK }}>{c.cohortName}</RNText>
-                    {c.programName ? <RNText style={{ fontSize: 12, color: INK3, marginTop: 1 }}>{c.programName}</RNText> : null}
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: INK }}>{c.cohortName}</Text>
+                    {c.programName ? <Text style={{ fontSize: 12, color: INK3, marginTop: 1 }}>{c.programName}</Text> : null}
                   </View>
-                  {c.isPrimary ? <RNText style={{ fontSize: 11, fontWeight: '700', color: SAFFRON_DARK }}>当前主班</RNText> : null}
+                  {c.isPrimary ? <Text style={{ fontSize: 11, fontWeight: '700', color: SAFFRON_DARK }}>当前主班</Text> : null}
                 </Pressable>
               ))}
             </View>
-            {switchPrimary.isPending ? <RNText style={{ fontSize: 12, color: INK3, textAlign: 'center', marginTop: 10 }}>切换中…</RNText> : null}
+            {switchPrimary.isPending ? <Text style={{ fontSize: 12, color: INK3, textAlign: 'center', marginTop: 10 }}>切换中…</Text> : null}
           </Pressable>
         </Pressable>
       </Modal>
@@ -336,10 +336,10 @@ function Section({ icon, title, sub, action, children }: { icon: React.ReactNode
           {icon}
           <View style={{ flex: 1 }}>
             <Text className="font-serif" style={{ fontSize: 16, fontWeight: '700', color: INK }}>{title}</Text>
-            {sub ? <RNText style={{ fontSize: 11, color: INK3, marginTop: 1 }}>{sub}</RNText> : null}
+            {sub ? <Text style={{ fontSize: 11, color: INK3, marginTop: 1 }}>{sub}</Text> : null}
           </View>
         </View>
-        {action ? <RNText style={{ fontSize: 12, fontWeight: '700', color: SAFFRON_DARK }}>{action} ›</RNText> : null}
+        {action ? <Text style={{ fontSize: 12, fontWeight: '700', color: SAFFRON_DARK }}>{action} ›</Text> : null}
       </View>
       <View style={{ gap: 8 }}>{children}</View>
     </View>

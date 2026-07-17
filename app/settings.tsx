@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import * as Notifications from 'expo-notifications';
 import { useEffect, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -58,16 +58,16 @@ export default function Settings() {
         <Group title="通知">
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <RNText style={styles.title}>学习提醒</RNText>
-              <RNText style={styles.sub}>是否提醒由所在班级的辅导员统一设置;这里是本设备的通知权限状态</RNText>
+              <Text style={styles.title}>学习提醒</Text>
+              <Text style={styles.sub}>是否提醒由所在班级的辅导员统一设置;这里是本设备的通知权限状态</Text>
             </View>
             {notifStatus === 'granted' ? (
-              <View style={styles.soonTag}><RNText style={{ fontSize: 11, color: INK3, fontWeight: '600' }}>已开启</RNText></View>
+              <View style={styles.soonTag}><Text style={{ fontSize: 11, color: INK3, fontWeight: '600' }}>已开启</Text></View>
             ) : notifStatus === 'unsupported' ? (
-              <View style={styles.soonTag}><RNText style={{ fontSize: 11, color: INK3, fontWeight: '600' }}>仅移动端支持</RNText></View>
+              <View style={styles.soonTag}><Text style={{ fontSize: 11, color: INK3, fontWeight: '600' }}>仅移动端支持</Text></View>
             ) : notifStatus === 'checking' ? null : (
               <Pressable testID={testIds.settings.enableNotificationsButton} style={styles.enableBtn} onPress={() => void enableNotifications()}>
-                <RNText style={{ fontSize: 12, color: '#fff', fontWeight: '700' }}>开启通知</RNText>
+                <Text style={{ fontSize: 12, color: '#fff', fontWeight: '700' }}>开启通知</Text>
               </Pressable>
             )}
           </View>
@@ -76,18 +76,18 @@ export default function Settings() {
         {/* 偏好 */}
         <Group title="偏好">
           <View style={[styles.row, styles.rowBorder]}>
-            <View style={{ flex: 1 }}><RNText style={styles.title}>字号</RNText></View>
+            <View style={{ flex: 1 }}><Text style={styles.title}>字号</Text></View>
             <View style={styles.seg}>
               {FONT_LEVELS.map((f) => (
                 <Pressable key={f} onPress={() => setFont(f)} style={[styles.segBtn, font === f && styles.segOn]}>
-                  <RNText style={{ fontSize: 13, fontWeight: '700', color: font === f ? '#fff' : INK3 }}>{f}</RNText>
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: font === f ? '#fff' : INK3 }}>{f}</Text>
                 </Pressable>
               ))}
             </View>
           </View>
           <View style={[styles.row, DOWNLOADS_SUPPORTED && styles.rowBorder]}>
-            <View style={{ flex: 1 }}><RNText style={styles.title}>简体 / 繁体</RNText><RNText style={styles.sub}>多语言切换</RNText></View>
-            <View style={styles.soonTag}><RNText style={{ fontSize: 11, color: INK3, fontWeight: '600' }}>即将推出</RNText></View>
+            <View style={{ flex: 1 }}><Text style={styles.title}>简体 / 繁体</Text><Text style={styles.sub}>多语言切换</Text></View>
+            <View style={styles.soonTag}><Text style={{ fontSize: 11, color: INK3, fontWeight: '600' }}>即将推出</Text></View>
           </View>
           {DOWNLOADS_SUPPORTED ? (
             <NavRow title="离线下载管理" sub="已下载的音频 / 课件 · 占用与清理" last onPress={() => router.push('/downloads-manage')} />
@@ -104,12 +104,12 @@ export default function Settings() {
 
         {/* 关于 */}
         <Group title="关于">
-          <View style={[styles.row, styles.rowBorder]}><View style={{ flex: 1 }}><RNText style={styles.title}>版本</RNText></View><RNText style={styles.sub}>纽约佛学会 v1.0.0</RNText></View>
+          <View style={[styles.row, styles.rowBorder]}><View style={{ flex: 1 }}><Text style={styles.title}>版本</Text></View><Text style={styles.sub}>纽约佛学会 v1.0.0</Text></View>
           <NavRow title="关于纽约佛学会" sub="闻思修 · 学修端" last onPress={() => router.push('/about')} />
         </Group>
 
         <Pressable style={styles.logout} onPress={async () => { await supabase.auth.signOut(); router.replace('/login'); }}>
-          <RNText style={{ color: CRIM, fontWeight: '700', fontSize: 15 }}>退出登录</RNText>
+          <Text style={{ color: CRIM, fontWeight: '700', fontSize: 15 }}>退出登录</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
@@ -127,7 +127,7 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
 function NavRow({ title, sub, titleColor, last, onPress }: { title: string; sub?: string; titleColor?: string; last?: boolean; onPress?: () => void }) {
   return (
     <Pressable style={[styles.row, !last && styles.rowBorder]} onPress={onPress}>
-      <View style={{ flex: 1 }}><RNText style={[styles.title, titleColor ? { color: titleColor } : null]}>{title}</RNText>{sub ? <RNText style={styles.sub}>{sub}</RNText> : null}</View>
+      <View style={{ flex: 1 }}><Text style={[styles.title, titleColor ? { color: titleColor } : null]}>{title}</Text>{sub ? <Text style={styles.sub}>{sub}</Text> : null}</View>
       <ChevronRight size={18} color={INK3} />
     </Pressable>
   );

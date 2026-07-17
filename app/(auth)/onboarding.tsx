@@ -2,13 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 
+import { TextInput } from '@/components/ui/text-input';
 // 完善资料 / 入学申请(D-2/D-3·2026-07-02 接真;决策059/168 一页 2 项 + 进度条)。
 // 步1 身份:姓名(必填)+ 法名(可选,D-3)+ 手机(可选);
 // 步2 学习意愿 + 无障碍:想自学(选专业)/想进班(D-3,写 learning_mode + intended_program_id,
@@ -73,13 +74,13 @@ export default function Onboarding() {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FBF4E9' }} edges={['top']}>
       <View style={styles.top}>
         <Pressable hitSlop={8} onPress={() => (step === 0 ? router.back() : setStep(0))}><ChevronLeft size={24} color={INK} /></Pressable>
-        <RNText style={{ fontSize: 13, color: INK3 }}>第 {step + 1} / {STEPS} 步</RNText>
+        <Text style={{ fontSize: 13, color: INK3 }}>第 {step + 1} / {STEPS} 步</Text>
       </View>
       <View style={styles.progress}><View style={[styles.progressFill, { width: `${((step + 1) / STEPS) * 100}%` }]} /></View>
 
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
         <Text className="font-serif" style={{ fontSize: 24, fontWeight: '700', color: INK, letterSpacing: 1 }}>完善资料</Text>
-        <RNText style={{ fontSize: 13, color: INK3, marginTop: 6 }}>{step === 0 ? '先填你的身份信息' : '再说说你想怎么学(管理员按此审批开通)'}</RNText>
+        <Text style={{ fontSize: 13, color: INK3, marginTop: 6 }}>{step === 0 ? '先填你的身份信息' : '再说说你想怎么学(管理员按此审批开通)'}</Text>
 
         {step === 0 ? (
           <View style={{ gap: 14, marginTop: 22 }}>
@@ -90,48 +91,48 @@ export default function Onboarding() {
         ) : (
           <View style={{ gap: 16, marginTop: 22 }}>
             <View style={{ gap: 8 }}>
-              <RNText style={styles.label}>学习意愿</RNText>
+              <Text style={styles.label}>学习意愿</Text>
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 <Pressable style={[styles.modeChip, mode === 'self_study' && styles.chipOn]} onPress={() => setMode('self_study')}>
-                  <RNText style={[styles.chipTxt, mode === 'self_study' && { color: '#fff' }]}>自学</RNText>
+                  <Text style={[styles.chipTxt, mode === 'self_study' && { color: '#fff' }]}>自学</Text>
                 </Pressable>
                 <Pressable style={[styles.modeChip, mode === 'class' && styles.chipOn]} onPress={() => { setMode('class'); setProgramId(null); }}>
-                  <RNText style={[styles.chipTxt, mode === 'class' && { color: '#fff' }]}>想进班共修</RNText>
+                  <Text style={[styles.chipTxt, mode === 'class' && { color: '#fff' }]}>想进班共修</Text>
                 </Pressable>
               </View>
             </View>
             {mode === 'self_study' ? (
               <View style={{ gap: 8 }}>
-                <RNText style={styles.label}>想自学哪个专业?</RNText>
+                <Text style={styles.label}>想自学哪个专业?</Text>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                   {programs.map((p) => (
                     <Pressable key={p.id} style={[styles.modeChip, programId === p.id && styles.chipOn]} onPress={() => setProgramId(p.id)}>
-                      <RNText style={[styles.chipTxt, programId === p.id && { color: '#fff' }]}>{p.name}</RNText>
+                      <Text style={[styles.chipTxt, programId === p.id && { color: '#fff' }]}>{p.name}</Text>
                     </Pressable>
                   ))}
                 </View>
                 {programs.length === 0 ? (
-                  <RNText style={{ fontSize: 12, color: programsError ? CRIMSON : INK3 }}>
+                  <Text style={{ fontSize: 12, color: programsError ? CRIMSON : INK3 }}>
                     {programsLoading ? '专业列表加载中…' : programsError ? '专业列表加载失败,请检查网络后重试(也可先选「想进班共修」,由管理员审批时再确认专业)' : '暂无可选专业,可先选「想进班共修」'}
-                  </RNText>
+                  </Text>
                 ) : null}
               </View>
             ) : (
-              <RNText style={{ fontSize: 12, color: INK3, lineHeight: 18 }}>管理员审批时会与你联系,安排合适的班级。</RNText>
+              <Text style={{ fontSize: 12, color: INK3, lineHeight: 18 }}>管理员审批时会与你联系,安排合适的班级。</Text>
             )}
             <View style={{ gap: 8 }}>
-              <RNText style={styles.label}>无障碍学修(可选)</RNText>
+              <Text style={styles.label}>无障碍学修(可选)</Text>
               <CheckRow checked={blind} onPress={() => setBlind((v) => !v)} title="我有视力障碍" sub="听两遍即圆满(免看法本、免答题)" />
               <CheckRow checked={deaf} onPress={() => setDeaf((v) => !v)} title="我有听力障碍" sub="看两遍即圆满(免听、免答题)" />
             </View>
-            {err ? <RNText style={{ fontSize: 12, color: CRIMSON }}>{err}</RNText> : null}
+            {err ? <Text style={{ fontSize: 12, color: CRIMSON }}>{err}</Text> : null}
           </View>
         )}
 
         <Pressable style={[styles.primary, !canNext && { opacity: 0.4 }]} disabled={!canNext} onPress={() => (step === 0 ? setStep(1) : submit())}>
-          <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{step === 0 ? '下一步' : busy ? '提交中…' : '提交入学申请'}</RNText>
+          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{step === 0 ? '下一步' : busy ? '提交中…' : '提交入学申请'}</Text>
         </Pressable>
-        {step === 1 ? <RNText style={{ fontSize: 11, color: INK3, textAlign: 'center', marginTop: 12 }}>提交后进入「待审核」,无需重复提交。</RNText> : null}
+        {step === 1 ? <Text style={{ fontSize: 11, color: INK3, textAlign: 'center', marginTop: 12 }}>提交后进入「待审核」,无需重复提交。</Text> : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -140,7 +141,7 @@ export default function Onboarding() {
 function Field({ label, required, value, onChange, placeholder, keyboard }: { label: string; required?: boolean; value: string; onChange: (v: string) => void; placeholder: string; keyboard?: 'phone-pad' }) {
   return (
     <View style={{ gap: 6 }}>
-      <RNText style={styles.label}>{label}{required ? <RNText style={{ color: SAFFRON_DARK }}> *</RNText> : null}</RNText>
+      <Text style={styles.label}>{label}{required ? <Text style={{ color: SAFFRON_DARK }}> *</Text> : null}</Text>
       <View style={styles.field}>
         <TextInput value={value} onChangeText={onChange} placeholder={placeholder} placeholderTextColor={INK3} keyboardType={keyboard} style={styles.input} />
       </View>
@@ -150,10 +151,10 @@ function Field({ label, required, value, onChange, placeholder, keyboard }: { la
 function CheckRow({ checked, onPress, title, sub }: { checked: boolean; onPress: () => void; title: string; sub: string }) {
   return (
     <Pressable style={styles.a11yRow} onPress={onPress}>
-      <View style={[styles.check, checked && { backgroundColor: SAFFRON, borderColor: SAFFRON }]}>{checked ? <RNText style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</RNText> : null}</View>
+      <View style={[styles.check, checked && { backgroundColor: SAFFRON, borderColor: SAFFRON }]}>{checked ? <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text> : null}</View>
       <View style={{ flex: 1 }}>
-        <RNText style={{ fontSize: 14, color: INK, fontWeight: '600' }}>{title}</RNText>
-        <RNText style={{ fontSize: 12, color: INK3, marginTop: 1 }}>{sub}</RNText>
+        <Text style={{ fontSize: 14, color: INK, fontWeight: '600' }}>{title}</Text>
+        <Text style={{ fontSize: 12, color: INK3, marginTop: 1 }}>{sub}</Text>
       </View>
     </Pressable>
   );

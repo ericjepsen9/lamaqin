@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { CalendarClock, ChevronLeft } from 'lucide-react-native';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -29,28 +29,28 @@ export default function SpeakingDetail() {
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color={SAFFRON} /></View>
       ) : isError ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <RNText style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>加载失败,请检查网络后重试(不代表没有此讲考安排)。</RNText>
+          <Text style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>加载失败,请检查网络后重试(不代表没有此讲考安排)。</Text>
         </View>
       ) : !data ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <RNText style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>暂无此讲考安排,或不属于你的班级。</RNText>
+          <Text style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>暂无此讲考安排,或不属于你的班级。</Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 14 }}>
           <View style={styles.card}>
-            {data.cohortName ? <RNText style={{ fontSize: 12, color: INK3 }}>{data.cohortName}</RNText> : null}
+            {data.cohortName ? <Text style={{ fontSize: 12, color: INK3 }}>{data.cohortName}</Text> : null}
             <Text className="font-serif" style={{ fontSize: 19, fontWeight: '700', color: INK, marginTop: 6, lineHeight: 28 }}>
               {data.lessonNumber != null ? `第 ${data.lessonNumber} 节 · ` : ''}{data.lessonTitle ?? '讲考'}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 }}>
               <CalendarClock size={15} color={INK3} />
-              <RNText style={{ fontSize: 13, color: INK2 }}>截止 {data.sessionEndAt.slice(0, 10)}</RNText>
+              <Text style={{ fontSize: 13, color: INK2 }}>截止 {data.sessionEndAt.slice(0, 10)}</Text>
             </View>
-            {data.notes ? <RNText style={{ fontSize: 13, color: INK2, lineHeight: 21, marginTop: 12 }}>{data.notes}</RNText> : null}
+            {data.notes ? <Text style={{ fontSize: 13, color: INK2, lineHeight: 21, marginTop: 12 }}>{data.notes}</Text> : null}
           </View>
-          <RNText style={{ fontSize: 11, color: INK3, textAlign: 'center', lineHeight: 17 }}>
+          <Text style={{ fontSize: 11, color: INK3, textAlign: 'center', lineHeight: 17 }}>
             参与方式与记录由辅导员在讲考时登记;讲考作升学人工参考,不自动计分。
-          </RNText>
+          </Text>
         </ScrollView>
       )}
     </SafeAreaView>

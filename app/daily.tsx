@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text as RNText, View, type TextStyle, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, View, type TextStyle, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { QuickCountSheet } from '@/components/quick-count-sheet';
@@ -39,16 +39,16 @@ function Node({ num, state, tag, title, sub, chip, chipState, onPress, actionLab
   return (
     <View style={styles.step}>
       <View style={[styles.node, NODE[state]]}>
-        <RNText style={[styles.glyph, state === 'current' && { color: '#fff' }, state === 'done' && { color: SAGE }, state === 'gold' && { color: GOLD }, state === 'todo' && { color: SAFFRON_DARK }]}>{num}</RNText>
+        <Text style={[styles.glyph, state === 'current' && { color: '#fff' }, state === 'done' && { color: SAGE }, state === 'gold' && { color: GOLD }, state === 'todo' && { color: SAFFRON_DARK }]}>{num}</Text>
       </View>
       <View style={[styles.card, state === 'current' && styles.cardCurrent, state === 'todo' && styles.cardTodo]}>
-        <RNText style={styles.tag}>{tag}</RNText>
+        <Text style={styles.tag}>{tag}</Text>
         <Text className="font-serif" style={styles.cardTitle}>{title}</Text>
-        {sub ? <RNText style={styles.cardSub}>{sub}</RNText> : null}
+        {sub ? <Text style={styles.cardSub}>{sub}</Text> : null}
         {(chip || actionLabel) ? (
           <View style={styles.row}>
-            {chip ? <RNText style={[styles.chip, CHIP[chipState ?? 'todo']]}>{chip}</RNText> : null}
-            {actionLabel && onPress ? <Pressable style={styles.go} onPress={onPress}><RNText style={styles.goTxt}>{actionLabel}</RNText></Pressable> : null}
+            {chip ? <Text style={[styles.chip, CHIP[chipState ?? 'todo']]}>{chip}</Text> : null}
+            {actionLabel && onPress ? <Pressable style={styles.go} onPress={onPress}><Text style={styles.goTxt}>{actionLabel}</Text></Pressable> : null}
           </View>
         ) : null}
       </View>
@@ -72,27 +72,27 @@ function LessonNode({ num, tag, title, sub, comp, onStep }: {
     : [];
   return (
     <View style={styles.step}>
-      <View style={[styles.node, NODE.current]}><RNText style={[styles.glyph, { color: '#fff' }]}>{num}</RNText></View>
+      <View style={[styles.node, NODE.current]}><Text style={[styles.glyph, { color: '#fff' }]}>{num}</Text></View>
       <View style={[styles.card, styles.cardCurrent]}>
-        <RNText style={styles.tag}>{tag}</RNText>
+        <Text style={styles.tag}>{tag}</Text>
         <Text className="font-serif" style={styles.cardTitle}>{title}</Text>
-        {sub ? <RNText style={styles.cardSub}>{sub}</RNText> : null}
+        {sub ? <Text style={styles.cardSub}>{sub}</Text> : null}
         {comp ? (
           <View style={styles.subwrap}>
             {rows.map((r, i) => (
               <Pressable key={r.key} style={[styles.subrow, i === rows.length - 1 && styles.subrowLast]} onPress={() => onStep(r.step)}>
                 <View style={styles.subLeft}>
-                  <RNText style={styles.subNum}>{i + 1}</RNText>
-                  <RNText style={styles.subLabel}>{r.label}</RNText>
+                  <Text style={styles.subNum}>{i + 1}</Text>
+                  <Text style={styles.subLabel}>{r.label}</Text>
                 </View>
                 {r.done === true
-                  ? <RNText style={styles.subDone}>已完成 ✓</RNText>
-                  : <RNText style={styles.subGo}>{r.go} ›</RNText>}
+                  ? <Text style={styles.subDone}>已完成 ✓</Text>
+                  : <Text style={styles.subGo}>{r.go} ›</Text>}
               </Pressable>
             ))}
           </View>
         ) : (
-          <RNText style={styles.cardSub}>听 + 读法本 + 答 = 圆满</RNText>
+          <Text style={styles.cardSub}>听 + 读法本 + 答 = 圆满</Text>
         )}
       </View>
     </View>
@@ -156,7 +156,7 @@ export default function Daily() {
           <View style={styles.headRow}>
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text className="font-serif" style={styles.verse}>{DAILY_VERSE}</Text>
-              <RNText style={styles.headData}>今日已完成 {doneToday} 项</RNText>
+              <Text style={styles.headData}>今日已完成 {doneToday} 项</Text>
             </View>
             <Image source={require('../assets/images/bell-vajra.png')} resizeMode="contain" style={styles.bell} />
           </View>
@@ -173,7 +173,7 @@ export default function Daily() {
               {/* 正行 · 闻思(本周课慢查询:只在此格转圈,不拖整页) */}
               {wensiLoading ? (
                 <View style={styles.step}>
-                  <View style={[styles.node, NODE.current]}><RNText style={[styles.glyph, { color: '#fff' }]}>{nextStep()}</RNText></View>
+                  <View style={[styles.node, NODE.current]}><Text style={[styles.glyph, { color: '#fff' }]}>{nextStep()}</Text></View>
                   <View style={[styles.card, styles.cardCurrent, { paddingVertical: 22, alignItems: 'center' }]}><ActivityIndicator color={SAFFRON_DARK} /></View>
                 </View>
               ) : wensiError ? (
@@ -208,14 +208,14 @@ export default function Daily() {
               {otherWeeks.length > 0 ? (
                 <View style={styles.branch}>
                   <Pressable style={styles.branchBtn} onPress={() => setOthersOpen((o) => !o)}>
-                    <RNText style={{ flex: 1, fontSize: 13, color: INK2, fontWeight: '600' }}>＋ 其他班(兼修)· {otherWeeks.length} 个专业</RNText>
-                    <RNText style={{ fontSize: 13, color: INK3 }}>{othersOpen ? '收起 ▴' : '展开 ▾'}</RNText>
+                    <Text style={{ flex: 1, fontSize: 13, color: INK2, fontWeight: '600' }}>＋ 其他班(兼修)· {otherWeeks.length} 个专业</Text>
+                    <Text style={{ fontSize: 13, color: INK3 }}>{othersOpen ? '收起 ▴' : '展开 ▾'}</Text>
                   </Pressable>
                   {othersOpen ? otherWeeks.map((w) => (
                     <Pressable key={w.programId} style={styles.branchItem}
                       onPress={() => { const l = w.lessons[0]; if (l) router.push(`/lesson/${l.lessonId}?step=wensi` as never); }}>
-                      <RNText style={{ flex: 1, fontSize: 13, color: INK }}>{w.programName}{w.week ? ` · 第${w.week}周` : ''} · {w.lessons.length} 节</RNText>
-                      <RNText style={{ fontSize: 14, color: INK3 }}>›</RNText>
+                      <Text style={{ flex: 1, fontSize: 13, color: INK }}>{w.programName}{w.week ? ` · 第${w.week}周` : ''} · {w.lessons.length} 节</Text>
+                      <Text style={{ fontSize: 14, color: INK3 }}>›</Text>
                     </Pressable>
                   )) : null}
                 </View>
@@ -247,7 +247,7 @@ export default function Daily() {
                 actionLabel={huixiang ? undefined : '去回向'} onPress={() => markRitual.mutate('huixiang')} />
 
               <View style={styles.legend}>
-                <RNText style={styles.legendTxt}>未完成为柔色「待补」,可随时补、不催;念诵为累积,显进度不计日;回向不受未完成阻拦。</RNText>
+                <Text style={styles.legendTxt}>未完成为柔色「待补」,可随时补、不催;念诵为累积,显进度不计日;回向不受未完成阻拦。</Text>
               </View>
             </View>
           </ScrollView>

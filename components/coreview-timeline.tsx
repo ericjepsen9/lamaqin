@@ -1,6 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, Text as RNText, View } from 'react-native';
-
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import type { CoreviewNode } from '@/lib/queries/coreview';
 
@@ -27,7 +26,7 @@ export function CoreviewList({ nodes, showMonths }: { nodes: CoreviewNode[]; sho
         const monthHeader = showMonths && (i === 0 || nodes[i - 1].date.slice(0, 7) !== ym);
         return (
           <View key={n.key}>
-            {monthHeader ? <RNText style={styles.monthHead}>{`${Number(n.date.slice(0, 4))} 年 ${Number(n.date.slice(5, 7))} 月`}</RNText> : null}
+            {monthHeader ? <Text style={styles.monthHead}>{`${Number(n.date.slice(0, 4))} 年 ${Number(n.date.slice(5, 7))} 月`}</Text> : null}
             <NodeRow
               node={n}
               first={i === 0}
@@ -52,9 +51,9 @@ function NodeRow({ node, first, last, onPress }: { node: CoreviewNode; first: bo
   return (
     <View style={styles.node}>
       <View style={styles.dateCol}>
-        <RNText style={styles.dMonth}>{monthLabel(node.date)}</RNText>
+        <Text style={styles.dMonth}>{monthLabel(node.date)}</Text>
         <Text className="font-serif" style={[styles.dDay, past && { color: INK2 }]}>{dayLabel(node.date)}</Text>
-        {node.time ? <RNText style={styles.dTime}>{node.time}</RNText> : null}
+        {node.time ? <Text style={styles.dTime}>{node.time}</Text> : null}
       </View>
       <View style={styles.railCol}>
         {!(first && last) ? <View style={[styles.railLine, lineStyle]} /> : null}
@@ -70,7 +69,7 @@ function NodeRow({ node, first, last, onPress }: { node: CoreviewNode; first: bo
         </View>
 
         <Text className="font-serif" style={[styles.title, past && { color: INK2 }]}>{node.title}</Text>
-        {node.sub ? <RNText style={styles.sub}>{node.sub}</RNText> : null}
+        {node.sub ? <Text style={styles.sub}>{node.sub}</Text> : null}
 
         {/* 法会「窗口节点」(无场次):回向数据 + 发愿按钮(只此一个胖节点,不在每场重复) */}
         {isWindow && !past ? (
@@ -79,27 +78,27 @@ function NodeRow({ node, first, last, onPress }: { node: CoreviewNode; first: bo
               <Stat v={(node.myCount ?? 0).toLocaleString()} k="我已念(遍)" />
               <Stat v={fmtWan(node.platformTotal ?? 0)} k="全平台共修(遍)" accent />
             </View>
-            <View style={styles.btnFull}><RNText style={styles.btnFullTxt}>去发愿 / 回向 →</RNText></View>
+            <View style={styles.btnFull}><Text style={styles.btnFullTxt}>去发愿 / 回向 →</Text></View>
           </>
         ) : null}
         {isWindow && past ? (
-          <RNText style={styles.doneMuted}>已圆满{node.myCount ? ` · 我念 ${node.myCount.toLocaleString()} 遍` : ''}{node.platformTotal ? ` · 全平台 ${fmtWan(node.platformTotal)}` : ''}</RNText>
+          <Text style={styles.doneMuted}>已圆满{node.myCount ? ` · 我念 ${node.myCount.toLocaleString()} 遍` : ''}{node.platformTotal ? ` · 全平台 ${fmtWan(node.platformTotal)}` : ''}</Text>
         ) : null}
 
         {/* 法会「场次节点」:轻节点(点卡进详情发愿/回向);此处不重复回向数据 */}
         {isEvent && !isWindow ? (
-          <RNText style={styles.tapHint}>点开发愿 / 回向 ›</RNText>
+          <Text style={styles.tapHint}>点开发愿 / 回向 ›</Text>
         ) : null}
 
         {/* 共修即将:进入按钮 */}
         {node.kind === 'coreview' && !past ? (
-          <View style={styles.btnPill}><RNText style={styles.btnPillTxt}>进入共修 →</RNText></View>
+          <View style={styles.btnPill}><Text style={styles.btnPillTxt}>进入共修 →</Text></View>
         ) : null}
 
         {/* 往期共修:出勤态 */}
         {node.kind === 'coreview' && past ? (
-          node.attended === 'present' ? <RNText style={styles.done}>已出席 ✓</RNText>
-            : node.attended === 'absent' ? <RNText style={styles.miss}>未出席</RNText>
+          node.attended === 'present' ? <Text style={styles.done}>已出席 ✓</Text>
+            : node.attended === 'absent' ? <Text style={styles.miss}>未出席</Text>
               : null
         ) : null}
       </Pressable>
@@ -108,13 +107,13 @@ function NodeRow({ node, first, last, onPress }: { node: CoreviewNode; first: bo
 }
 
 function Tag({ children, bg, fg }: { children: React.ReactNode; bg: string; fg: string }) {
-  return <View style={[styles.tag, { backgroundColor: bg }]}><RNText style={{ fontSize: 10, fontWeight: '700', color: fg }}>{children}</RNText></View>;
+  return <View style={[styles.tag, { backgroundColor: bg }]}><Text style={{ fontSize: 10, fontWeight: '700', color: fg }}>{children}</Text></View>;
 }
 function Stat({ v, k, accent }: { v: string; k: string; accent?: boolean }) {
   return (
     <View style={styles.stat}>
       <Text className="font-serif" style={[styles.statV, accent && { color: SAFFRON_DARK }]}>{v}</Text>
-      <RNText style={styles.statK}>{k}</RNText>
+      <Text style={styles.statK}>{k}</Text>
     </View>
   );
 }

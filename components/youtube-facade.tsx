@@ -1,8 +1,9 @@
 import { Play } from 'lucide-react-native';
 import { memo, useState } from 'react';
-import { Image, LayoutChangeEvent, Pressable, StyleSheet, Text as RNText, View } from 'react-native';
+import { Image, LayoutChangeEvent, Pressable, StyleSheet, View } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 
+import { Text } from '@/components/ui/text';
 // 通用 YouTube「封面 + 点击内嵌播放」(facade·决策161)。
 // 平时只显示封面 + 播放按钮;点一下才挂载播放器(首屏快 / 省流量 / 点了才起 webview)。
 // 内嵌播放(CLAUDE.md 锁定 react-native-youtube-iframe·PM 2026-06-25 选「应用内内嵌」):
@@ -47,9 +48,9 @@ export const YouTubeFacade = memo(function YouTubeFacade({ videoId, cover, title
       {videoId ? (
         <View style={styles.playCircle}><Play size={26} color="#b35535" fill="#b35535" /></View>
       ) : (
-        <RNText style={styles.noVideo}>暂无视频</RNText>
+        <Text style={styles.noVideo}>暂无视频</Text>
       )}
-      {title ? <RNText style={styles.title} numberOfLines={1}>{title}</RNText> : null}
+      {title ? <Text style={styles.title} numberOfLines={1}>{title}</Text> : null}
     </Pressable>
   );
 });

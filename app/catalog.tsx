@@ -2,12 +2,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
 import { ChevronLeft, GraduationCap, Search } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
 import { useCourses } from '@/lib/queries/courses';
 
+import { TextInput } from '@/components/ui/text-input';
 // 全部课程 = 觉学 闻思 CoursesPage UI(PM 2026-06-19:按觉学 UI·主要大小比例/间距):
 //   头部(闻思/诸经汇集·选本入学)+ 搜索 + 筛选chips(全部/已加入/未加入)+ 类别 + 3 列书封网格(2:3·已加入角标·居中书名)。
 // 功能口径守 2.0:课程随专业分配(决策126),「已加入」= 我的专业已选课;「未加入」= 其他可浏览(浏览也存进度·决策149);
@@ -45,7 +46,7 @@ function BookCover({ title, emoji }: { title: string; emoji?: string }) {
       <LinearGradient colors={p.g} style={StyleSheet.absoluteFill} start={{ x: 0.2, y: 0 }} end={{ x: 0, y: 1 }} />
       <View style={[styles.spine, { backgroundColor: p.spine }]} />
       <Text className="font-serif" numberOfLines={3} style={[styles.coverTitle, { color: p.fg }]}>{title}</Text>
-      <RNText style={styles.coverEmoji}>{emoji || '📖'}</RNText>
+      <Text style={styles.coverEmoji}>{emoji || '📖'}</Text>
     </>
   );
 }
@@ -70,7 +71,7 @@ export default function Catalog() {
         {/* 头部 */}
         <View style={{ paddingHorizontal: 20, paddingTop: 2, paddingBottom: 14 }}>
           <Text className="font-serif" style={{ fontSize: 26, fontWeight: '700', color: INK, letterSpacing: 2 }}>全部课程</Text>
-          <RNText style={{ fontSize: 12, color: INK3, letterSpacing: 1, marginTop: 4 }}>诸经汇集 · 选本入学</RNText>
+          <Text style={{ fontSize: 12, color: INK3, letterSpacing: 1, marginTop: 4 }}>诸经汇集 · 选本入学</Text>
         </View>
 
         {/* 搜索 */}
@@ -85,7 +86,7 @@ export default function Catalog() {
         <View style={styles.filterRow}>
           {FILTERS.map((f) => (
             <Pressable key={f} onPress={() => setFilter(f)} style={{ alignItems: 'center' }}>
-              <RNText style={{ fontSize: 14, fontWeight: f === filter ? '700' : '500', color: f === filter ? SAFFRON_DARK : INK3 }}>{f}</RNText>
+              <Text style={{ fontSize: 14, fontWeight: f === filter ? '700' : '500', color: f === filter ? SAFFRON_DARK : INK3 }}>{f}</Text>
               <View style={{ marginTop: 4, height: 2, width: 18, borderRadius: 1, backgroundColor: f === filter ? SAFFRON : 'transparent' }} />
             </Pressable>
           ))}
@@ -95,22 +96,22 @@ export default function Catalog() {
 
         {/* 自学读物 */}
         <View style={{ paddingHorizontal: 20, paddingBottom: 16 }}>
-          <RNText style={{ fontSize: 12, color: INK3, letterSpacing: 1, marginBottom: 10 }}>自学读物</RNText>
+          <Text style={{ fontSize: 12, color: INK3, letterSpacing: 1, marginBottom: 10 }}>自学读物</Text>
           <Pressable style={styles.selfStudyCard} onPress={() => router.push('/speech' as never)}>
             <View style={styles.selfStudyIcon}>
               <GraduationCap size={22} color={SAFFRON_DARK} />
             </View>
             <View style={{ flex: 1 }}>
               <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: INK }}>大学演讲</Text>
-              <RNText style={{ fontSize: 12, color: INK3, marginTop: 2 }}>听闻 + 阅读即圆满 · 免答题</RNText>
+              <Text style={{ fontSize: 12, color: INK3, marginTop: 2 }}>听闻 + 阅读即圆满 · 免答题</Text>
             </View>
-            <RNText style={{ fontSize: 20, color: INK3 }}>›</RNText>
+            <Text style={{ fontSize: 20, color: INK3 }}>›</Text>
           </Pressable>
         </View>
 
         {/* 闻思课程 */}
         <View style={{ paddingHorizontal: 20, paddingBottom: 10 }}>
-          <RNText style={{ fontSize: 12, color: INK3, letterSpacing: 1 }}>闻思课程</RNText>
+          <Text style={{ fontSize: 12, color: INK3, letterSpacing: 1 }}>闻思课程</Text>
         </View>
 
         {/* 3 列书封网格 */}
@@ -119,11 +120,11 @@ export default function Catalog() {
         ) : isError ? (
           // 查询失败别落进"暂无课程"——那对课程库确有内容是假空态(全文件审计 2026-07-12)
           <View style={{ paddingVertical: 48, alignItems: 'center' }}>
-            <RNText style={{ fontSize: 13, color: INK3 }}>加载失败,请检查网络后重试</RNText>
+            <Text style={{ fontSize: 13, color: INK3 }}>加载失败,请检查网络后重试</Text>
           </View>
         ) : list.length === 0 ? (
           <View style={{ paddingVertical: 48, alignItems: 'center' }}>
-            <RNText style={{ fontSize: 13, color: INK3 }}>{q ? '没有匹配的课程' : '暂无课程'}</RNText>
+            <Text style={{ fontSize: 13, color: INK3 }}>{q ? '没有匹配的课程' : '暂无课程'}</Text>
           </View>
         ) : (
           <View style={styles.grid}>
@@ -137,7 +138,7 @@ export default function Catalog() {
                       <BookCover title={c.name} />
                     )}
                     {c.joined ? (
-                      <View style={styles.joinedBadge}><RNText style={{ fontSize: 10, fontWeight: '700', color: SAFFRON_DARK, letterSpacing: 1 }}>在学</RNText></View>
+                      <View style={styles.joinedBadge}><Text style={{ fontSize: 10, fontWeight: '700', color: SAFFRON_DARK, letterSpacing: 1 }}>在学</Text></View>
                     ) : null}
                   </View>
                   <Text className="font-serif" numberOfLines={2} style={styles.bookTitle}>{c.name}</Text>

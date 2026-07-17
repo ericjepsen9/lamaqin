@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -10,6 +10,7 @@ import type { CurrentUser } from '@/lib/queries/profile';
 import { supabase } from '@/lib/supabase';
 import { testIds } from '@/lib/testids';
 
+import { TextInput } from '@/components/ui/text-input';
 // 验证码登录(找回密码路径)成功后的一次性顺路提示(PM 2026-07-12·选项B):此时已有 session,
 // 但用户走的是"忘了密码"这条路,原密码永远没法再用——这里给个机会设个新密码,可跳过(不强制)。
 // 密码模式登录成功不经过这一页,直接进 index 闸门(见 verify.tsx)。
@@ -64,11 +65,11 @@ export default function SetPassword() {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FBF4E9' }} edges={['top']}>
       <View style={{ flex: 1, paddingHorizontal: 32, paddingTop: 40 }}>
         <Text className="font-serif" style={{ fontSize: 22, fontWeight: '700', color: INK }}>{isForced ? '请先设置你自己的密码' : '要不要顺便设个新密码?'}</Text>
-        <RNText style={{ fontSize: 13, color: INK3, marginTop: 6, lineHeight: 20 }}>
+        <Text style={{ fontSize: 13, color: INK3, marginTop: 6, lineHeight: 20 }}>
           {isForced
             ? '你现在用的是系统给的默认密码,为了账号安全,需要先改成只有你自己知道的新密码,才能继续使用。'
             : '你刚才是用验证码登录的,原密码可能已经忘了。现在设一个新密码,以后就能直接用密码登录,不用每次都等邮件验证码。也可以先跳过,以后再说。'}
-        </RNText>
+        </Text>
 
         <View style={{ gap: 12, marginTop: 24 }}>
           <View style={styles.field}>
@@ -77,21 +78,21 @@ export default function SetPassword() {
           <View style={styles.field}>
             <TextInput testID={testIds.setPassword.pwd2Input} value={pwd2} onChangeText={(t) => { setPwd2(t); setErr(null); }} placeholder="再输一遍新密码" placeholderTextColor={INK3} secureTextEntry style={styles.input} />
           </View>
-          {pwd2.length > 0 && pwd !== pwd2 ? <RNText style={{ fontSize: 12, color: CRIMSON }}>两次密码不一致</RNText> : null}
-          {err ? <RNText style={{ fontSize: 12, color: CRIMSON }}>{err}</RNText> : null}
+          {pwd2.length > 0 && pwd !== pwd2 ? <Text style={{ fontSize: 12, color: CRIMSON }}>两次密码不一致</Text> : null}
+          {err ? <Text style={{ fontSize: 12, color: CRIMSON }}>{err}</Text> : null}
           <Pressable testID={testIds.setPassword.submitButton} style={[styles.primary, (!valid || busy) && { opacity: 0.4 }]} disabled={!valid || busy} onPress={submit}>
-            <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{busy ? '设置中…' : '设置新密码'}</RNText>
+            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{busy ? '设置中…' : '设置新密码'}</Text>
           </Pressable>
           {isForced ? (
             // forced 模式不给"跳过"(必须改密码才放行,见上方注释),但仍需要一条退出路径——
             // 万一改密码本身出错(网络/服务端),不能把人困死在无返回、无跳过的页面上(2026-07-17
             // PM报告),给个和 pending.tsx/account-deletion-pending.tsx 一致的"退出登录"逃生口。
             <Pressable testID={testIds.setPassword.signOutButton} onPress={async () => { await supabase.auth.signOut(); router.replace('/login'); }} style={{ alignItems: 'center', marginTop: 4, padding: 8 }}>
-              <RNText style={{ fontSize: 13, color: INK3 }}>退出登录</RNText>
+              <Text style={{ fontSize: 13, color: INK3 }}>退出登录</Text>
             </Pressable>
           ) : (
             <Pressable onPress={proceed} style={{ alignItems: 'center', marginTop: 4, padding: 8 }}>
-              <RNText style={{ fontSize: 13, color: INK2, fontWeight: '600' }}>先跳过,以后再说</RNText>
+              <Text style={{ fontSize: 13, color: INK2, fontWeight: '600' }}>先跳过,以后再说</Text>
             </Pressable>
           )}
         </View>

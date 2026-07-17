@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { CalendarClock, ChevronLeft, MapPin } from 'lucide-react-native';
-import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -40,52 +40,52 @@ export default function SessionDetail() {
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color={SAFFRON} /></View>
       ) : isError ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <RNText style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>加载失败,请检查网络后重试(不代表该场次不存在)。</RNText>
+          <Text style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>加载失败,请检查网络后重试(不代表该场次不存在)。</Text>
         </View>
       ) : !data ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <RNText style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>共修场次不存在,或不属于你的班级。</RNText>
+          <Text style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>共修场次不存在,或不属于你的班级。</Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 14 }}>
           <View style={styles.card}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <View style={styles.typeTag}>
-                <RNText style={{ fontSize: 11, fontWeight: '700', color: SAFFRON_DARK }}>{data.type === 'practice' ? '实修共修' : '常规共修'}</RNText>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: SAFFRON_DARK }}>{data.type === 'practice' ? '实修共修' : '常规共修'}</Text>
               </View>
-              {data.cohortName ? <RNText style={{ fontSize: 12, color: INK3 }}>{data.cohortName}</RNText> : null}
+              {data.cohortName ? <Text style={{ fontSize: 12, color: INK3 }}>{data.cohortName}</Text> : null}
             </View>
             <Text className="font-serif" style={{ fontSize: 19, fontWeight: '700', color: INK, marginTop: 10, lineHeight: 28 }}>
               {data.lessonNumber != null ? `第 ${data.lessonNumber} 节 · ` : ''}{data.lessonTitle ?? '本班共修'}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 }}>
               <CalendarClock size={15} color={INK3} />
-              <RNText style={{ fontSize: 13, color: INK2 }}>{fmtRange(data.scheduledAt, data.sessionEndAt)}</RNText>
+              <Text style={{ fontSize: 13, color: INK2 }}>{fmtRange(data.scheduledAt, data.sessionEndAt)}</Text>
             </View>
             {data.location ? (
               isLink ? (
                 <Pressable style={styles.joinBtn} onPress={() => Linking.openURL(data.location!)}>
-                  <RNText style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>进入线上共修</RNText>
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>进入线上共修</Text>
                 </Pressable>
               ) : (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 }}>
                   <MapPin size={15} color={INK3} />
-                  <RNText style={{ fontSize: 13, color: INK2 }}>{data.location}</RNText>
+                  <Text style={{ fontSize: 13, color: INK2 }}>{data.location}</Text>
                 </View>
               )
             ) : null}
-            {data.notes ? <RNText style={{ fontSize: 13, color: INK2, lineHeight: 21, marginTop: 12 }}>{data.notes}</RNText> : null}
+            {data.notes ? <Text style={{ fontSize: 13, color: INK2, lineHeight: 21, marginTop: 12 }}>{data.notes}</Text> : null}
           </View>
 
           {data.lessonId ? (
             <Pressable style={styles.lessonBtn} onPress={() => router.push(`/lesson/${data.lessonId}?step=wensi` as never)}>
-              <RNText style={{ fontSize: 14, fontWeight: '700', color: SAFFRON_DARK }}>去学修本节 ›</RNText>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: SAFFRON_DARK }}>去学修本节 ›</Text>
             </Pressable>
           ) : null}
 
-          <RNText style={{ fontSize: 11, color: INK3, textAlign: 'center', lineHeight: 17 }}>
+          <Text style={{ fontSize: 11, color: INK3, textAlign: 'center', lineHeight: 17 }}>
             出勤由辅导员/爱心师兄在共修后统一录入,无需自行签到。
-          </RNText>
+          </Text>
         </ScrollView>
       )}
     </SafeAreaView>

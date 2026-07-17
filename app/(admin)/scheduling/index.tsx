@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -35,6 +35,7 @@ import { INK, INK2, INK3, INK4, SAFFRON, SAFFRON_DARK } from '@/lib/theme';
 import { useAdminLayout } from '../_layout';
 import { bookTitle } from '@/lib/utils';
 
+import { TextInput } from '@/components/ui/text-input';
 // 管理端「排课管理」· 排表模板录入端(决策:PM 2026-06-28)。
 //   一句话排课:选专业 → 选一门课、学到第几节 → 自动按周铺好(program_semesters→weeks→week_courses)。
 //   写的就是进度算法 get_week_lessons 的数据源 → 师兄端「本周应学 / 班级进度 / 继续学习」即真实点亮。

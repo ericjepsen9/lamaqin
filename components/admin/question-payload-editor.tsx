@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
-
+import { Pressable, StyleSheet, View } from 'react-native';
 import { type QuestionPayload, type QuestionType } from '@/lib/queries/admin/quiz';
 
+import { Text } from '@/components/ui/text';
+import { TextInput } from '@/components/ui/text-input';
 // 客观题选项/答案编辑器(单选/判断/填空/记忆卡/颂词组句/颂词续接)。
 // 产出 payload 与学员端 lesson/[id].tsx → QuestionCard 映射一致(options/answer/back/tokens/distractors/hint/previousLine)。
 // 列表类(选项/词块)用「每行一个」文本框,顺序=行序(颂词/续接的 tokens 必须按正确顺序输入)。
@@ -58,27 +59,27 @@ export function QuestionPayloadEditor({ type, initial, onChange }: {
     <View style={{ gap: 8 }}>
       {type === 'single' ? (
         <>
-          <RNText style={styles.label}>选项(每行一个)</RNText>
+          <Text style={styles.label}>选项(每行一个)</Text>
           <TextInput style={styles.area} multiline value={local.optionsText} onChangeText={(t) => emit({ optionsText: t })} placeholder={'选项A\n选项B\n选项C'} placeholderTextColor={INK3} textAlignVertical="top" />
-          <RNText style={styles.label}>正确答案(点选)</RNText>
+          <Text style={styles.label}>正确答案(点选)</Text>
           <View style={styles.chips}>
             {toLines(local.optionsText).map((opt, i) => (
               <Pressable key={`${opt}-${i}`} onPress={() => emit({ answer: opt })} style={[styles.chip, local.answer === opt && styles.chipOn]}>
-                <RNText style={{ fontSize: 13, color: local.answer === opt ? '#fff' : INK2 }}>{opt}</RNText>
+                <Text style={{ fontSize: 13, color: local.answer === opt ? '#fff' : INK2 }}>{opt}</Text>
               </Pressable>
             ))}
-            {toLines(local.optionsText).length === 0 ? <RNText style={styles.hint}>先在上方填选项</RNText> : null}
+            {toLines(local.optionsText).length === 0 ? <Text style={styles.hint}>先在上方填选项</Text> : null}
           </View>
         </>
       ) : null}
 
       {type === 'judge' ? (
         <>
-          <RNText style={styles.label}>正确答案</RNText>
+          <Text style={styles.label}>正确答案</Text>
           <View style={styles.chips}>
             {['正确', '错误'].map((opt) => (
               <Pressable key={opt} onPress={() => emit({ answer: opt })} style={[styles.chip, local.answer === opt && styles.chipOn]}>
-                <RNText style={{ fontSize: 13, color: local.answer === opt ? '#fff' : INK2 }}>{opt}</RNText>
+                <Text style={{ fontSize: 13, color: local.answer === opt ? '#fff' : INK2 }}>{opt}</Text>
               </Pressable>
             ))}
           </View>
@@ -87,15 +88,15 @@ export function QuestionPayloadEditor({ type, initial, onChange }: {
 
       {type === 'fill' ? (
         <>
-          <RNText style={styles.label}>正确答案(题干里用 ____ 表示空格)</RNText>
+          <Text style={styles.label}>正确答案(题干里用 ____ 表示空格)</Text>
           <TextInput style={styles.input} value={local.answer} onChangeText={(t) => emit({ answer: t })} placeholder="填空正确答案" placeholderTextColor={INK3} />
-          <RNText style={styles.hint}>判分忽略标点/空格;单空。</RNText>
+          <Text style={styles.hint}>判分忽略标点/空格;单空。</Text>
         </>
       ) : null}
 
       {type === 'flip' ? (
         <>
-          <RNText style={styles.label}>背面/答案(正面=题干)</RNText>
+          <Text style={styles.label}>背面/答案(正面=题干)</Text>
           <TextInput style={styles.area} multiline value={local.back} onChangeText={(t) => emit({ back: t })} placeholder="点击翻看时显示的内容" placeholderTextColor={INK3} textAlignVertical="top" />
         </>
       ) : null}
@@ -104,18 +105,18 @@ export function QuestionPayloadEditor({ type, initial, onChange }: {
         <>
           {type === 'chain' ? (
             <>
-              <RNText style={styles.label}>已给上一句</RNText>
+              <Text style={styles.label}>已给上一句</Text>
               <TextInput style={styles.input} value={local.previousLine} onChangeText={(t) => emit({ previousLine: t })} placeholder="提供给师兄的上一句" placeholderTextColor={INK3} />
             </>
           ) : (
             <>
-              <RNText style={styles.label}>上文提示(可选)</RNText>
+              <Text style={styles.label}>上文提示(可选)</Text>
               <TextInput style={styles.input} value={local.hint} onChangeText={(t) => emit({ hint: t })} placeholder="可留空" placeholderTextColor={INK3} />
             </>
           )}
-          <RNText style={styles.label}>正确词块(每行一个,按正确顺序)</RNText>
+          <Text style={styles.label}>正确词块(每行一个,按正确顺序)</Text>
           <TextInput style={styles.area} multiline value={local.tokensText} onChangeText={(t) => emit({ tokensText: t })} placeholder={'第一块\n第二块\n第三块'} placeholderTextColor={INK3} textAlignVertical="top" />
-          <RNText style={styles.label}>干扰词块(可选,每行一个)</RNText>
+          <Text style={styles.label}>干扰词块(可选,每行一个)</Text>
           <TextInput style={styles.area} multiline value={local.distractorsText} onChangeText={(t) => emit({ distractorsText: t })} placeholder="混在词池里的错误选项" placeholderTextColor={INK3} textAlignVertical="top" />
         </>
       ) : null}

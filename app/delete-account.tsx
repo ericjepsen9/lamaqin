@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft, TriangleAlert } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -56,34 +56,34 @@ export default function DeleteAccount() {
           </View>
           {POINTS.map((p, i) => (
             <View key={i} className="flex-row" style={{ gap: 8, marginTop: i === 0 ? 0 : 8 }}>
-              <RNText style={{ color: SAFFRON_DARK, fontWeight: '700' }}>·</RNText>
-              <RNText style={{ flex: 1, fontSize: 14, color: INK2, lineHeight: 22 }}>{p}</RNText>
+              <Text style={{ color: SAFFRON_DARK, fontWeight: '700' }}>·</Text>
+              <Text style={{ flex: 1, fontSize: 14, color: INK2, lineHeight: 22 }}>{p}</Text>
             </View>
           ))}
         </View>
 
         <View style={styles.softCard}>
-          <RNText style={{ fontSize: 14, color: INK2, lineHeight: 22 }}>有疑虑或遇到困难?不必急着离开,先和辅导员聊聊。</RNText>
+          <Text style={{ fontSize: 14, color: INK2, lineHeight: 22 }}>有疑虑或遇到困难?不必急着离开,先和辅导员聊聊。</Text>
           <Pressable style={styles.contactBtn} onPress={() => router.push('/help')}>
-            <RNText style={{ fontSize: 14, fontWeight: '700', color: SAFFRON_DARK }}>联系辅导员 ›</RNText>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: SAFFRON_DARK }}>联系辅导员 ›</Text>
           </Pressable>
         </View>
 
         <Pressable style={styles.agreeRow} onPress={() => setAgree((v) => !v)}>
-          <View style={[styles.check, agree && { backgroundColor: CRIM, borderColor: CRIM }]}>{agree ? <RNText style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</RNText> : null}</View>
-          <RNText style={{ flex: 1, fontSize: 14, color: INK, fontWeight: '600' }}>我已了解上述说明,确认注销账号</RNText>
+          <View style={[styles.check, agree && { backgroundColor: CRIM, borderColor: CRIM }]}>{agree ? <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text> : null}</View>
+          <Text style={{ flex: 1, fontSize: 14, color: INK, fontWeight: '600' }}>我已了解上述说明,确认注销账号</Text>
         </Pressable>
 
-        {err ? <RNText style={{ fontSize: 13, color: CRIM, textAlign: 'center' }}>{err}</RNText> : null}
+        {err ? <Text style={{ fontSize: 13, color: CRIM, textAlign: 'center' }}>{err}</Text> : null}
         <Pressable
           style={[styles.deleteBtn, (!agree || requestDeletion.isPending) && { opacity: 0.4 }]}
           disabled={!agree || requestDeletion.isPending}
           onPress={() => void handleDelete()}
         >
-          <RNText style={{ fontSize: 15, fontWeight: '700', color: '#fff' }}>{requestDeletion.isPending ? '处理中…' : '永久注销账号'}</RNText>
+          <Text style={{ fontSize: 15, fontWeight: '700', color: '#fff' }}>{requestDeletion.isPending ? '处理中…' : '永久注销账号'}</Text>
         </Pressable>
         <Pressable style={styles.cancel} onPress={() => router.back()}>
-          <RNText style={{ fontSize: 14, fontWeight: '700', color: INK2 }}>再想想,返回</RNText>
+          <Text style={{ fontSize: 14, fontWeight: '700', color: INK2 }}>再想想,返回</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>

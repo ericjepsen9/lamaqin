@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { BadgeCheck, BookOpen, ChevronLeft, Flower2, Users } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -117,7 +117,7 @@ export default function Notifications() {
           <Text className="font-serif" style={{ fontSize: 18, fontWeight: '700', color: INK }}>通知</Text>
         </View>
         {unreadCount > 0 ? (
-          <Pressable hitSlop={8} onPress={markAll}><RNText style={{ fontSize: 13, color: SAFFRON_DARK, fontWeight: '700' }}>全部已读</RNText></Pressable>
+          <Pressable hitSlop={8} onPress={markAll}><Text style={{ fontSize: 13, color: SAFFRON_DARK, fontWeight: '700' }}>全部已读</Text></Pressable>
         ) : null}
       </View>
 
@@ -126,7 +126,7 @@ export default function Notifications() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll} contentContainerStyle={styles.chipRow}>
           {chips.map((c) => (
             <Pressable key={c.key} style={[styles.chip, filter === c.key && styles.chipOn]} onPress={() => setFilter(c.key)}>
-              <RNText numberOfLines={1} style={{ fontSize: 13, fontWeight: '700', color: filter === c.key ? '#fff' : INK2 }}>{c.label} {c.count}</RNText>
+              <Text numberOfLines={1} style={{ fontSize: 13, fontWeight: '700', color: filter === c.key ? '#fff' : INK2 }}>{c.label} {c.count}</Text>
             </Pressable>
           ))}
         </ScrollView>
@@ -135,14 +135,14 @@ export default function Notifications() {
       <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}>
         {error ? (
           <View style={styles.empty}>
-            <RNText style={{ fontSize: 14, color: CRIMSON }}>加载失败,请检查网络后重试。</RNText>
+            <Text style={{ fontSize: 14, color: CRIMSON }}>加载失败,请检查网络后重试。</Text>
           </View>
         ) : isLoading ? (
           <ActivityIndicator color={SAFFRON} style={{ paddingVertical: 60 }} />
         ) : filtered.length === 0 ? (
           <View style={styles.empty}>
             <Flower2 size={30} color={INK3} />
-            <RNText style={{ fontSize: 14, color: INK3, marginTop: 10 }}>这里还没有通知</RNText>
+            <Text style={{ fontSize: 14, color: INK3, marginTop: 10 }}>这里还没有通知</Text>
           </View>
         ) : (
           GROUP_ORDER.map((g) => {
@@ -150,7 +150,7 @@ export default function Notifications() {
             if (items.length === 0) return null;
             return (
               <View key={g} style={{ marginTop: 6 }}>
-                <RNText style={styles.groupLabel}>{GROUP_LABEL[g]}</RNText>
+                <Text style={styles.groupLabel}>{GROUP_LABEL[g]}</Text>
                 <View style={{ gap: 8 }}>
                   {items.map((n) => {
                     const unread = !n.read;
@@ -162,8 +162,8 @@ export default function Notifications() {
                             {unread ? <View style={styles.dot} /> : null}
                             <Text className="font-serif" style={{ flex: 1, fontSize: 15, fontWeight: '700', color: INK }}>{n.title}</Text>
                           </View>
-                          <RNText style={{ fontSize: 13, color: INK2, lineHeight: 20, marginTop: 3 }}>{n.body}</RNText>
-                          <RNText style={{ fontSize: 11, color: INK3, marginTop: 6 }}>{n.time}</RNText>
+                          <Text style={{ fontSize: 13, color: INK2, lineHeight: 20, marginTop: 3 }}>{n.body}</Text>
+                          <Text style={{ fontSize: 11, color: INK3, marginTop: 6 }}>{n.time}</Text>
                         </View>
                       </Pressable>
                     );
@@ -174,9 +174,9 @@ export default function Notifications() {
           })
         )}
 
-        <RNText style={{ fontSize: 11, color: INK3, lineHeight: 18, marginTop: 18, textAlign: 'center' }}>
+        <Text style={{ fontSize: 11, color: INK3, lineHeight: 18, marginTop: 18, textAlign: 'center' }}>
           这里汇总学修提醒、班级公告与法会活动通知。
-        </RNText>
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );

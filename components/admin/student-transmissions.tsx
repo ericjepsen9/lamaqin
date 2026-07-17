@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
-
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { AdminButton, Badge } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
 import { notify } from '@/lib/dialog';
@@ -8,6 +7,7 @@ import { useRecordTransmission } from '@/lib/mutations/proxy';
 import { useStudentTransmissions, useTransmissions } from '@/lib/queries/admin/proxy';
 import { INK, INK2, INK3, SAFFRON_DARK } from '@/lib/theme';
 
+import { TextInput } from '@/components/ui/text-input';
 // 传承记录(设计②·2026-07-08):显宗传承录入(课程听闻/法会所得)。
 // ⚠️ 灌顶/密法不做(维持决策060/112 红线决定,见 lib/queries/admin/proxy.ts 头注);
 //   本组件只列 transmissions 表已有的显宗传承(source_kind ∈ course/assembly)。
@@ -45,14 +45,14 @@ export function StudentTransmissions({ userId, name, canWrite }: { userId: strin
   return (
     <>
       {isLoading ? null : obtained.length === 0 ? (
-        <RNText style={styles.hint}>暂无已得传承记录。</RNText>
+        <Text style={styles.hint}>暂无已得传承记录。</Text>
       ) : (
         <View style={{ gap: 8 }}>
           {obtained.map((t) => (
             <View key={t.id} style={styles.row}>
-              <RNText style={{ flex: 1, fontSize: 13, fontWeight: '600', color: INK }}>{t.name}</RNText>
+              <Text style={{ flex: 1, fontSize: 13, fontWeight: '600', color: INK }}>{t.name}</Text>
               <Badge tone="sage">{t.obtainedAt ?? '—'}</Badge>
-              <RNText style={{ fontSize: 10, color: INK3 }}>{SOURCE_LABEL[t.source] ?? t.source}</RNText>
+              <Text style={{ fontSize: 10, color: INK3 }}>{SOURCE_LABEL[t.source] ?? t.source}</Text>
             </View>
           ))}
         </View>
@@ -71,16 +71,16 @@ export function StudentTransmissions({ userId, name, canWrite }: { userId: strin
         <Pressable style={styles.backdrop} onPress={() => setOpen(false)}>
           <Pressable style={styles.card} onPress={() => {}}>
             <Text className="font-serif" style={styles.cardTitle}>录入传承</Text>
-            <RNText style={styles.cardSub}>为 {name} 录入显宗传承(听课/法会所得)。灌顶/密法传承不在本库处理。</RNText>
+            <Text style={styles.cardSub}>为 {name} 录入显宗传承(听课/法会所得)。灌顶/密法传承不在本库处理。</Text>
             {pending.length === 0 ? (
-              <RNText style={[styles.hint, { marginTop: 12 }]}>已得全部已知传承,或暂无可选传承(先在中枢配置传承清单)。</RNText>
+              <Text style={[styles.hint, { marginTop: 12 }]}>已得全部已知传承,或暂无可选传承(先在中枢配置传承清单)。</Text>
             ) : (
               <ScrollView style={{ maxHeight: 260, marginTop: 12 }}>
                 <View style={{ gap: 6 }}>
                   {pending.map((o) => (
                     <Pressable key={o.id} style={[styles.opt, pickId === o.id && styles.optPick]} onPress={() => setPickId(o.id)}>
-                      <RNText style={{ fontSize: 13, fontWeight: '600', color: INK }}>{o.name}</RNText>
-                      <RNText style={{ fontSize: 10, color: INK3 }}>{SOURCE_LABEL[o.sourceKind] ?? o.sourceKind}</RNText>
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: INK }}>{o.name}</Text>
+                      <Text style={{ fontSize: 10, color: INK3 }}>{SOURCE_LABEL[o.sourceKind] ?? o.sourceKind}</Text>
                     </Pressable>
                   ))}
                 </View>

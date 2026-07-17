@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { ChevronRight, Clock, MapPin, Plus, Users } from 'lucide-react-native';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AdminButton, AdminModal, Badge, EmptyState, ModalActions, ModalField, ModalFootnote, SCREEN_BG, type BadgeTone } from '@/components/ui/admin-kit';
@@ -13,6 +13,7 @@ import { GOLD_SOFT, INK, INK2, INK3, INK4, SAFFRON, SAGE, SAGE_SOFT } from '@/li
 import { useAdminLayout } from '../_layout';
 import { ClassDetailPanel } from './[id]';
 
+import { TextInput } from '@/components/ui/text-input';
 const WIDE = 900;
 const MASTER_W = 360;
 

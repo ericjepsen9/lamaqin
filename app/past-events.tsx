@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CoreviewList } from '@/components/coreview-timeline';
@@ -28,16 +28,16 @@ export default function PastEvents() {
         ) : isError ? (
           // 查询失败别落进"还没有往期记录"——那对确有历史记录的师兄是假空态(全文件审计 2026-07-12)
           <View style={{ paddingVertical: 50, alignItems: 'center' }}>
-            <RNText style={{ fontSize: 13, color: INK3, textAlign: 'center' }}>加载失败,请检查网络后重试</RNText>
+            <Text style={{ fontSize: 13, color: INK3, textAlign: 'center' }}>加载失败,请检查网络后重试</Text>
           </View>
         ) : past.length === 0 ? (
           <View style={{ paddingVertical: 50, alignItems: 'center' }}>
-            <RNText style={{ fontSize: 13, color: INK3, textAlign: 'center' }}>还没有往期记录。</RNText>
+            <Text style={{ fontSize: 13, color: INK3, textAlign: 'center' }}>还没有往期记录。</Text>
           </View>
         ) : (
           <>
             <CoreviewList nodes={past} showMonths />
-            <RNText style={{ fontSize: 11, color: INK3, textAlign: 'center', marginTop: 10 }}>展示你的个人参与与集体回向总和。</RNText>
+            <Text style={{ fontSize: 11, color: INK3, textAlign: 'center', marginTop: 10 }}>展示你的个人参与与集体回向总和。</Text>
           </>
         )}
       </ScrollView>

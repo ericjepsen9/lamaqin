@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Users } from 'lucide-react-native';
-import { Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -25,14 +25,14 @@ export default function JoinClass() {
         <View style={styles.card}>
           <View style={styles.icon}><Users size={22} color={SAFFRON} /></View>
           <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK, marginTop: 12 }}>入班由管理员安排</Text>
-          <RNText style={{ fontSize: 14, color: INK2, lineHeight: 23, marginTop: 8 }}>
+          <Text style={{ fontSize: 14, color: INK2, lineHeight: 23, marginTop: 8 }}>
             班级共修按学会的班次统一编排,由管理员根据你的学习意愿与进度分配入班——无需在这里自选。
-          </RNText>
-          <RNText style={{ fontSize: 13, color: INK3, lineHeight: 21, marginTop: 10 }}>
+          </Text>
+          <Text style={{ fontSize: 13, color: INK3, lineHeight: 21, marginTop: 10 }}>
             想加入班级共修:请联系你的辅导员或管理员;还没有联系方式的,可在「设置 → 帮助与反馈」里留言,管理员会与你联系。
-          </RNText>
+          </Text>
         </View>
-        <RNText style={{ fontSize: 11, color: INK3, textAlign: 'center' }}>入班后课程随班级专业分配;先以旁听加入,辅导员核对后转正式。</RNText>
+        <Text style={{ fontSize: 11, color: INK3, textAlign: 'center' }}>入班后课程随班级专业分配;先以旁听加入,辅导员核对后转正式。</Text>
       </ScrollView>
     </SafeAreaView>
   );

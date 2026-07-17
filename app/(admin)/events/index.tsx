@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -27,6 +27,7 @@ import { GOLD_DARK as GOLD, INK, INK2, INK3, INK4, SAFFRON } from '@/lib/theme';
 import { genClientToken } from '@/lib/utils';
 import { useAdminLayout } from '../_layout';
 
+import { TextInput } from '@/components/ui/text-input';
 type TabType = 'events' | 'announcements';
 
 const EVENT_TYPE_TONE: Record<string, BadgeTone> = { 法会: 'gold' };

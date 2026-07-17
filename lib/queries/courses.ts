@@ -21,7 +21,7 @@ export type CourseListItem = {
   isRequired: boolean;
   joined: boolean;
   coverImageUrl: string | null; // 有值→用真实封面图;无→UI 兜底(hash 配色书封,决策160)
-  programs: { name: string; displayOrder: number }[]; // 所属专业(分类分组用;一课可挂多专业)
+  programs: { name: string; displayOrder: number; sortOrder: number }[]; // 所属专业(分类分组用;一课可挂多专业);sortOrder=该课在这个专业课表里的顺序(program_courses.sort_order)
 };
 
 export function useCourses() {
@@ -33,7 +33,7 @@ export function useCourses() {
     queryFn: async (): Promise<CourseListItem[]> => {
       const { data, error } = await supabase
         .from('courses')
-        .select('id, name, slug, author, description, total_lessons, course_type, is_required, cover_image_url, program_courses(programs(name, display_order))')
+        .select('id, name, slug, author, description, total_lessons, course_type, is_required, cover_image_url, program_courses(sort_order, programs(name, display_order))')
         .order('name');
       if (error) throw error;
 
@@ -43,7 +43,7 @@ export function useCourses() {
       type Row = {
         id: string; name: string; slug: string | null; author: string | null; description: string | null;
         total_lessons: number | null; course_type: string | null; is_required: boolean | null; cover_image_url: string | null;
-        program_courses: { programs: { name: string; display_order: number } | null }[] | null;
+        program_courses: { sort_order: number | null; programs: { name: string; display_order: number } | null }[] | null;
       };
       return ((data ?? []) as unknown as Row[]).map((c) => ({
         id: c.id,
@@ -57,9 +57,8 @@ export function useCourses() {
         joined: joinedSet.has(c.id),
         coverImageUrl: c.cover_image_url,
         programs: (c.program_courses ?? [])
-          .map((pc) => pc.programs)
-          .filter((p): p is { name: string; display_order: number } => !!p)
-          .map((p) => ({ name: p.name, displayOrder: p.display_order })),
+          .filter((pc): pc is { sort_order: number | null; programs: { name: string; display_order: number } } => !!pc.programs)
+          .map((pc) => ({ name: pc.programs.name, displayOrder: pc.programs.display_order, sortOrder: pc.sort_order ?? 0 })),
       }));
     },
   });

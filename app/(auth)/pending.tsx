@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { Clock } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text as RNText, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -20,12 +20,12 @@ export default function Pending() {
           <Clock size={34} color={SAFFRON_DARK} />
         </View>
         <Text className="font-serif" style={{ fontSize: 20, fontWeight: '700', color: INK }}>报名已提交,等待审核</Text>
-        <RNText style={{ fontSize: 14, color: INK3, textAlign: 'center', lineHeight: 24 }}>管理员确认后,你就能进入学修。请耐心等候,无需重复提交。</RNText>
+        <Text style={{ fontSize: 14, color: INK3, textAlign: 'center', lineHeight: 24 }}>管理员确认后,你就能进入学修。请耐心等候,无需重复提交。</Text>
         <Pressable style={styles.refresh} onPress={() => router.replace('/')}>
-          <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>刷新审核状态</RNText>
+          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>刷新审核状态</Text>
         </Pressable>
         <Pressable onPress={async () => { await supabase.auth.signOut(); router.replace('/login'); }} style={{ paddingVertical: 8 }}>
-          <RNText style={{ fontSize: 13, color: INK3 }}>退出登录</RNText>
+          <Text style={{ fontSize: 13, color: INK3 }}>退出登录</Text>
         </Pressable>
       </View>
     </SafeAreaView>

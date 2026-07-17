@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { Camera, ChevronLeft } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -11,6 +11,7 @@ import { useAuth } from '@/lib/auth';
 import { useCurrentUser } from '@/lib/queries/profile';
 import { supabase } from '@/lib/supabase';
 
+import { TextInput } from '@/components/ui/text-input';
 // 编辑资料(设置 → 账号与隐私)。法名 / 头像 / 联系方式可改;真实姓名供辅导员核对;
 // 学号 = 转正后发放·只读(决策134);无障碍登记(盲聋豁免·听看两遍即圆满)。
 // 守:无状态色。保存已接真(D-9·2026-07-02:full_name/dharma_name/phone/accessibility_needs);头像上传仍待 storage。
@@ -68,14 +69,14 @@ export default function EditProfile() {
       <View style={styles.top}>
         <Pressable hitSlop={8} onPress={() => router.back()}><ChevronLeft size={24} color={INK} /></Pressable>
         <Text className="font-serif" style={{ flex: 1, fontSize: 17, fontWeight: '700', color: INK }}>编辑资料</Text>
-        <Pressable hitSlop={8} disabled={busy} onPress={save}><RNText style={{ fontSize: 14, fontWeight: '700', color: SAFFRON_DARK }}>{busy ? '保存中…' : '保存'}</RNText></Pressable>
+        <Pressable hitSlop={8} disabled={busy} onPress={save}><Text style={{ fontSize: 14, fontWeight: '700', color: SAFFRON_DARK }}>{busy ? '保存中…' : '保存'}</Text></Pressable>
       </View>
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 16 }}>
         {/* 查询失败别让表单静默留空——那和"还没填过"没法区分(全文件审计 2026-07-12):
             资料没到位时明确提示,避免师兄误以为字段本就是空/未转正而直接保存覆盖旧值。 */}
         {meError ? (
           <View style={styles.errorBanner}>
-            <RNText style={{ fontSize: 12.5, color: '#a13c2e', lineHeight: 18 }}>资料加载失败,请检查网络后重试。下方字段可能未取到你的现有资料,建议刷新后再保存,以免覆盖为空值。</RNText>
+            <Text style={{ fontSize: 12.5, color: '#a13c2e', lineHeight: 18 }}>资料加载失败,请检查网络后重试。下方字段可能未取到你的现有资料,建议刷新后再保存,以免覆盖为空值。</Text>
           </View>
         ) : null}
 
@@ -85,7 +86,7 @@ export default function EditProfile() {
             <View style={styles.avatar}><Text className="font-serif" style={{ fontSize: 30, fontWeight: '700', color: '#fff' }}>{initial}</Text></View>
             <View style={styles.cam}><Camera size={14} color="#fff" /></View>
           </Pressable>
-          <RNText style={{ fontSize: 12, color: INK3 }}>更换头像</RNText>
+          <Text style={{ fontSize: 12, color: INK3 }}>更换头像</Text>
         </View>
 
         <View style={styles.group}>
@@ -97,24 +98,24 @@ export default function EditProfile() {
         {/* 学号(只读) */}
         <View style={styles.group}>
           <View style={styles.row}>
-            <View style={{ flex: 1 }}><RNText style={styles.label}>学号</RNText><RNText style={styles.note}>转正后由辅导员发放,不可自行修改</RNText></View>
-            <RNText style={{ fontSize: 15, color: INK3 }}>{me?.studentId ?? '转正后发放'}</RNText>
+            <View style={{ flex: 1 }}><Text style={styles.label}>学号</Text><Text style={styles.note}>转正后由辅导员发放,不可自行修改</Text></View>
+            <Text style={{ fontSize: 15, color: INK3 }}>{me?.studentId ?? '转正后发放'}</Text>
           </View>
         </View>
 
         {/* 无障碍(盲/聋分列,与注册登记一致) */}
         <Pressable style={styles.a11y} onPress={() => setBlind((v) => !v)}>
-          <View style={[styles.check, blind && { backgroundColor: SAFFRON, borderColor: SAFFRON }]}>{blind ? <RNText style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</RNText> : null}</View>
+          <View style={[styles.check, blind && { backgroundColor: SAFFRON, borderColor: SAFFRON }]}>{blind ? <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text> : null}</View>
           <View style={{ flex: 1 }}>
-            <RNText style={{ fontSize: 14, color: INK, fontWeight: '600' }}>我有视力障碍</RNText>
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 1 }}>听两遍即圆满(免看法本、免答题)</RNText>
+            <Text style={{ fontSize: 14, color: INK, fontWeight: '600' }}>我有视力障碍</Text>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 1 }}>听两遍即圆满(免看法本、免答题)</Text>
           </View>
         </Pressable>
         <Pressable style={styles.a11y} onPress={() => setDeaf((v) => !v)}>
-          <View style={[styles.check, deaf && { backgroundColor: SAFFRON, borderColor: SAFFRON }]}>{deaf ? <RNText style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</RNText> : null}</View>
+          <View style={[styles.check, deaf && { backgroundColor: SAFFRON, borderColor: SAFFRON }]}>{deaf ? <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text> : null}</View>
           <View style={{ flex: 1 }}>
-            <RNText style={{ fontSize: 14, color: INK, fontWeight: '600' }}>我有听力障碍</RNText>
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 1 }}>看两遍即圆满(免听、免答题)</RNText>
+            <Text style={{ fontSize: 14, color: INK, fontWeight: '600' }}>我有听力障碍</Text>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 1 }}>看两遍即圆满(免听、免答题)</Text>
           </View>
         </Pressable>
       </ScrollView>
@@ -126,8 +127,8 @@ function Field({ label, value, onChange, placeholder, note, last }: { label: str
   return (
     <View style={[styles.row, !last && styles.rowBorder]}>
       <View style={{ flex: 1 }}>
-        <RNText style={styles.label}>{label}</RNText>
-        {note ? <RNText style={styles.note}>{note}</RNText> : null}
+        <Text style={styles.label}>{label}</Text>
+        {note ? <Text style={styles.note}>{note}</Text> : null}
       </View>
       <TextInput value={value} onChangeText={onChange} placeholder={placeholder} placeholderTextColor={INK3} style={styles.input} />
     </View>

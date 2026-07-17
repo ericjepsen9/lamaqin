@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ChevronLeft, MailCheck } from 'lucide-react-native';
 import { useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -9,6 +9,7 @@ import { isEmailTakenError } from '@/lib/auth-errors';
 import { supabase } from '@/lib/supabase';
 import { testIds } from '@/lib/testids';
 
+import { TextInput } from '@/components/ui/text-input';
 // 注册(D-2/D-3·2026-07-02):邮箱+密码 signUp → 触发器自动建 pending 档案(审批门 058/132 fail-closed)。
 // 成功后两种走向(按 Supabase 项目「邮箱确认」开关自适应):
 //   · 关(直接给会话)→ 进 /onboarding 完善资料+学习意愿;
@@ -88,7 +89,7 @@ export default function Register() {
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40, gap: 14 }}>
           <View style={styles.mark}><MailCheck size={30} color={SAFFRON_DARK} /></View>
           <Text className="font-serif" style={{ fontSize: 20, fontWeight: '700', color: INK }}>输入验证码完成确认</Text>
-          <RNText style={{ fontSize: 14, color: INK3, textAlign: 'center', lineHeight: 24 }}>验证码已发送至{'\n'}{email.trim()}</RNText>
+          <Text style={{ fontSize: 14, color: INK3, textAlign: 'center', lineHeight: 24 }}>验证码已发送至{'\n'}{email.trim()}</Text>
 
           <View style={{ width: '100%', gap: 10, marginTop: 8 }}>
             <View style={styles.field}>
@@ -104,22 +105,22 @@ export default function Register() {
                 style={[styles.input, { letterSpacing: 6, fontSize: 20, textAlign: 'center' }]}
               />
             </View>
-            {codeErr ? <RNText style={{ fontSize: 12, color: CRIMSON, textAlign: 'center' }}>{codeErr}</RNText> : null}
+            {codeErr ? <Text style={{ fontSize: 12, color: CRIMSON, textAlign: 'center' }}>{codeErr}</Text> : null}
             <Pressable
               testID={testIds.register.codeSubmitButton}
               style={[styles.primary, (!code.trim() || codeBusy) && { opacity: 0.4 }]}
               disabled={!code.trim() || codeBusy}
               onPress={submitCode}
             >
-              <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{codeBusy ? '确认中…' : '确认'}</RNText>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{codeBusy ? '确认中…' : '确认'}</Text>
             </Pressable>
             <Pressable testID={testIds.register.resendButton} onPress={resendCode} hitSlop={6} style={{ alignItems: 'center', padding: 8 }}>
-              <RNText style={{ fontSize: 13, color: INK2 }}>{resent ? '已重新发送' : '没收到?重新发送'}</RNText>
+              <Text style={{ fontSize: 13, color: INK2 }}>{resent ? '已重新发送' : '没收到?重新发送'}</Text>
             </Pressable>
           </View>
 
           <Pressable onPress={() => router.replace('/login' as never)}>
-            <RNText style={{ fontSize: 13, color: SAFFRON_DARK, fontWeight: '700' }}>回登录页</RNText>
+            <Text style={{ fontSize: 13, color: SAFFRON_DARK, fontWeight: '700' }}>回登录页</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -133,7 +134,7 @@ export default function Register() {
       </View>
       <View style={{ flex: 1, paddingHorizontal: 32, paddingTop: 24 }}>
         <Text className="font-serif" style={{ fontSize: 22, fontWeight: '700', color: INK }}>注册账号</Text>
-        <RNText style={{ fontSize: 13, color: INK3, marginTop: 6 }}>注册后完善资料,管理员审批通过即可开始学修。</RNText>
+        <Text style={{ fontSize: 13, color: INK3, marginTop: 6 }}>注册后完善资料,管理员审批通过即可开始学修。</Text>
 
         <View style={{ gap: 12, marginTop: 24 }}>
           <View style={styles.field}>
@@ -145,12 +146,12 @@ export default function Register() {
           <View style={styles.field}>
             <TextInput testID={testIds.register.password2Input} value={pwd2} onChangeText={(t) => { setPwd2(t); setErr(null); }} placeholder="再输一遍密码" placeholderTextColor={INK3} secureTextEntry style={styles.input} />
           </View>
-          {pwd2.length > 0 && pwd !== pwd2 ? <RNText style={{ fontSize: 12, color: CRIMSON }}>两次密码不一致</RNText> : null}
-          {err ? <RNText style={{ fontSize: 12, color: CRIMSON }}>{err}</RNText> : null}
+          {pwd2.length > 0 && pwd !== pwd2 ? <Text style={{ fontSize: 12, color: CRIMSON }}>两次密码不一致</Text> : null}
+          {err ? <Text style={{ fontSize: 12, color: CRIMSON }}>{err}</Text> : null}
           <Pressable testID={testIds.register.submitButton} style={[styles.primary, { alignSelf: 'stretch', marginTop: 4 }, (!valid || busy) && { opacity: 0.4 }]} disabled={!valid || busy} onPress={submit}>
-            <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{busy ? '注册中…' : '注册'}</RNText>
+            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{busy ? '注册中…' : '注册'}</Text>
           </Pressable>
-          <RNText style={{ fontSize: 12, color: INK2, textAlign: 'center', marginTop: 6 }}>已有账号?返回上一页直接登录。</RNText>
+          <Text style={{ fontSize: 12, color: INK2, textAlign: 'center', marginTop: 6 }}>已有账号?返回上一页直接登录。</Text>
         </View>
       </View>
     </SafeAreaView>

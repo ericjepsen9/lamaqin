@@ -1,10 +1,10 @@
 import { Check, Download, X } from 'lucide-react-native';
-import { ActivityIndicator, Pressable, Text as RNText, StyleSheet, View } from 'react-native';
-
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { notify } from '@/lib/dialog';
 import type { DownloadKind } from '@/lib/download-store';
 import { DOWNLOADS_SUPPORTED, type DownloadUiState, useDownloadAsset, useDownloadAssetGroup } from '@/lib/downloads';
 
+import { Text } from '@/components/ui/text';
 const SAFFRON_DARK = '#b35535';
 const SAGE = '#6f9a86';
 const INK3 = '#7e6d5b';
@@ -18,7 +18,7 @@ function DownloadStateView({ state, progressRatio, onStart, onRemove }: {
     return (
       <View style={styles.pill}>
         <ActivityIndicator size="small" color={SAFFRON_DARK} />
-        <RNText style={styles.txt}>{Math.round(progressRatio * 100)}%</RNText>
+        <Text style={styles.txt}>{Math.round(progressRatio * 100)}%</Text>
       </View>
     );
   }
@@ -26,7 +26,7 @@ function DownloadStateView({ state, progressRatio, onStart, onRemove }: {
     return (
       <Pressable style={[styles.btn, styles.done]} onPress={onRemove} hitSlop={8}>
         <Check size={13} color={SAGE} />
-        <RNText style={[styles.txt, { color: SAGE }]}>已下载</RNText>
+        <Text style={[styles.txt, { color: SAGE }]}>已下载</Text>
         <X size={12} color={INK3} />
       </Pressable>
     );
@@ -34,7 +34,7 @@ function DownloadStateView({ state, progressRatio, onStart, onRemove }: {
   return (
     <Pressable style={styles.btn} hitSlop={8} onPress={onStart}>
       <Download size={13} color={SAFFRON_DARK} />
-      <RNText style={styles.txt}>离线下载</RNText>
+      <Text style={styles.txt}>离线下载</Text>
     </Pressable>
   );
 }

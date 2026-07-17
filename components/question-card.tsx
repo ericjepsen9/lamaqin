@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
-
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
+import { TextInput } from '@/components/ui/text-input';
 // 思考题卡片 · 7 题型(决策082/105):open 问答 / single 单选 / judge 判断 / fill 填空 /
 //   flip 记忆卡 / verse 颂词组句(词块拼句·Duolingo 式) / chain 颂词续接(给上句·拼下句)。
 // 答案/判分:问答 submit-only·不揭示参考(师兄不见·计圆满);客观/拼句/卡片 提交后揭示参考 + 本地判分。
@@ -58,7 +58,7 @@ export function QuestionCard({ q, submitted, value, onChange, onSubmit }: {
   return (
     <View style={styles.card}>
       <View style={[styles.tag, q.gomman ? { backgroundColor: '#FBE5DA' } : { backgroundColor: 'rgba(43,34,24,0.06)' }]}>
-        <RNText style={{ fontSize: 10, fontWeight: '700', color: q.gomman ? SAFFRON_DARK : INK3 }}>{TYPE_LABEL[q.type]} · {q.gomman ? '计入圆满' : '练习'}</RNText>
+        <Text style={{ fontSize: 10, fontWeight: '700', color: q.gomman ? SAFFRON_DARK : INK3 }}>{TYPE_LABEL[q.type]} · {q.gomman ? '计入圆满' : '练习'}</Text>
       </View>
       <Text className="font-serif" style={{ fontSize: 16, lineHeight: 26, color: INK, marginTop: 10 }}>{q.prompt}</Text>
 
@@ -79,13 +79,13 @@ export function QuestionCard({ q, submitted, value, onChange, onSubmit }: {
         disabled={!canSubmit && !submitted}
         onPress={() => { if (!submitted) onSubmit(); }}
       >
-        <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>
+        <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>
           {submitted ? '已提交 ✓（随答随存）' : q.type === 'flip' ? '我已记住' : '提交本题'}
-        </RNText>
+        </Text>
       </Pressable>
 
       {submitted && q.type === 'open' ? (
-        <RNText style={styles.openNote}>问答以自己的思维为主,不设标准答案;已记入「答」。</RNText>
+        <Text style={styles.openNote}>问答以自己的思维为主,不设标准答案;已记入「答」。</Text>
       ) : null}
     </View>
   );
@@ -120,9 +120,9 @@ function OptionBody({ options, value, answer, submitted, onChange }: { options: 
         return (
           <Pressable key={opt} disabled={submitted} style={[styles.option, chosen && !submitted && { borderColor: SAFFRON }, showCorrect && styles.optCorrect, showWrong && styles.optWrong]} onPress={() => onChange(opt)}>
             <View style={[styles.radio, chosen && !submitted && { borderColor: SAFFRON, backgroundColor: SAFFRON }, showCorrect && { borderColor: SAGE, backgroundColor: SAGE }, showWrong && { borderColor: CRIMSON, backgroundColor: CRIMSON }]} />
-            <RNText style={{ flex: 1, fontSize: 14, color: INK }}>{opt}</RNText>
-            {showCorrect ? <RNText style={{ fontSize: 11, fontWeight: '700', color: SAGE_DARK }}>✓ 参考答案</RNText> : null}
-            {showWrong ? <RNText style={{ fontSize: 12, fontWeight: '700', color: CRIMSON }}>✗</RNText> : null}
+            <Text style={{ flex: 1, fontSize: 14, color: INK }}>{opt}</Text>
+            {showCorrect ? <Text style={{ fontSize: 11, fontWeight: '700', color: SAGE_DARK }}>✓ 参考答案</Text> : null}
+            {showWrong ? <Text style={{ fontSize: 12, fontWeight: '700', color: CRIMSON }}>✗</Text> : null}
           </Pressable>
         );
       })}
@@ -144,7 +144,7 @@ function FillBody({ value, onChange, submitted, answer }: { value: unknown; onCh
           placeholderTextColor={INK3}
           style={{ fontSize: 15, color: INK, paddingVertical: 0, flex: 1 }}
         />
-        {submitted ? <RNText style={{ fontSize: 15, fontWeight: '700', color: ok ? SAGE_DARK : CRIMSON }}>{ok ? '✓' : '✗'}</RNText> : null}
+        {submitted ? <Text style={{ fontSize: 15, fontWeight: '700', color: ok ? SAGE_DARK : CRIMSON }}>{ok ? '✓' : '✗'}</Text> : null}
       </View>
       {submitted && answer ? <RevealBox text={`参考答案:${answer}`} /> : null}
     </View>
@@ -155,7 +155,7 @@ function FillBody({ value, onChange, submitted, answer }: { value: unknown; onCh
 function FlipBody({ front, back, flipped, onFlip }: { front: string; back: string; flipped: boolean; onFlip: () => void }) {
   return (
     <Pressable style={[styles.flip, flipped && styles.flipBack]} onPress={onFlip}>
-      <RNText style={{ fontSize: 11, fontWeight: '700', color: flipped ? SAGE_DARK : SAFFRON_DARK, letterSpacing: 1 }}>{flipped ? '答案' : '正面 · 点击翻看'}</RNText>
+      <Text style={{ fontSize: 11, fontWeight: '700', color: flipped ? SAGE_DARK : SAFFRON_DARK, letterSpacing: 1 }}>{flipped ? '答案' : '正面 · 点击翻看'}</Text>
       <Text className="font-serif" style={{ fontSize: 16, lineHeight: 26, color: INK, marginTop: 8, textAlign: 'center' }}>{flipped ? back : front}</Text>
     </Pressable>
   );
@@ -173,7 +173,7 @@ function TokenBody({ q, picked, submitted, onChange }: { q: Question; picked: st
     <View style={{ marginTop: 10, gap: 10 }}>
       {lead ? (
         <View style={styles.lead}>
-          {q.type === 'chain' ? <RNText style={{ fontSize: 11, color: INK3, marginBottom: 2 }}>已给上一句</RNText> : null}
+          {q.type === 'chain' ? <Text style={{ fontSize: 11, color: INK3, marginBottom: 2 }}>已给上一句</Text> : null}
           <Text className="font-serif" style={{ fontSize: 15, color: INK, lineHeight: 24 }}>{lead}</Text>
         </View>
       ) : null}
@@ -181,7 +181,7 @@ function TokenBody({ q, picked, submitted, onChange }: { q: Question; picked: st
       {/* 上区:已选词块(提交后逐词标对/错色) */}
       <View style={styles.tokenSlot}>
         {picked.length === 0 ? (
-          <RNText style={{ fontSize: 13, color: INK3 }}>点下方词块,按顺序拼出{q.type === 'chain' ? '下一句' : '颂词'}…</RNText>
+          <Text style={{ fontSize: 13, color: INK3 }}>点下方词块,按顺序拼出{q.type === 'chain' ? '下一句' : '颂词'}…</Text>
         ) : (
           <View className="flex-row" style={{ flexWrap: 'wrap', gap: 8 }}>
             {picked.map((t, i) => {
@@ -192,7 +192,7 @@ function TokenBody({ q, picked, submitted, onChange }: { q: Question; picked: st
                   <Pressable disabled={submitted} onPress={() => onChange(picked.filter((_, idx) => idx !== i))} style={[styles.tokenPicked, ok === true && styles.tokCorrect, ok === false && styles.tokWrong]}>
                     <Text className="font-serif" style={{ fontSize: 15, color: ok === true ? SAGE_DARK : ok === false ? CRIMSON : SAFFRON_DARK }}>{t}</Text>
                   </Pressable>
-                  {corrected ? <RNText style={{ fontSize: 12, color: SAGE_DARK }}>→{corrected}</RNText> : null}
+                  {corrected ? <Text style={{ fontSize: 12, color: SAGE_DARK }}>→{corrected}</Text> : null}
                 </View>
               );
             })}
@@ -209,7 +209,7 @@ function TokenBody({ q, picked, submitted, onChange }: { q: Question; picked: st
             </Pressable>
           ))}
           {picked.length > 0 ? (
-            <Pressable onPress={() => onChange([])} style={styles.clearChip}><RNText style={{ fontSize: 12, color: INK3, fontWeight: '600' }}>清除</RNText></Pressable>
+            <Pressable onPress={() => onChange([])} style={styles.clearChip}><Text style={{ fontSize: 12, color: INK3, fontWeight: '600' }}>清除</Text></Pressable>
           ) : null}
         </View>
       ) : null}

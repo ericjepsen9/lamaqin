@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { BookOpen, CalendarCheck, ChevronLeft, GraduationCap, Headphones, ListChecks, Mic2, Sparkles, Timer } from 'lucide-react-native';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -56,7 +56,7 @@ export default function Dossier() {
         <View style={styles.hero}>
           <LinearGradient colors={['#E8C99A', '#F3E2C6', '#FBF4E9']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 0.7, y: 1 }} />
           <Text className="font-serif" style={{ fontSize: 20, fontWeight: '700', color: INK }}>我的学修积累</Text>
-          <RNText style={{ fontSize: 12, color: INK2, marginTop: 4 }}>以下均为你本人的数据,仅本人可见</RNText>
+          <Text style={{ fontSize: 12, color: INK2, marginTop: 4 }}>以下均为你本人的数据,仅本人可见</Text>
         </View>
 
         {/* 听读足迹(真实数据·决策183 规则2):本人全部听课 / 读讲记 / 大学演讲完成,班级 + 个人合并 */}
@@ -69,7 +69,7 @@ export default function Dossier() {
           {/* 查询失败别落进"三计数=0"+"还没有听读记录"——那对有真实积累的师兄像是历史被清空了
               (全文件审计 2026-07-12);查询失败单独给一条"加载失败",不套用空态文案。 */}
           {fpError ? (
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 10 }}>加载失败,请检查网络后重试(不代表记录被清空)</RNText>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 10 }}>加载失败,请检查网络后重试(不代表记录被清空)</Text>
           ) : (
             <>
               {/* 三计数 */}
@@ -81,22 +81,22 @@ export default function Dossier() {
               {/* 最近明细 */}
               {footprint && footprint.recent.length > 0 ? (
                 <View style={{ marginTop: 12, gap: 10 }}>
-                  <RNText style={{ fontSize: 11, color: INK3, fontWeight: '600' }}>最近</RNText>
+                  <Text style={{ fontSize: 11, color: INK3, fontWeight: '600' }}>最近</Text>
                   {footprint.recent.map((it) => (
                     <View key={it.key} className="flex-row items-center" style={{ gap: 9 }}>
                       {KIND_META[it.kind].icon}
                       <View style={{ flex: 1 }}>
-                        <RNText style={{ fontSize: 13, color: INK, fontWeight: '600' }} numberOfLines={1}>{it.title}</RNText>
-                        <RNText style={{ fontSize: 11, color: INK3 }} numberOfLines={1}>
+                        <Text style={{ fontSize: 13, color: INK, fontWeight: '600' }} numberOfLines={1}>{it.title}</Text>
+                        <Text style={{ fontSize: 11, color: INK3 }} numberOfLines={1}>
                           {KIND_META[it.kind].label} · {it.context}{it.scope === 'self' ? ' · 个人' : ''}
-                        </RNText>
+                        </Text>
                       </View>
-                      <RNText style={{ fontSize: 11, color: INK3 }}>{fmtDate(it.date)}</RNText>
+                      <Text style={{ fontSize: 11, color: INK3 }}>{fmtDate(it.date)}</Text>
                     </View>
                   ))}
                 </View>
               ) : !fpLoading ? (
-                <RNText style={{ fontSize: 12, color: INK3, marginTop: 10 }}>还没有听读记录。学修一课后,标记完成即可在此看到。</RNText>
+                <Text style={{ fontSize: 12, color: INK3, marginTop: 10 }}>还没有听读记录。学修一课后,标记完成即可在此看到。</Text>
               ) : null}
             </>
           )}
@@ -146,9 +146,9 @@ export default function Dossier() {
           sub="历史所有班级累计"
         />
 
-        <RNText style={{ fontSize: 11, color: INK3, lineHeight: 18, marginTop: 2, paddingHorizontal: 4 }}>
+        <Text style={{ fontSize: 11, color: INK3, lineHeight: 18, marginTop: 2, paddingHorizontal: 4 }}>
           此处展示你的学修积累——功德、进度与里程碑(决策014/145)。
-        </RNText>
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -158,7 +158,7 @@ function Stat({ n, label }: { n: number; label: string }) {
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
       <Text className="font-serif" style={{ fontSize: 26, fontWeight: '700', color: INK }}>{n}</Text>
-      <RNText style={{ fontSize: 11, color: INK3, marginTop: 2 }}>{label}</RNText>
+      <Text style={{ fontSize: 11, color: INK3, marginTop: 2 }}>{label}</Text>
     </View>
   );
 }
@@ -174,7 +174,7 @@ function Module({ icon, title, main, pct, sub, loading, error }: { icon: React.R
         {loading ? <ActivityIndicator size="small" color={SAFFRON} /> : <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: INK }}>{error ? '—' : main}</Text>}
       </View>
       {pct != null && !error ? <View style={[styles.bar, { marginTop: 12 }]}><View style={[styles.fill, { width: `${pct}%` }]} /></View> : null}
-      <RNText style={{ fontSize: 12, color: INK3, marginTop: pct != null ? 8 : 6 }}>{error ? '加载失败,请检查网络后重试' : sub}</RNText>
+      <Text style={{ fontSize: 12, color: INK3, marginTop: pct != null ? 8 : 6 }}>{error ? '加载失败,请检查网络后重试' : sub}</Text>
     </View>
   );
 }

@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { BarChart3, CalendarDays, ChevronLeft, ChevronRight, LogOut, Settings } from 'lucide-react-native';
-import { Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -48,10 +48,10 @@ export default function Me() {
           <View style={{ flex: 1 }}>
             <View className="flex-row items-center" style={{ gap: 8 }}>
               <Text className="font-serif" style={{ fontSize: 19, fontWeight: '700', color: INK }}>{name}</Text>
-              <View style={styles.roleTag}><RNText style={{ fontSize: 11, fontWeight: '700', color: SAFFRON_DARK }}>师兄</RNText></View>
+              <View style={styles.roleTag}><Text style={{ fontSize: 11, fontWeight: '700', color: SAFFRON_DARK }}>师兄</Text></View>
             </View>
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 3 }}>学号 · {meError ? '加载失败' : (me?.studentId ?? '转正后发放')}</RNText>
-            <RNText style={{ fontSize: 12, color: INK2, marginTop: 2 }}>{identity}</RNText>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 3 }}>学号 · {meError ? '加载失败' : (me?.studentId ?? '转正后发放')}</Text>
+            <Text style={{ fontSize: 12, color: INK2, marginTop: 2 }}>{identity}</Text>
           </View>
         </View>
 
@@ -85,8 +85,8 @@ function Row({ icon, title, sub, onPress, titleColor, last }: { icon: React.Reac
     <Pressable onPress={onPress} style={[styles.row, !last && styles.rowBorder]}>
       {icon}
       <View style={{ flex: 1 }}>
-        <RNText style={{ fontSize: 15, fontWeight: '600', color: titleColor ?? INK }}>{title}</RNText>
-        {sub ? <RNText style={{ fontSize: 12, color: INK3, marginTop: 1 }}>{sub}</RNText> : null}
+        <Text style={{ fontSize: 15, fontWeight: '600', color: titleColor ?? INK }}>{title}</Text>
+        {sub ? <Text style={{ fontSize: 12, color: INK3, marginTop: 1 }}>{sub}</Text> : null}
       </View>
       {titleColor ? null : <ChevronRight size={18} color={INK3} />}
     </Pressable>

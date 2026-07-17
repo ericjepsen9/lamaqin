@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft, FileImage, Headphones, Trash2 } from 'lucide-react-native';
-import { Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -52,17 +52,17 @@ export default function DownloadsManage() {
 
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 12 }}>
         <View style={styles.summary}>
-          <RNText style={{ fontSize: 13, color: INK2 }}>共 {list.length} 项 · 占用 {formatBytes(totalBytes)}</RNText>
+          <Text style={{ fontSize: 13, color: INK2 }}>共 {list.length} 项 · 占用 {formatBytes(totalBytes)}</Text>
           {list.length > 0 ? (
-            <Pressable onPress={clearAll} hitSlop={6}><RNText style={{ fontSize: 12, color: CRIM, fontWeight: '700' }}>清空全部</RNText></Pressable>
+            <Pressable onPress={clearAll} hitSlop={6}><Text style={{ fontSize: 12, color: CRIM, fontWeight: '700' }}>清空全部</Text></Pressable>
           ) : null}
         </View>
 
         {list.length === 0 ? (
           <View style={{ paddingVertical: 50, alignItems: 'center' }}>
-            <RNText style={{ fontSize: 13, color: INK3, textAlign: 'center', lineHeight: 20 }}>
+            <Text style={{ fontSize: 13, color: INK3, textAlign: 'center', lineHeight: 20 }}>
               暂无离线下载内容{'\n'}在课时页的音频 / 观修课件旁点「离线下载」,没有网络时也能打开
-            </RNText>
+            </Text>
           </View>
         ) : (
           <View style={styles.group}>
@@ -70,8 +70,8 @@ export default function DownloadsManage() {
               <View key={e.url} style={[styles.row, i < list.length - 1 && styles.rowBorder]}>
                 {e.kind === 'audio' ? <Headphones size={18} color={SAGE} /> : <FileImage size={18} color={SAGE} />}
                 <View style={{ flex: 1 }}>
-                  <RNText style={{ fontSize: 14, fontWeight: '600', color: INK }} numberOfLines={1}>{e.label}</RNText>
-                  <RNText style={{ fontSize: 11, color: INK3, marginTop: 1 }}>{formatBytes(e.sizeBytes)}</RNText>
+                  <Text style={{ fontSize: 14, fontWeight: '600', color: INK }} numberOfLines={1}>{e.label}</Text>
+                  <Text style={{ fontSize: 11, color: INK3, marginTop: 1 }}>{formatBytes(e.sizeBytes)}</Text>
                 </View>
                 <Pressable hitSlop={8} onPress={() => removeOne(e.url, e.label)}><Trash2 size={17} color={INK3} /></Pressable>
               </View>

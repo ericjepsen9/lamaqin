@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Calendar, ChevronLeft, Headphones, ListChecks, Presentation, Video } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { ActivityIndicator, Animated, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -24,6 +24,7 @@ import { useCurrentUser } from '@/lib/queries/profile';
 import { testIds } from '@/lib/testids';
 import { bookTitle, genClientToken } from '@/lib/utils';
 
+import { TextInput } from '@/components/ui/text-input';
 // 课时学修流 · 向导式(决策150/151/154/155)。覆盖大纲场景:
 //   · 正式课程:听闻(音视频任一)+ 阅读法本 + 答(法本思考题=问答题) + 观修;圆满=听闻+阅读+答。
 //   · 限制性课程(course_type='restricted'):自动【免答题步】,圆满=听闻+阅读。
@@ -308,7 +309,7 @@ export default function LessonFlow() {
   if (lessonError) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#FBF4E9', alignItems: 'center', justifyContent: 'center', padding: 24 }} edges={['top']}>
-        <RNText style={{ fontSize: 14, color: CRIMSON, textAlign: 'center' }}>加载失败，请检查网络后重试</RNText>
+        <Text style={{ fontSize: 14, color: CRIMSON, textAlign: 'center' }}>加载失败，请检查网络后重试</Text>
       </SafeAreaView>
     );
   }
@@ -316,35 +317,38 @@ export default function LessonFlow() {
   if (!lessonDetail) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#FBF4E9', alignItems: 'center', justifyContent: 'center', padding: 24 }} edges={['top']}>
-        <RNText style={{ fontSize: 14, color: INK3, textAlign: 'center' }}>找不到该课时</RNText>
+        <Text style={{ fontSize: 14, color: INK3, textAlign: 'center' }}>找不到该课时</Text>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView role="main" style={{ flex: 1, backgroundColor: '#FBF4E9' }} edges={['top']}>
-      {/* 顶栏浮层(下滑隐藏 · 上滑/回顶显示·PM 2026-06-29):标题 + 提示条 + 进度轴 */}
+      {/* 顶栏浮层(下滑隐藏 · 上滑/回顶显示·PM 2026-06-29):标题 + 提示条 + 进度轴
+          ⚠️ position:absolute 不吃 SafeAreaView 的顶部安全区 padding(同 2026-07-17 courses.tsx/
+          scroll-title-bar.tsx 那次"顶部与状态栏断开"修复的同一条道理),这里要自己补 insets.top,
+          否则整条浮层贴着物理屏幕顶端画、盖住状态栏(PM 真机反馈 2026-07-17)。 */}
       <Animated.View
         onLayout={(e) => setTopH(e.nativeEvent.layout.height)}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, backgroundColor: '#FBF4E9', transform: [{ translateY: topTranslate }] }}>
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, paddingTop: insets.top, backgroundColor: '#FBF4E9', transform: [{ translateY: topTranslate }] }}>
       <View style={styles.top}>
         <Pressable hitSlop={8} onPress={() => router.back()}><ChevronLeft size={24} color={INK} /></Pressable>
         <Text className="font-serif" style={{ flex: 1, fontSize: 16, fontWeight: '700', color: INK, textAlign: 'center' }} numberOfLines={1}>{lessonTitle}</Text>
-        <Pressable hitSlop={8} onPress={() => setTocOpen(true)} style={styles.tocBtn}><ListChecks size={15} color={INK2} /><RNText style={{ fontSize: 12, color: INK2, fontWeight: '600' }}>目录</RNText></Pressable>
+        <Pressable hitSlop={8} onPress={() => setTocOpen(true)} style={styles.tocBtn}><ListChecks size={15} color={INK2} /><Text style={{ fontSize: 12, color: INK2, fontWeight: '600' }}>目录</Text></Pressable>
       </View>
 
       {/* 课程类型/身份提示条 */}
       {(restricted || a11y) ? (
         <View style={styles.banner}>
-          <RNText style={{ fontSize: 12, color: SAFFRON_DARK, fontWeight: '600' }}>
+          <Text style={{ fontSize: 12, color: SAFFRON_DARK, fontWeight: '600' }}>
             {restricted ? '限制性课程:只需 听闻 + 阅读(免答题、不计考试)' : a11y === 'blind' ? '无障碍:听两遍即圆满(免看、免答)' : '无障碍:看两遍即圆满(免听、免答)'}
-          </RNText>
+          </Text>
         </View>
       ) : null}
       {/* 个人学修提示(本课无班级归属:自学无班 / 课外浏览·决策183:听读完成计入个人足迹、不计班级) */}
       {noCohort ? (
         <View style={[styles.banner, { backgroundColor: 'rgba(43,34,24,0.06)' }]}>
-          <RNText style={{ fontSize: 12, color: INK3, fontWeight: '600' }}>个人学修 · 本课不在您的在读班级 · 完成计入个人足迹(不计班级)</RNText>
+          <Text style={{ fontSize: 12, color: INK3, fontWeight: '600' }}>个人学修 · 本课不在您的在读班级 · 完成计入个人足迹(不计班级)</Text>
         </View>
       ) : null}
 
@@ -353,7 +357,7 @@ export default function LessonFlow() {
         {order.map((s, i) => (
           <View key={s} style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Pressable onPress={() => goStep(s)} style={[styles.sdot, cur === s && { backgroundColor: SAFFRON_DARK }]}>
-              <RNText style={{ fontSize: 13, fontWeight: '700', color: cur === s ? '#fff' : INK3 }}>{LABEL[s][0]}</RNText>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: cur === s ? '#fff' : INK3 }}>{LABEL[s][0]}</Text>
             </Pressable>
             {i < order.length - 1 ? <View style={styles.sline} /> : null}
           </View>
@@ -376,7 +380,7 @@ export default function LessonFlow() {
             { value: 'ppt', icon: <Presentation size={15} color={guanMedia === 'ppt' ? '#fff' : INK2} />, label: '课件' },
           ]} />
         ) : (
-          <RNText style={{ fontSize: 13, color: INK3 }}>{LABEL[cur]}{cur === 'fudao' ? '(可选)' : ''}</RNText>
+          <Text style={{ fontSize: 13, color: INK3 }}>{LABEL[cur]}{cur === 'fudao' ? '(可选)' : ''}</Text>
         )}
       </View>
       </Animated.View>
@@ -395,33 +399,33 @@ export default function LessonFlow() {
             {needRead ? <FaBen blocks={primaryBlocks} /> : null}
             {needRead ? (
               <Pressable onPress={() => { setCorrectionToken(genClientToken()); setCorrectionOpen(true); }} style={{ alignSelf: 'flex-end', paddingVertical: 2 }}>
-                <RNText style={{ fontSize: 12, color: INK3, textDecorationLine: 'underline' }}>发现法本有误?纠错</RNText>
+                <Text style={{ fontSize: 12, color: INK3, textDecorationLine: 'underline' }}>发现法本有误?纠错</Text>
               </Pressable>
             ) : null}
-            <RNText style={{ fontSize: 12, color: INK3 }}>
+            <Text style={{ fontSize: 12, color: INK3 }}>
               {needListen ? `听闻 ${heardN}/${listenTarget}` : ''}{needListen && needRead ? ' · ' : ''}{needRead ? `阅读 ${seenN}/${readTarget}` : ''}
               {hasQuiz ? '(圆满需 听闻 + 阅读 + 答)' : '(圆满需 听闻 + 阅读)'}
-            </RNText>
+            </Text>
             <Pressable testID={testIds.lesson.markCompleteButton} style={styles.mark} onPress={() => { setMarkL(needListen); setMarkR(a11y === 'deaf'); setBackdate(false); setMarkOpen(true); setMarkListenToken(genClientToken()); setMarkReadToken(genClientToken()); }}>
-              <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>标记完成</RNText>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>标记完成</Text>
             </Pressable>
             <Pressable onPress={reportComplete} style={{ paddingVertical: 8 }}>
-              <RNText style={{ fontSize: 13, color: SAFFRON_DARK, fontWeight: '700', textAlign: 'center' }}>已学过本课? 直接报圆满 ›</RNText>
+              <Text style={{ fontSize: 13, color: SAFFRON_DARK, fontWeight: '700', textAlign: 'center' }}>已学过本课? 直接报圆满 ›</Text>
             </Pressable>
           </>
         ) : cur === 'fudao' ? (
           <>
-            <RNText style={{ fontSize: 12, color: INK3 }}>法师辅导为可选,不计入圆满。</RNText>
+            <Text style={{ fontSize: 12, color: INK3 }}>法师辅导为可选,不计入圆满。</Text>
             {coaches.length > 0 ? (
               <View style={styles.speakerRow}>
                 {coaches.map((c, i) => (
                   <Pressable key={`${c}-${i}`} onPress={() => setCoach(i)} style={[styles.chip, coach === i && styles.chipOn]}>
-                    <RNText style={{ fontSize: 12, fontWeight: '600', color: coach === i ? '#fff' : INK2 }}>{c}</RNText>
+                    <Text style={{ fontSize: 12, fontWeight: '600', color: coach === i ? '#fff' : INK2 }}>{c}</Text>
                   </Pressable>
                 ))}
               </View>
             ) : (
-              <RNText style={{ fontSize: 13, color: INK3 }}>本课暂无辅导视频/音频</RNText>
+              <Text style={{ fontSize: 13, color: INK3 }}>本课暂无辅导视频/音频</Text>
             )}
             {coaches.length > 0 ? (() => {
               const ci = Math.min(coach, coachResources.length - 1);
@@ -433,7 +437,7 @@ export default function LessonFlow() {
                   {coachBlocks.length > 0 ? (
                     <FaBen blocks={coachBlocks} />
                   ) : (
-                    <RNText style={{ fontSize: 12, color: INK3 }}>本课辅导法师暂无文字讲记(请观看上方视频/音频);法本原文在「上师学习」一步阅读。</RNText>
+                    <Text style={{ fontSize: 12, color: INK3 }}>本课辅导法师暂无文字讲记(请观看上方视频/音频);法本原文在「上师学习」一步阅读。</Text>
                   )}
                 </>
               );
@@ -448,9 +452,9 @@ export default function LessonFlow() {
               // hasQuiz 已保证 questionCount>0 才会进这一步；走到这仍空 = 加载失败或数据不一致，不是"本课确实无题"。
               return (
                 <View style={{ alignItems: 'center', paddingVertical: 40, paddingHorizontal: 24 }}>
-                  <RNText style={{ fontSize: 13, color: questionsError ? CRIMSON : INK3, textAlign: 'center' }}>
+                  <Text style={{ fontSize: 13, color: questionsError ? CRIMSON : INK3, textAlign: 'center' }}>
                     {questionsError ? '题目加载失败，请检查网络后重试' : '题目暂未加载到，请返回重试或联系辅导员'}
-                  </RNText>
+                  </Text>
                 </View>
               );
             }
@@ -459,8 +463,8 @@ export default function LessonFlow() {
             return (
               <View style={{ gap: 12 }}>
                 <View className="flex-row items-center justify-between">
-                  <RNText style={{ fontSize: 13, color: INK2, fontWeight: '600' }}>第 {boundIdx + 1} / {questions.length} 题</RNText>
-                  <Pressable style={styles.tocBtn} onPress={() => setQgridOpen(true)}><ListChecks size={15} color={INK2} /><RNText style={{ fontSize: 12, color: INK2, fontWeight: '600' }}>题号</RNText></Pressable>
+                  <Text style={{ fontSize: 13, color: INK2, fontWeight: '600' }}>第 {boundIdx + 1} / {questions.length} 题</Text>
+                  <Pressable style={styles.tocBtn} onPress={() => setQgridOpen(true)}><ListChecks size={15} color={INK2} /><Text style={{ fontSize: 12, color: INK2, fontWeight: '600' }}>题号</Text></Pressable>
                 </View>
                 <QuestionCard
                   q={q}
@@ -478,10 +482,10 @@ export default function LessonFlow() {
                   }}
                 />
                 <View className="flex-row items-center justify-between" style={{ marginTop: 2 }}>
-                  <Pressable disabled={boundIdx === 0} onPress={() => setQIdx((i) => Math.max(0, i - 1))} style={[styles.qNav, boundIdx === 0 && { opacity: 0.4 }]}><RNText style={styles.qNavTxt}>‹ 上一题</RNText></Pressable>
-                  <Pressable disabled={boundIdx === questions.length - 1} onPress={() => setQIdx((i) => Math.min(questions.length - 1, i + 1))} style={[styles.qNav, boundIdx === questions.length - 1 && { opacity: 0.4 }]}><RNText style={styles.qNavTxt}>下一题 ›</RNText></Pressable>
+                  <Pressable disabled={boundIdx === 0} onPress={() => setQIdx((i) => Math.max(0, i - 1))} style={[styles.qNav, boundIdx === 0 && { opacity: 0.4 }]}><Text style={styles.qNavTxt}>‹ 上一题</Text></Pressable>
+                  <Pressable disabled={boundIdx === questions.length - 1} onPress={() => setQIdx((i) => Math.min(questions.length - 1, i + 1))} style={[styles.qNav, boundIdx === questions.length - 1 && { opacity: 0.4 }]}><Text style={styles.qNavTxt}>下一题 ›</Text></Pressable>
                 </View>
-                <RNText style={{ fontSize: 11, color: INK3 }}>圆满只看&ldquo;问答题(法本思考题)&rdquo;全部提交;其余题型为练习、不计圆满。</RNText>
+                <Text style={{ fontSize: 11, color: INK3 }}>圆满只看&ldquo;问答题(法本思考题)&rdquo;全部提交;其余题型为练习、不计圆满。</Text>
               </View>
             );
           })()
@@ -499,21 +503,21 @@ export default function LessonFlow() {
             if (prevLesson) router.replace(`/lesson/${prevLesson.id}?step=wensi` as never);
             else router.back();
           }}>
-            <RNText style={{ fontWeight: '700', fontSize: 14, color: SAFFRON_DARK }}>‹ {prevLesson ? '上一课' : '返回'}</RNText>
+            <Text style={{ fontWeight: '700', fontSize: 14, color: SAFFRON_DARK }}>‹ {prevLesson ? '上一课' : '返回'}</Text>
           </Pressable>
         ) : (
           <Pressable style={styles.navGhost} onPress={() => { const p = prevOf(cur); if (p) setCur(p); }}>
-            <RNText style={{ fontWeight: '700', fontSize: 14, color: SAFFRON_DARK }}>‹ 上一步</RNText>
+            <Text style={{ fontWeight: '700', fontSize: 14, color: SAFFRON_DARK }}>‹ 上一步</Text>
           </Pressable>
         )}
         {cur === 'wensi' ? (
-          <Pressable style={styles.navPrimary} onPress={() => { if (!wensiDone) { setLeaveMiss(wensiMiss()); setLeaveTo('fudao'); } else setCur('fudao'); }}><RNText style={styles.navPrimaryTxt}>去法师辅导</RNText></Pressable>
+          <Pressable style={styles.navPrimary} onPress={() => { if (!wensiDone) { setLeaveMiss(wensiMiss()); setLeaveTo('fudao'); } else setCur('fudao'); }}><Text style={styles.navPrimaryTxt}>去法师辅导</Text></Pressable>
         ) : cur === 'fudao' ? (
-          <Pressable style={styles.navPrimary} onPress={() => setCur(hasQuiz ? 'quiz' : 'guan')}><RNText style={styles.navPrimaryTxt}>{hasQuiz ? '去答题' : '去观修'}</RNText></Pressable>
+          <Pressable style={styles.navPrimary} onPress={() => setCur(hasQuiz ? 'quiz' : 'guan')}><Text style={styles.navPrimaryTxt}>{hasQuiz ? '去答题' : '去观修'}</Text></Pressable>
         ) : cur === 'quiz' ? (
-          <Pressable style={styles.navPrimary} onPress={() => { if (!answered) { setLeaveMiss([`${openQs.filter((x) => !submitted[x.id]).length} 道问答题`]); setLeaveTo('guan'); } else setCur('guan'); }}><RNText style={styles.navPrimaryTxt}>去观修</RNText></Pressable>
+          <Pressable style={styles.navPrimary} onPress={() => { if (!answered) { setLeaveMiss([`${openQs.filter((x) => !submitted[x.id]).length} 道问答题`]); setLeaveTo('guan'); } else setCur('guan'); }}><Text style={styles.navPrimaryTxt}>去观修</Text></Pressable>
         ) : (
-          <Pressable style={styles.navPrimary} onPress={() => setGateOpen(true)}><RNText style={styles.navPrimaryTxt}>完成 · 下一课</RNText></Pressable>
+          <Pressable style={styles.navPrimary} onPress={() => setGateOpen(true)}><Text style={styles.navPrimaryTxt}>完成 · 下一课</Text></Pressable>
         )}
       </Animated.View>
 
@@ -525,18 +529,18 @@ export default function LessonFlow() {
             <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK, marginBottom: 10 }}>目录</Text>
             <ScrollView style={{ maxHeight: 360 }}>
               {tocGroups.length === 0 ? (
-                <RNText style={{ fontSize: 13, color: INK3 }}>暂无课时目录</RNText>
+                <Text style={{ fontSize: 13, color: INK3 }}>暂无课时目录</Text>
               ) : (
                 tocGroups.map((g) => (
                   <View key={g.ch} style={{ marginBottom: 10 }}>
-                    <RNText style={{ fontSize: 13, fontWeight: '700', color: INK2, marginBottom: 4 }}>{g.ch}</RNText>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: INK2, marginBottom: 4 }}>{g.ch}</Text>
                     {g.lessons.map((l) => (
                       <Pressable
                         key={l.id}
                         style={[styles.tocRow, l.id === lessonId && { borderColor: SAFFRON, backgroundColor: '#FBE5DA' }]}
                         onPress={() => { setTocOpen(false); if (l.id !== lessonId) router.replace(`/lesson/${l.id}?step=wensi` as never); }}
                       >
-                        <RNText style={{ fontSize: 14, color: l.id === lessonId ? SAFFRON_DARK : INK }}>{l.lessonNumber}. {l.title}</RNText>
+                        <Text style={{ fontSize: 14, color: l.id === lessonId ? SAFFRON_DARK : INK }}>{l.lessonNumber}. {l.title}</Text>
                       </Pressable>
                     ))}
                   </View>
@@ -555,11 +559,11 @@ export default function LessonFlow() {
             <View className="flex-row" style={{ flexWrap: 'wrap', gap: 10 }}>
               {questions.map((q, i) => (
                 <Pressable key={q.id} onPress={() => { setQIdx(i); setQgridOpen(false); }} style={[styles.qcell, submitted[q.id] ? { backgroundColor: SAGE, borderColor: SAGE } : q.gomman ? { borderColor: SAFFRON } : null]}>
-                  <RNText style={{ fontSize: 14, fontWeight: '700', color: submitted[q.id] ? '#fff' : INK }}>{i + 1}</RNText>
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: submitted[q.id] ? '#fff' : INK }}>{i + 1}</Text>
                 </Pressable>
               ))}
             </View>
-            <RNText style={{ fontSize: 11, color: INK3, marginTop: 12 }}>绿=已提交;橙框=问答题(计圆满)未答;无框=练习题。</RNText>
+            <Text style={{ fontSize: 11, color: INK3, marginTop: 12 }}>绿=已提交;橙框=问答题(计圆满)未答;无框=练习题。</Text>
           </Pressable>
         </Pressable>
       </Modal>
@@ -575,11 +579,11 @@ export default function LessonFlow() {
           <Pressable style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]} onPress={() => {}}>
             <View style={styles.handle} />
             <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>确认本遍完成</Text>
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>勾选这一遍完成的项目</RNText>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>勾选这一遍完成的项目</Text>
             {needListen ? <CheckRow checked={markL} onPress={() => setMarkL((v) => !v)} label="视频 / 音频(听闻)" /> : null}
             {needRead ? <CheckRow checked={markR} onPress={() => setMarkR((v) => !v)} label="法本阅读" /> : null}
             <Pressable style={styles.backRow} onPress={() => setBackdate((v) => !v)}>
-              <Calendar size={14} color={backdate ? SAFFRON_DARK : INK3} /><RNText style={{ fontSize: 12, color: backdate ? SAFFRON_DARK : INK3 }}>完成日期:{backdate ? '补录(填真实过去日期)' : '今天'}</RNText>
+              <Calendar size={14} color={backdate ? SAFFRON_DARK : INK3} /><Text style={{ fontSize: 12, color: backdate ? SAFFRON_DARK : INK3 }}>完成日期:{backdate ? '补录(填真实过去日期)' : '今天'}</Text>
             </Pressable>
             {backdate ? (
               <View style={{ marginTop: 8 }}>
@@ -593,9 +597,9 @@ export default function LessonFlow() {
                   maxLength={10}
                   style={[styles.dateInput, !backDateValid && { borderColor: CRIMSON }]}
                 />
-                <RNText style={{ fontSize: 11, color: backDateValid ? INK3 : CRIMSON, marginTop: 4 }}>
+                <Text style={{ fontSize: 11, color: backDateValid ? INK3 : CRIMSON, marginTop: 4 }}>
                   {backDateValid ? '填实际完成那天(不晚于今天),即时计入对应日。' : '日期需为 YYYY-MM-DD 且不晚于今天。'}
-                </RNText>
+                </Text>
               </View>
             ) : null}
             <Pressable testID={testIds.lesson.markConfirmButton} style={[styles.mark, { marginTop: 12 }, ((!markL && !markR) || (backdate && !backDateValid)) && { opacity: 0.4 }]} disabled={(!markL && !markR) || (backdate && !backDateValid)} onPress={() => {
@@ -603,7 +607,7 @@ export default function LessonFlow() {
               if (markR) { setSeenN((n) => n + 1); recordStudy('read_notes', undefined, effectiveStudyDate, markReadToken); }
               setMarkOpen(false);
             }}>
-              <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>确认</RNText>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>确认</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -617,9 +621,9 @@ export default function LessonFlow() {
           <Pressable style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]} onPress={() => {}}>
             <View style={styles.handle} />
             <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>法本纠错</Text>
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>
               {courseLabel} · {lessonNumLabel || '本节'}——写明哪一段、错在哪,管理员核对后修正。
-            </RNText>
+            </Text>
             <TextInput
               value={correctionText}
               onChangeText={setCorrectionText}
@@ -638,9 +642,9 @@ export default function LessonFlow() {
                 );
               }}
             >
-              <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{submitCorrection.isPending ? '提交中…' : '提交纠错'}</RNText>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{submitCorrection.isPending ? '提交中…' : '提交纠错'}</Text>
             </Pressable>
-            {submitCorrection.isError ? <RNText style={{ fontSize: 11, color: SAFFRON_DARK, marginTop: 8, textAlign: 'center' }}>提交失败,请重试。</RNText> : null}
+            {submitCorrection.isError ? <Text style={{ fontSize: 11, color: SAFFRON_DARK, marginTop: 8, textAlign: 'center' }}>提交失败,请重试。</Text> : null}
           </Pressable>
         </Pressable>
         </KeyboardAvoidingView>
@@ -650,11 +654,11 @@ export default function LessonFlow() {
       <Modal visible={!!leaveTo} transparent animationType="fade" onRequestClose={() => setLeaveTo(null)}>
         <Pressable style={styles.dimmer} onPress={() => setLeaveTo(null)}>
           <Pressable style={styles.dialog} onPress={() => {}}>
-            <RNText style={{ fontSize: 17, fontWeight: '700', color: SAFFRON_DARK, textAlign: 'center' }}>本步还没圆满</RNText>
-            <RNText style={{ fontSize: 13, color: INK2, textAlign: 'center', marginTop: 8 }}>还差:{leaveMiss.join('、')}。</RNText>
-            <RNText style={{ fontSize: 11, color: INK3, textAlign: 'center', marginTop: 4 }}>可现在补,也可稍后(课末仍会提醒)。</RNText>
-            <Pressable style={[styles.mark, { marginTop: 16 }]} onPress={() => setLeaveTo(null)}><RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>去完成</RNText></Pressable>
-            <Pressable onPress={() => { const t = leaveTo; setLeaveTo(null); if (t) setCur(t); }} style={{ paddingVertical: 12 }}><RNText style={{ color: INK3, textAlign: 'center', fontSize: 13 }}>仍然离开</RNText></Pressable>
+            <Text style={{ fontSize: 17, fontWeight: '700', color: SAFFRON_DARK, textAlign: 'center' }}>本步还没圆满</Text>
+            <Text style={{ fontSize: 13, color: INK2, textAlign: 'center', marginTop: 8 }}>还差:{leaveMiss.join('、')}。</Text>
+            <Text style={{ fontSize: 11, color: INK3, textAlign: 'center', marginTop: 4 }}>可现在补,也可稍后(课末仍会提醒)。</Text>
+            <Pressable style={[styles.mark, { marginTop: 16 }]} onPress={() => setLeaveTo(null)}><Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>去完成</Text></Pressable>
+            <Pressable onPress={() => { const t = leaveTo; setLeaveTo(null); if (t) setCur(t); }} style={{ paddingVertical: 12 }}><Text style={{ color: INK3, textAlign: 'center', fontSize: 13 }}>仍然离开</Text></Pressable>
           </Pressable>
         </Pressable>
       </Modal>
@@ -665,18 +669,18 @@ export default function LessonFlow() {
           <Pressable style={styles.dialog} onPress={() => {}}>
             {complete ? (
               <>
-                <RNText style={{ fontSize: 18, fontWeight: '700', color: SAGE, textAlign: 'center' }}>本课已圆满 ✓</RNText>
-                <RNText style={{ fontSize: 12, color: INK3, textAlign: 'center', marginTop: 4 }}>
+                <Text style={{ fontSize: 18, fontWeight: '700', color: SAGE, textAlign: 'center' }}>本课已圆满 ✓</Text>
+                <Text style={{ fontSize: 12, color: INK3, textAlign: 'center', marginTop: 4 }}>
                   {a11y === 'blind' ? '听两遍 ✓(免看免答)' : a11y === 'deaf' ? '看两遍 ✓(免听免答)' : hasQuiz ? '听闻 ✓ · 阅读 ✓ · 答 ✓' : '听闻 ✓ · 阅读 ✓(限制性课程·免答)'}
-                </RNText>
+                </Text>
                 {nextLesson ? (
                   <View style={styles.nextCard}>
-                    <RNText style={{ fontSize: 11, color: INK3 }}>下一课</RNText>
+                    <Text style={{ fontSize: 11, color: INK3 }}>下一课</Text>
                     <Text className="font-serif" style={{ fontSize: 16, fontWeight: '700', color: INK, marginTop: 2 }}>第 {nextLesson.lessonNumber} 课 · {nextLesson.title}</Text>
                   </View>
                 ) : (
                   <View style={styles.nextCard}>
-                    <RNText style={{ fontSize: 11, color: INK3 }}>这是本课程最后一课</RNText>
+                    <Text style={{ fontSize: 11, color: INK3 }}>这是本课程最后一课</Text>
                     <Text className="font-serif" style={{ fontSize: 14, color: INK, marginTop: 4 }}>恭喜完成全部课时 🙏</Text>
                   </View>
                 )}
@@ -686,14 +690,14 @@ export default function LessonFlow() {
                   else if (lessonDetail?.courseId) router.replace(`/course/${lessonDetail.courseId}` as never);
                   else router.back();
                 }}>
-                  <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{nextLesson ? '进入下一课' : '返回课程'}</RNText>
+                  <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{nextLesson ? '进入下一课' : '返回课程'}</Text>
                 </Pressable>
-                <Pressable onPress={() => setGateOpen(false)} style={{ paddingVertical: 10 }}><RNText style={{ color: INK3, textAlign: 'center', fontSize: 13 }}>留在本课</RNText></Pressable>
+                <Pressable onPress={() => setGateOpen(false)} style={{ paddingVertical: 10 }}><Text style={{ color: INK3, textAlign: 'center', fontSize: 13 }}>留在本课</Text></Pressable>
               </>
             ) : (
               <>
-                <RNText style={{ fontSize: 18, fontWeight: '700', color: SAFFRON_DARK, textAlign: 'center' }}>本课尚未圆满</RNText>
-                <RNText style={{ fontSize: 12, color: INK3, textAlign: 'center', marginTop: 4 }}>还差:</RNText>
+                <Text style={{ fontSize: 18, fontWeight: '700', color: SAFFRON_DARK, textAlign: 'center' }}>本课尚未圆满</Text>
+                <Text style={{ fontSize: 12, color: INK3, textAlign: 'center', marginTop: 4 }}>还差:</Text>
                 <View style={{ gap: 8, marginTop: 12 }}>
                   {wensiMiss().map((m) => <GateMiss key={m} label={`${m}(未完成)`} onPress={() => { setGateOpen(false); setCur('wensi'); }} />)}
                   {hasQuiz && !answered ? (
@@ -713,7 +717,7 @@ export default function LessonFlow() {
                   if (nextLesson) router.replace(`/lesson/${nextLesson.id}?step=wensi` as never);
                   else if (lessonDetail?.courseId) router.replace(`/course/${lessonDetail.courseId}` as never);
                   else router.back();
-                }} style={{ paddingVertical: 12, marginTop: 4 }}><RNText style={{ color: INK3, textAlign: 'center', fontSize: 13 }}>稍后再说 · 先去下一课</RNText></Pressable>
+                }} style={{ paddingVertical: 12, marginTop: 4 }}><Text style={{ color: INK3, textAlign: 'center', fontSize: 13 }}>稍后再说 · 先去下一课</Text></Pressable>
               </>
             )}
           </Pressable>
@@ -724,10 +728,10 @@ export default function LessonFlow() {
 }
 
 function GateMiss({ label, onPress }: { label: string; onPress: () => void }) {
-  return (<Pressable style={styles.gateMiss} onPress={onPress}><RNText style={{ flex: 1, fontSize: 14, color: INK }}>{label}</RNText><RNText style={{ fontSize: 13, fontWeight: '700', color: SAFFRON_DARK }}>去完成 ›</RNText></Pressable>);
+  return (<Pressable style={styles.gateMiss} onPress={onPress}><Text style={{ flex: 1, fontSize: 14, color: INK }}>{label}</Text><Text style={{ fontSize: 13, fontWeight: '700', color: SAFFRON_DARK }}>去完成 ›</Text></Pressable>);
 }
 function CheckRow({ checked, onPress, label }: { checked: boolean; onPress: () => void; label: string }) {
-  return (<Pressable style={styles.checkRow} onPress={onPress}><View style={[styles.checkBox, checked && { backgroundColor: SAFFRON, borderColor: SAFFRON }]}>{checked ? <RNText style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>✓</RNText> : null}</View><RNText style={{ fontSize: 15, color: INK }}>{label}</RNText></Pressable>);
+  return (<Pressable style={styles.checkRow} onPress={onPress}><View style={[styles.checkBox, checked && { backgroundColor: SAFFRON, borderColor: SAFFRON }]}>{checked ? <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>✓</Text> : null}</View><Text style={{ fontSize: 15, color: INK }}>{label}</Text></Pressable>);
 }
 // 媒体段切换:放进度轴行最右侧(闻思=视频/音频、法师辅导=视频/音频、观修=视频/课件,三处共用同一套样式)。
 function MediaToggle<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { value: T; icon: React.ReactNode; label: string }[] }) {
@@ -735,7 +739,7 @@ function MediaToggle<T extends string>({ value, onChange, options }: { value: T;
     <View style={styles.segToggle}>
       {options.map((opt) => (
         <Pressable key={opt.value} onPress={() => onChange(opt.value)} style={[styles.segToggleBtn, value === opt.value && styles.segToggleOn]}>
-          {opt.icon}<RNText style={{ fontSize: 13, fontWeight: '700', color: value === opt.value ? '#fff' : INK2 }}>{opt.label}</RNText>
+          {opt.icon}<Text style={{ fontSize: 13, fontWeight: '700', color: value === opt.value ? '#fff' : INK2 }}>{opt.label}</Text>
         </Pressable>
       ))}
     </View>
@@ -750,7 +754,7 @@ function MediaArea({ media, who, courseName, videoId, audioUrl, audioOnly, lesso
       ) : audioUrl ? (
         <AudioPlayer url={audioUrl} title={`${bookTitle(courseName)} · ${lessonLabel}`} subtitle={who} />
       ) : (
-        <View style={styles.player}><View style={styles.pcover}><Headphones size={20} color={SAFFRON_DARK} /></View><View style={{ flex: 1 }}><RNText style={{ fontSize: 13, fontWeight: '700', color: INK }} numberOfLines={1}>{who} · {lessonLabel}</RNText><RNText style={{ fontSize: 11, color: INK3 }}>暂无音频</RNText></View></View>
+        <View style={styles.player}><View style={styles.pcover}><Headphones size={20} color={SAFFRON_DARK} /></View><View style={{ flex: 1 }}><Text style={{ fontSize: 13, fontWeight: '700', color: INK }} numberOfLines={1}>{who} · {lessonLabel}</Text><Text style={{ fontSize: 11, color: INK3 }}>暂无音频</Text></View></View>
       )}
     </View>
   );
@@ -764,8 +768,8 @@ function FaBen({ blocks }: { blocks: LessonBlock[] }) {
   if (blocks.length === 0) {
     return (
       <View style={{ gap: 6 }}>
-        <RNText style={{ fontSize: 12, color: SAFFRON_DARK, fontWeight: '700' }}>法本讲记</RNText>
-        <RNText className="font-serif" style={{ fontSize: 16, lineHeight: 28, color: INK }}>法本讲记正文(由 ETL 线导入,待内容导入后显示)</RNText>
+        <Text style={{ fontSize: 12, color: SAFFRON_DARK, fontWeight: '700' }}>法本讲记</Text>
+        <Text className="font-serif" style={{ fontSize: 16, lineHeight: 28, color: INK }}>法本讲记正文(由 ETL 线导入,待内容导入后显示)</Text>
       </View>
     );
   }
@@ -785,7 +789,7 @@ function FaBen({ blocks }: { blocks: LessonBlock[] }) {
           return (
             <View key={b.id} style={{ marginLeft: indent, marginTop: 10, marginBottom: 2 }}>
               <Text className="font-serif" style={{ fontSize: 19, fontWeight: '700', color: SAFFRON_DARK }}>{[b.kepanMark, b.kepanTitle].filter(Boolean).join('  ') || cleanText}</Text>
-              {b.kepanSplit ? <RNText style={{ fontSize: 14, color: INK3, marginTop: 2 }}>{b.kepanSplit}</RNText> : null}
+              {b.kepanSplit ? <Text style={{ fontSize: 14, color: INK3, marginTop: 2 }}>{b.kepanSplit}</Text> : null}
             </View>
           );
         }
@@ -804,7 +808,7 @@ function FaBen({ blocks }: { blocks: LessonBlock[] }) {
           const qText = cleanText.replace(/^\d+[、.。，,]\s*/, '');
           return (
             <View key={b.id} style={styles.questionBlock}>
-              <RNText style={{ fontSize: 12, fontWeight: '700', color: SAGE, marginBottom: 3, letterSpacing: 1 }}>思考题</RNText>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: SAGE, marginBottom: 3, letterSpacing: 1 }}>思考题</Text>
               <Text className="font-serif" style={{ fontSize: 17, lineHeight: 29, color: INK }}>{qIndex}、{qText}</Text>
             </View>
           );

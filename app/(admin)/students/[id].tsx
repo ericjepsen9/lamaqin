@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -52,7 +52,7 @@ function ProfileRow({ label, value }: { label: string; value: string }) {
 function A11yChip({ label, active, disabled, onPress }: { label: string; active: boolean; disabled: boolean; onPress: () => void }) {
   return (
     <Pressable style={[styles.a11yChip, active && styles.a11yChipOn]} disabled={disabled} onPress={onPress}>
-      <RNText style={[styles.a11yChipTxt, active && styles.a11yChipTxtOn]}>{active ? '✓ ' : ''}{label}</RNText>
+      <Text style={[styles.a11yChipTxt, active && styles.a11yChipTxtOn]}>{active ? '✓ ' : ''}{label}</Text>
     </Pressable>
   );
 }
@@ -119,7 +119,7 @@ export default function StudentDetailScreen() {
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 14, fontWeight: '700', color: '#a13c2e' }}>该学员已申请注销账号</Text>
-                  <RNText style={{ fontSize: 12, color: INK3, marginTop: 2 }}>申请于 {detail.deletion_requested_at.slice(0, 10)};保留期满将永久删除全部数据。</RNText>
+                  <Text style={{ fontSize: 12, color: INK3, marginTop: 2 }}>申请于 {detail.deletion_requested_at.slice(0, 10)};保留期满将永久删除全部数据。</Text>
                 </View>
                 <AdminButton
                   variant="secondary"
@@ -227,8 +227,8 @@ export default function StudentDetailScreen() {
               <A11yChip label="视力障碍" active={accessibilityNeeds.includes('blind')} disabled={!isAdmin || updateA11y.isPending} onPress={() => toggleA11y('blind')} />
               <A11yChip label="听力障碍" active={accessibilityNeeds.includes('deaf')} disabled={!isAdmin || updateA11y.isPending} onPress={() => toggleA11y('deaf')} />
             </View>
-            {accessibilityNeeds.length === 0 ? <RNText style={styles.placeholder}>未登记(闻思圆满按常规判定)</RNText> : null}
-            {!isAdmin ? <RNText style={styles.hint}>仅系统管理员可代登记;学员本人可在个人设置自助登记。</RNText> : null}
+            {accessibilityNeeds.length === 0 ? <Text style={styles.placeholder}>未登记(闻思圆满按常规判定)</Text> : null}
+            {!isAdmin ? <Text style={styles.hint}>仅系统管理员可代登记;学员本人可在个人设置自助登记。</Text> : null}
           </SectionCard>
 
           {/* 代行记录(设计①·2026-07-08:替代/追认/豁免只读历史,proxy_action_records) */}
@@ -243,11 +243,11 @@ export default function StudentDetailScreen() {
                   <View key={p.id} style={styles.proxyRow}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                       <Badge tone="gold">{PROXY_ACTION_LABEL[p.actionType] ?? p.actionType}</Badge>
-                      <RNText style={{ fontSize: 12, fontWeight: '600', color: INK }}>{PROXY_TARGET_LABEL[p.targetKind] ?? p.targetKind}</RNText>
-                      {p.substitutePracticeName ? <RNText style={{ fontSize: 11, color: INK3 }}>→ {p.substitutePracticeName} × {p.substituteCount}</RNText> : null}
+                      <Text style={{ fontSize: 12, fontWeight: '600', color: INK }}>{PROXY_TARGET_LABEL[p.targetKind] ?? p.targetKind}</Text>
+                      {p.substitutePracticeName ? <Text style={{ fontSize: 11, color: INK3 }}>→ {p.substitutePracticeName} × {p.substituteCount}</Text> : null}
                     </View>
-                    <RNText style={{ fontSize: 12, color: INK2, marginTop: 2 }}>{p.reason}</RNText>
-                    <RNText style={{ fontSize: 10, color: INK3, marginTop: 2 }}>{p.createdAt.slice(0, 10)} · {p.adminName ?? '管理员'}{p.basis ? ` · 依据:${p.basis}` : ''}</RNText>
+                    <Text style={{ fontSize: 12, color: INK2, marginTop: 2 }}>{p.reason}</Text>
+                    <Text style={{ fontSize: 10, color: INK3, marginTop: 2 }}>{p.createdAt.slice(0, 10)} · {p.adminName ?? '管理员'}{p.basis ? ` · 依据:${p.basis}` : ''}</Text>
                   </View>
                 ))}
               </View>

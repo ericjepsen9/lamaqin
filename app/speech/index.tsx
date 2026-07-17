@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ScrollTitleBar, useScrollTitleBar } from '@/components/scroll-title-bar';
@@ -44,7 +44,7 @@ export default function SpeechList() {
             <View style={{ paddingVertical: 80, alignItems: 'center' }}><ActivityIndicator color={SAFFRON_DARK} /></View>
           ) : error || !lib ? (
             <View style={{ paddingVertical: 80, alignItems: 'center', paddingHorizontal: 24 }}>
-              <RNText style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>加载失败,请检查网络或权限。</RNText>
+              <Text style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>加载失败,请检查网络或权限。</Text>
             </View>
           ) : (
             <>
@@ -55,18 +55,18 @@ export default function SpeechList() {
                 </View>
                 <View style={{ flex: 1, paddingTop: 6 }}>
                   <Text className="font-serif" style={{ fontSize: 21, fontWeight: '700', color: INK, letterSpacing: 1 }}>《大学演讲系列》</Text>
-                  <RNText style={{ fontSize: 12, color: INK2, marginTop: 4 }}>索达吉堪布 · 世界高校演讲实录</RNText>
+                  <Text style={{ fontSize: 12, color: INK2, marginTop: 4 }}>索达吉堪布 · 世界高校演讲实录</Text>
                   <View style={styles.actionRow}>
                     {cont ? (
                       <Pressable style={styles.cta} onPress={() => router.push(`/speech/${cont.id}` as never)}>
-                        <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{hasStarted ? '继续阅读' : '开始阅读'}</RNText>
+                        <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{hasStarted ? '继续阅读' : '开始阅读'}</Text>
                       </Pressable>
                     ) : null}
                   </View>
                   {cont ? (
-                    <RNText style={{ fontSize: 11, color: INK3, marginTop: 8 }} numberOfLines={1}>
+                    <Text style={{ fontSize: 11, color: INK3, marginTop: 8 }} numberOfLines={1}>
                       {cont.bookNumber != null ? `第${cont.bookNumber}册 · ` : ''}{cont.title}
-                    </RNText>
+                    </Text>
                   ) : null}
                 </View>
               </View>
@@ -96,9 +96,9 @@ export default function SpeechList() {
               books={lib.extra}
               currentId={cont?.id ?? null}
             />
-            <RNText style={{ fontSize: 11, color: INK3, marginTop: 12, paddingHorizontal: 4 }}>
+            <Text style={{ fontSize: 11, color: INK3, marginTop: 12, paddingHorizontal: 4 }}>
               圆满 = 看演讲 + 读文字稿(纯文字篇读完即可);免答题、不计考试。
-            </RNText>
+            </Text>
           </View>
         ) : null}
       </ScrollView>
@@ -110,7 +110,7 @@ export default function SpeechList() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.statCol}>
-      <RNText style={{ fontSize: 11, color: INK3, letterSpacing: 1 }}>{label}</RNText>
+      <Text style={{ fontSize: 11, color: INK3, letterSpacing: 1 }}>{label}</Text>
       <Text className="font-serif" style={{ fontSize: 20, fontWeight: '700', color: INK, marginTop: 3 }}>{value}</Text>
     </View>
   );
@@ -122,16 +122,16 @@ function Group({ title, note, books, currentId }: { title: string; note: string;
     <View style={{ gap: 6 }}>
       <View style={styles.groupHead}>
         <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: SAFFRON_DARK, letterSpacing: 0.5 }}>{title}</Text>
-        <RNText style={{ fontSize: 11, color: INK3, marginTop: 2 }}>{note}</RNText>
+        <Text style={{ fontSize: 11, color: INK3, marginTop: 2 }}>{note}</Text>
       </View>
       {books.map((b) => (
         <View key={b.id} style={{ gap: 6 }}>
           <View style={styles.sectionHeader}>
-            <View style={styles.chapNo}><RNText style={{ fontSize: 11, fontWeight: '700', color: SAGE }}>{b.bookNumber ?? '·'}</RNText></View>
+            <View style={styles.chapNo}><Text style={{ fontSize: 11, fontWeight: '700', color: SAGE }}>{b.bookNumber ?? '·'}</Text></View>
             <Text className="font-serif" style={{ flex: 1, fontSize: 14, fontWeight: '700', color: INK }} numberOfLines={1}>《{b.title}》</Text>
-            <RNText style={{ fontSize: 11, color: b.doneCount === b.articles.length && b.articles.length > 0 ? SAGE : INK3 }}>
+            <Text style={{ fontSize: 11, color: b.doneCount === b.articles.length && b.articles.length > 0 ? SAGE : INK3 }}>
               {b.doneCount}/{b.articles.length} 篇
-            </RNText>
+            </Text>
           </View>
           {b.articles.map((a) => (
             <ArticleRow key={a.id} a={a} isCurrent={a.id === currentId} />
@@ -147,16 +147,16 @@ function ArticleRow({ a, isCurrent }: { a: SpeechArticleRow; isCurrent: boolean 
   return (
     <Pressable style={[styles.artRow, isCurrent && styles.artRowCurrent]} onPress={() => router.push(`/speech/${a.id}` as never)}>
       <View style={[styles.artNoBox, isCurrent && { backgroundColor: SAFFRON }]}>
-        <RNText style={{ fontSize: 11, fontWeight: '700', color: isCurrent ? '#fff' : INK3 }}>{a.articleNumber ?? '·'}</RNText>
+        <Text style={{ fontSize: 11, fontWeight: '700', color: isCurrent ? '#fff' : INK3 }}>{a.articleNumber ?? '·'}</Text>
       </View>
-      <RNText numberOfLines={1} style={{ flex: 1, fontSize: 14, fontWeight: isCurrent ? '700' : '500', color: isCurrent ? INK : INK2 }}>{a.title}</RNText>
-      {isCurrent ? <RNText style={{ fontSize: 10, fontWeight: '700', color: SAFFRON_DARK }}>当前</RNText> : null}
+      <Text numberOfLines={1} style={{ flex: 1, fontSize: 14, fontWeight: isCurrent ? '700' : '500', color: isCurrent ? INK : INK2 }}>{a.title}</Text>
+      {isCurrent ? <Text style={{ fontSize: 10, fontWeight: '700', color: SAFFRON_DARK }}>当前</Text> : null}
       {a.status === 'completed' ? (
-        <View style={styles.badgeDone}><RNText style={{ fontSize: 10, fontWeight: '700', color: SAGE }}>圆满 ✓</RNText></View>
+        <View style={styles.badgeDone}><Text style={{ fontSize: 10, fontWeight: '700', color: SAGE }}>圆满 ✓</Text></View>
       ) : a.status === 'reading' ? (
-        <RNText style={{ fontSize: 10, color: SAFFRON_DARK }}>{a.watched && !a.read ? '已看' : a.read && !a.watched ? '已读' : '进行中'}</RNText>
+        <Text style={{ fontSize: 10, color: SAFFRON_DARK }}>{a.watched && !a.read ? '已看' : a.read && !a.watched ? '已读' : '进行中'}</Text>
       ) : null}
-      <RNText style={{ fontSize: 14, color: INK3 }}>›</RNText>
+      <Text style={{ fontSize: 14, color: INK3 }}>›</Text>
     </Pressable>
   );
 }

@@ -10,14 +10,13 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { OfflineBanner } from '@/components/offline-banner';
 import { AuthProvider } from '@/lib/auth';
-import { useFontScale } from '@/lib/font-scale'; // 副作用:导入即给 Text/TextInput 打字号补丁
 import { OFFLINE_CACHE_MAX_AGE, shouldDehydrateQuery } from '@/lib/query-persist-allowlist';
 import { queryClient } from '@/lib/query-client';
 import { asyncStoragePersister } from '@/lib/query-persister';
 
 // 离线缓存从 AsyncStorage 灌回 QueryClient 是异步的;灌回完成前各页 useQuery 会先各自
 // 发起网络请求,离线时可能先闪一下"加载失败"才被灌回的缓存数据纠正过来——等灌回完成再渲染真实树。
-function AppShell({ scale }: { scale: number }) {
+function AppShell() {
   const isRestoring = useIsRestoring();
   if (isRestoring) {
     return (
@@ -28,7 +27,7 @@ function AppShell({ scale }: { scale: number }) {
   }
   return (
     <AuthProvider>
-      <Stack key={`fs-${scale}`} screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }} />
       <StatusBar style="auto" />
       <OfflineBanner />
     </AuthProvider>
@@ -36,8 +35,9 @@ function AppShell({ scale }: { scale: number }) {
 }
 
 export default function RootLayout() {
-  // 字号档位改变 → scale 变 → 用作 Stack 的 key,整树重渲染、全局即时生效(标准=1 时补丁无副作用)。
-  const scale = useFontScale((s) => s.scale);
+  // 字号改档不再需要在这里强制整树重渲染(2026-07-17 重做):components/ui/text.tsx 的 Text /
+  // components/ui/text-input.tsx 的 TextInput 各自订阅 useFontScale 的 scale,改档时各自
+  // 该组件自然重渲染,不需要靠 Stack 换 key 抡一次全树重挂载。
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
@@ -48,7 +48,7 @@ export default function RootLayout() {
             maxAge: OFFLINE_CACHE_MAX_AGE,
             dehydrateOptions: { shouldDehydrateQuery },
           }}>
-          <AppShell scale={scale} />
+          <AppShell />
         </PersistQueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

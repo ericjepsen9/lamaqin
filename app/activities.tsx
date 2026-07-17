@@ -1,6 +1,6 @@
 import { Link, useRouter } from 'expo-router';
 import { ChevronLeft, History } from 'lucide-react-native';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CoreviewList } from '@/components/coreview-timeline';
@@ -26,7 +26,7 @@ export default function Activities() {
         <Pressable hitSlop={8} onPress={() => router.back()}><ChevronLeft size={24} color={INK} /></Pressable>
         <Text className="font-serif" style={{ flex: 1, fontSize: 18, fontWeight: '700', color: INK }}>共修 / 法会</Text>
         <Link href="/past-events" asChild>
-          <Pressable hitSlop={8} style={styles.histBtn}><History size={15} color={INK2} /><RNText style={{ fontSize: 12, color: INK2, fontWeight: '600' }}>历史</RNText></Pressable>
+          <Pressable hitSlop={8} style={styles.histBtn}><History size={15} color={INK2} /><Text style={{ fontSize: 12, color: INK2, fontWeight: '600' }}>历史</Text></Pressable>
         </Link>
       </View>
       <ScrollView contentContainerStyle={{ paddingLeft: 10, paddingRight: 14, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
@@ -35,13 +35,13 @@ export default function Activities() {
         ) : isError ? (
           // 查询失败别落进"暂无安排"——那对确有共修/法会安排的师兄是假空态(全文件审计 2026-07-12)
           <View style={{ paddingVertical: 50, alignItems: 'center' }}>
-            <RNText style={{ fontSize: 13, color: INK3, textAlign: 'center', lineHeight: 20 }}>加载失败,请检查网络后重试</RNText>
+            <Text style={{ fontSize: 13, color: INK3, textAlign: 'center', lineHeight: 20 }}>加载失败,请检查网络后重试</Text>
           </View>
         ) : upcoming.length === 0 ? (
           <View style={{ paddingVertical: 50, alignItems: 'center' }}>
-            <RNText style={{ fontSize: 13, color: INK3, textAlign: 'center', lineHeight: 20 }}>暂无共修 / 法会安排。{'\n'}法会由管理员发布,本班共修按排课生成。</RNText>
+            <Text style={{ fontSize: 13, color: INK3, textAlign: 'center', lineHeight: 20 }}>暂无共修 / 法会安排。{'\n'}法会由管理员发布,本班共修按排课生成。</Text>
             <Link href="/past-events" asChild>
-              <Pressable style={[styles.moreBtn, { marginTop: 14 }]}><RNText style={{ fontSize: 13, color: INK2, fontWeight: '600' }}>看往期历史 →</RNText></Pressable>
+              <Pressable style={[styles.moreBtn, { marginTop: 14 }]}><Text style={{ fontSize: 13, color: INK2, fontWeight: '600' }}>看往期历史 →</Text></Pressable>
             </Link>
           </View>
         ) : (

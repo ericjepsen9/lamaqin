@@ -1,6 +1,6 @@
 import { Check, Pencil, Play, Presentation } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Linking, Modal, Platform, Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Linking, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
 import { SlideViewer } from '@/components/slide-viewer';
@@ -11,6 +11,7 @@ import { MEDITATION_SESSION_MIN_MINUTES, useMeditationSummary } from '@/lib/quer
 import { testIds } from '@/lib/testids';
 import { genClientToken } from '@/lib/utils';
 
+import { TextInput } from '@/components/ui/text-input';
 // 观修「修」步正文(决策161·并进闻思流程,顶部=闻辅答修步骤条,本组件只渲染正文)。
 // 交互:媒体切换(视频/课件,PM 2026-07-01 从 4 选项精简·音频/引导文去掉——引导文从未接过数据、音频接了但不留)+
 //   单按钮(开始观修⇄完成并计时)+ 满 30 分钟自动显示「圆满」(不需手点)+「填写时间」手动补一笔(更新环与已完成)。
@@ -81,10 +82,10 @@ export function GuanStep({ lessonId, media, videoId, downloadUrl, slideImageUrls
         <SlideViewer imageUrls={slideImageUrls} title="观修课件" />
       ) : downloadUrl ? (
         <Pressable style={styles.dlBtn} onPress={() => Linking.openURL(downloadUrl)}>
-          <Presentation size={16} color={SAFFRON_DARK} /><RNText style={{ color: SAFFRON_DARK, fontWeight: '700' }}>下载课件</RNText>
+          <Presentation size={16} color={SAFFRON_DARK} /><Text style={{ color: SAFFRON_DARK, fontWeight: '700' }}>下载课件</Text>
         </Pressable>
       ) : (
-        <RNText style={styles.empty}>本课观修暂无课件</RNText>
+        <Text style={styles.empty}>本课观修暂无课件</Text>
       )}
 
       {/* 计时打坐 = 一张卡(环 + 按钮 + 数据,无分割线;与视频之间加大间距) */}
@@ -96,19 +97,19 @@ export function GuanStep({ lessonId, media, videoId, downloadUrl, slideImageUrls
           </Svg>
           <Text className="font-serif" style={{ fontSize: 42, fontWeight: '700', color: INK, letterSpacing: 1 }}>{mm}:{ss}</Text>
           {reached ? (
-            <View style={styles.yuanman}><Check size={13} color="#fff" /><RNText style={{ fontSize: 12, fontWeight: '700', color: '#fff' }}>本座圆满</RNText></View>
+            <View style={styles.yuanman}><Check size={13} color="#fff" /><Text style={{ fontSize: 12, fontWeight: '700', color: '#fff' }}>本座圆满</Text></View>
           ) : (
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 2 }}>建议每座 ≥ 30 分钟</RNText>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 2 }}>建议每座 ≥ 30 分钟</Text>
           )}
         </View>
 
         <View className="flex-row" style={{ gap: 12, marginTop: 16 }}>
           <Pressable testID={testIds.guan.mainButton} style={[styles.mainBtn, { backgroundColor: SAFFRON }, logSession.isPending && { opacity: 0.5 }]} disabled={logSession.isPending} onPress={onMain}>
             {idle ? <Play size={18} color="#fff" /> : <Check size={18} color="#fff" />}
-            <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{logSession.isPending ? '记录中…' : idle ? '开始观修' : '完成并计时'}</RNText>
+            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{logSession.isPending ? '记录中…' : idle ? '开始观修' : '完成并计时'}</Text>
           </Pressable>
           <Pressable testID={testIds.guan.manualOpenButton} style={styles.editBtn} onPress={() => setManualOpen(true)}>
-            <Pencil size={16} color={SAFFRON_DARK} /><RNText style={{ color: SAFFRON_DARK, fontWeight: '700', fontSize: 14 }}>填写时间</RNText>
+            <Pencil size={16} color={SAFFRON_DARK} /><Text style={{ color: SAFFRON_DARK, fontWeight: '700', fontSize: 14 }}>填写时间</Text>
           </Pressable>
         </View>
 
@@ -116,7 +117,7 @@ export function GuanStep({ lessonId, media, videoId, downloadUrl, slideImageUrls
           <Stat label="累计" value={`${summary?.sessionCount ?? 0} 座 · ${summary?.totalMinutes ?? 0} 分`} />
         </View>
       </View>
-      <RNText style={{ fontSize: 11, color: INK3, textAlign: 'center' }}>计时仅辅助打坐(满 30 分钟为 1 座);正式座次与升学统计仍按「修持」页具体愿记录</RNText>
+      <Text style={{ fontSize: 11, color: INK3, textAlign: 'center' }}>计时仅辅助打坐(满 30 分钟为 1 座);正式座次与升学统计仍按「修持」页具体愿记录</Text>
 
       {/* 填写时间 */}
       <Modal visible={manualOpen} transparent animationType="fade" onRequestClose={() => setManualOpen(false)}>
@@ -124,14 +125,14 @@ export function GuanStep({ lessonId, media, videoId, downloadUrl, slideImageUrls
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalRoot}>
           <View style={styles.dialog}>
             <Text className="font-serif" style={{ fontSize: 16, fontWeight: '700', color: INK }}>填写打坐时间</Text>
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 4 }}>忘了计时 / 线下已打坐,直接填本座分钟数</RNText>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 4 }}>忘了计时 / 线下已打坐,直接填本座分钟数</Text>
             <View style={styles.inputRow}>
               <TextInput testID={testIds.guan.manualInput} value={manualVal} onChangeText={setManualVal} keyboardType="number-pad" style={styles.input} />
-              <RNText style={{ fontSize: 15, color: INK2 }}>分钟</RNText>
+              <Text style={{ fontSize: 15, color: INK2 }}>分钟</Text>
             </View>
             <View className="flex-row" style={{ gap: 10, marginTop: 16 }}>
-              <Pressable style={[styles.dlgBtn, styles.dlgGhost]} onPress={() => setManualOpen(false)}><RNText style={{ color: INK2, fontWeight: '700' }}>取消</RNText></Pressable>
-              <Pressable testID={testIds.guan.manualConfirmButton} style={[styles.dlgBtn, { backgroundColor: SAFFRON }]} onPress={onManual}><RNText style={{ color: '#fff', fontWeight: '700' }}>确认</RNText></Pressable>
+              <Pressable style={[styles.dlgBtn, styles.dlgGhost]} onPress={() => setManualOpen(false)}><Text style={{ color: INK2, fontWeight: '700' }}>取消</Text></Pressable>
+              <Pressable testID={testIds.guan.manualConfirmButton} style={[styles.dlgBtn, { backgroundColor: SAFFRON }]} onPress={onManual}><Text style={{ color: '#fff', fontWeight: '700' }}>确认</Text></Pressable>
             </View>
           </View>
         </KeyboardAvoidingView>
@@ -143,7 +144,7 @@ export function GuanStep({ lessonId, media, videoId, downloadUrl, slideImageUrls
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
-      <RNText style={{ fontSize: 11, color: INK3 }}>{label}</RNText>
+      <Text style={{ fontSize: 11, color: INK3 }}>{label}</Text>
       <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: INK, marginTop: 2 }}>{value}</Text>
     </View>
   );

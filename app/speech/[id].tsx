@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Calendar, ChevronLeft, Headphones, Video } from 'lucide-react-native';
 import { useState, type ReactNode } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AudioPlayer } from '@/components/audio-player';
@@ -12,6 +12,7 @@ import { useCurrentUser } from '@/lib/queries/profile';
 import { speechCompleteDerive, useSpeechDetail, useSpeechLibrary, type SpeechBlock } from '@/lib/queries/self_study';
 import { bookTitle } from '@/lib/utils';
 
+import { TextInput } from '@/components/ui/text-input';
 // 大学演讲详情(D-15 改版·2026-07-02)。学修流=restricted 模式:看视频 + 读正文,免答题、不计考试
 //   (大纲:限制性课=「至少听一遍上师传法的音视频、看一遍法本」+「不纳入考试范围」)。
 // 打卡=看/读分项落库(record_self_study_mark,补录支持),圆满按 B 判定线应用层派生
@@ -44,7 +45,7 @@ function Block({ b }: { b: SpeechBlock }) {
     );
   }
   if (b.blockType === 'footnote') {
-    return <RNText style={styles.footnote}>{b.text}</RNText>;
+    return <Text style={styles.footnote}>{b.text}</Text>;
   }
   return <Text className="font-serif" style={styles.body}>{b.text}</Text>;
 }
@@ -53,7 +54,7 @@ function Toggle({ active, onPress, icon, label }: { active: boolean; onPress: ()
   return (
     <Pressable onPress={onPress} style={[styles.toggleBtn, active && { backgroundColor: SAFFRON }]}>
       {icon}
-      <RNText style={{ fontSize: 13, fontWeight: '600', color: active ? '#fff' : INK2 }}>{label}</RNText>
+      <Text style={{ fontSize: 13, fontWeight: '600', color: active ? '#fff' : INK2 }}>{label}</Text>
     </Pressable>
   );
 }
@@ -62,9 +63,9 @@ function CheckRow({ checked, onPress, label }: { checked: boolean; onPress: () =
   return (
     <Pressable style={styles.checkRow} onPress={onPress}>
       <View style={[styles.checkBox, checked && { backgroundColor: SAFFRON, borderColor: SAFFRON }]}>
-        {checked ? <RNText style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</RNText> : null}
+        {checked ? <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text> : null}
       </View>
-      <RNText style={{ fontSize: 14, color: INK, fontWeight: '600' }}>{label}</RNText>
+      <Text style={{ fontSize: 14, color: INK, fontWeight: '600' }}>{label}</Text>
     </Pressable>
   );
 }
@@ -126,7 +127,7 @@ export default function SpeechDetail() {
           <View style={{ width: 24 }} />
         </View>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-          <RNText style={{ color: SAFFRON_DARK, textAlign: 'center' }}>未找到这篇演讲,或暂无权限。</RNText>
+          <Text style={{ color: SAFFRON_DARK, textAlign: 'center' }}>未找到这篇演讲,或暂无权限。</Text>
         </View>
       </SafeAreaView>
     );
@@ -206,7 +207,7 @@ export default function SpeechDetail() {
 
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 28, gap: 14 }}>
         <Text className="font-serif" style={styles.title}>{data.title}</Text>
-        <RNText style={styles.caption}>大学演讲 · {capText}</RNText>
+        <Text style={styles.caption}>大学演讲 · {capText}</Text>
 
         {/* 媒体:视频/音频切换 + 多段标签 + 单个播放器 */}
         {hasMedia ? (
@@ -221,7 +222,7 @@ export default function SpeechDetail() {
               <View style={styles.tabRow}>
                 {list.map((r, i) => (
                   <Pressable key={r.id} onPress={() => (type === 'video' ? setVideoIdx(i) : setAudioIdx(i))} style={[styles.tab, i === idx && styles.tabOn]}>
-                    <RNText style={{ fontSize: 12, fontWeight: '600', color: i === idx ? '#fff' : INK2 }}>{r.label || `${type === 'video' ? '视频' : '音频'}${i + 1}`}</RNText>
+                    <Text style={{ fontSize: 12, fontWeight: '600', color: i === idx ? '#fff' : INK2 }}>{r.label || `${type === 'video' ? '视频' : '音频'}${i + 1}`}</Text>
                   </Pressable>
                 ))}
               </View>
@@ -238,7 +239,7 @@ export default function SpeechDetail() {
 
         {/* 法本正文(self_study_blocks)——直接铺背景,无矩形框 */}
         {data.blocks.length === 0 ? (
-          <RNText style={{ fontSize: 13, color: INK3 }}>本篇暂无正文</RNText>
+          <Text style={{ fontSize: 13, color: INK3 }}>本篇暂无正文</Text>
         ) : (
           <View style={{ gap: 4 }}>
             {data.blocks.map((b) => <Block key={b.id} b={b} />)}
@@ -249,14 +250,14 @@ export default function SpeechDetail() {
         <View style={styles.progressRow}>
           {needWatch ? (
             <View style={[styles.dimBox, watched && styles.dimBoxOn]}>
-              <RNText style={[styles.dimText, watched && styles.dimTextOn]}>{watched ? '✓ 已看演讲' : '○ 看演讲'}</RNText>
-              {prog?.watchedAt ? <RNText style={styles.dimDate}>{prog.watchedAt}</RNText> : null}
+              <Text style={[styles.dimText, watched && styles.dimTextOn]}>{watched ? '✓ 已看演讲' : '○ 看演讲'}</Text>
+              {prog?.watchedAt ? <Text style={styles.dimDate}>{prog.watchedAt}</Text> : null}
             </View>
           ) : null}
           {needRead ? (
             <View style={[styles.dimBox, read && styles.dimBoxOn]}>
-              <RNText style={[styles.dimText, read && styles.dimTextOn]}>{read ? '✓ 已读文字稿' : '○ 读文字稿'}</RNText>
-              {prog?.readAt ? <RNText style={styles.dimDate}>{prog.readAt}</RNText> : null}
+              <Text style={[styles.dimText, read && styles.dimTextOn]}>{read ? '✓ 已读文字稿' : '○ 读文字稿'}</Text>
+              {prog?.readAt ? <Text style={styles.dimDate}>{prog.readAt}</Text> : null}
             </View>
           ) : null}
         </View>
@@ -264,28 +265,28 @@ export default function SpeechDetail() {
         {done ? (
           <View style={{ gap: 10 }}>
             <View style={[styles.mark, styles.markDone]}>
-              <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>✓ 本篇已圆满</RNText>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>✓ 本篇已圆满</Text>
             </View>
             <Pressable style={styles.notesBtn} onPress={() => { setNotesDraft(prog?.notes ?? ''); setNotesOpen(true); }}>
-              <RNText style={{ fontSize: 13, fontWeight: '600', color: SAFFRON_DARK }}>{prog?.notes ? '查看 / 修改读后感' : '写读后感(可选)'}</RNText>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: SAFFRON_DARK }}>{prog?.notes ? '查看 / 修改读后感' : '写读后感(可选)'}</Text>
             </Pressable>
-            {prog?.notes ? <RNText style={styles.notesPreview} numberOfLines={3}>{prog.notes}</RNText> : null}
+            {prog?.notes ? <Text style={styles.notesPreview} numberOfLines={3}>{prog.notes}</Text> : null}
           </View>
         ) : (
           <Pressable style={[styles.mark, mark.isPending && styles.markDisabled]} disabled={mark.isPending} onPress={openMark}>
-            <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{mark.isPending ? '记录中…' : '标记完成'}</RNText>
+            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{mark.isPending ? '记录中…' : '标记完成'}</Text>
           </Pressable>
         )}
         {mark.isError ? (
-          <RNText style={{ fontSize: 11, color: SAFFRON_DARK, textAlign: 'center' }}>记录失败,请重试。</RNText>
+          <Text style={{ fontSize: 11, color: SAFFRON_DARK, textAlign: 'center' }}>记录失败,请重试。</Text>
         ) : null}
-        <RNText style={{ fontSize: 11, color: INK3, textAlign: 'center' }}>
+        <Text style={{ fontSize: 11, color: INK3, textAlign: 'center' }}>
           {resolvedCohortIds && resolvedCohortIds.length > 0
             ? resolvedCohortIds.length > 1
               ? `本书属你在读专业,完成计入 ${resolvedCohortIds.length} 个班级学修。`
               : '本书属你在读专业,完成计入班级学修。'
             : '自学按你的节奏走,完成计入个人足迹(不计班级)。'}
-        </RNText>
+        </Text>
 
         {/* 上一篇 / 下一篇(跨册线性) */}
         {flat.length > 0 ? (
@@ -295,16 +296,16 @@ export default function SpeechDetail() {
               disabled={!prevArt}
               onPress={() => { if (prevArt) router.replace(`/speech/${prevArt.id}` as never); }}
             >
-              <RNText style={styles.navBtnText} numberOfLines={1}>‹ 上一篇</RNText>
-              {prevArt ? <RNText style={styles.navTitle} numberOfLines={1}>{prevArt.title}</RNText> : null}
+              <Text style={styles.navBtnText} numberOfLines={1}>‹ 上一篇</Text>
+              {prevArt ? <Text style={styles.navTitle} numberOfLines={1}>{prevArt.title}</Text> : null}
             </Pressable>
             <Pressable
               style={[styles.navBtn, styles.navBtnNext, !nextArt && { opacity: 0.35 }]}
               disabled={!nextArt}
               onPress={() => { if (nextArt) router.replace(`/speech/${nextArt.id}` as never); }}
             >
-              <RNText style={[styles.navBtnText, { color: '#fff', textAlign: 'right' }]} numberOfLines={1}>下一篇 ›</RNText>
-              {nextArt ? <RNText style={[styles.navTitle, { color: 'rgba(255,255,255,0.85)', textAlign: 'right' }]} numberOfLines={1}>{nextArt.title}</RNText> : null}
+              <Text style={[styles.navBtnText, { color: '#fff', textAlign: 'right' }]} numberOfLines={1}>下一篇 ›</Text>
+              {nextArt ? <Text style={[styles.navTitle, { color: 'rgba(255,255,255,0.85)', textAlign: 'right' }]} numberOfLines={1}>{nextArt.title}</Text> : null}
             </Pressable>
           </View>
         ) : null}
@@ -318,11 +319,11 @@ export default function SpeechDetail() {
           <Pressable style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]} onPress={() => {}}>
             <View style={styles.handle} />
             <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>标记完成</Text>
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>勾选这次完成的项目</RNText>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>勾选这次完成的项目</Text>
             {needWatch && !watched ? <CheckRow checked={markW} onPress={() => setMarkW((v) => !v)} label="看 / 听演讲(视频或音频)" /> : null}
             {needRead && !read ? <CheckRow checked={markR} onPress={() => setMarkR((v) => !v)} label="读文字稿" /> : null}
             <Pressable style={styles.backRow} onPress={() => setBackdate((v) => !v)}>
-              <Calendar size={14} color={backdate ? SAFFRON_DARK : INK3} /><RNText style={{ fontSize: 12, color: backdate ? SAFFRON_DARK : INK3 }}>完成日期:{backdate ? '补录(填真实过去日期)' : '今天'}</RNText>
+              <Calendar size={14} color={backdate ? SAFFRON_DARK : INK3} /><Text style={{ fontSize: 12, color: backdate ? SAFFRON_DARK : INK3 }}>完成日期:{backdate ? '补录(填真实过去日期)' : '今天'}</Text>
             </Pressable>
             {backdate ? (
               <View style={{ marginTop: 8 }}>
@@ -336,9 +337,9 @@ export default function SpeechDetail() {
                   maxLength={10}
                   style={[styles.dateInput, !backDateValid && { borderColor: CRIMSON }]}
                 />
-                <RNText style={{ fontSize: 11, color: backDateValid ? INK3 : CRIMSON, marginTop: 4 }}>
+                <Text style={{ fontSize: 11, color: backDateValid ? INK3 : CRIMSON, marginTop: 4 }}>
                   {backDateValid ? '填实际完成那天(不晚于今天),即时计入对应日。' : '日期需为 YYYY-MM-DD 且不晚于今天。'}
-                </RNText>
+                </Text>
               </View>
             ) : null}
             <Pressable
@@ -346,7 +347,7 @@ export default function SpeechDetail() {
               disabled={(!markW && !markR) || (backdate && !backDateValid)}
               onPress={submitMarks}
             >
-              <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>确认</RNText>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>确认</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -360,7 +361,7 @@ export default function SpeechDetail() {
           <Pressable style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]} onPress={() => {}}>
             <View style={styles.handle} />
             <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>读后感(可选)</Text>
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>只对你本人可见,随时可改。</RNText>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>只对你本人可见,随时可改。</Text>
             <TextInput
               value={notesDraft}
               onChangeText={setNotesDraft}
@@ -370,7 +371,7 @@ export default function SpeechDetail() {
               style={styles.notesInput}
             />
             <Pressable style={[styles.mark, { marginTop: 12 }]} onPress={saveNotes}>
-              <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>保存</RNText>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>保存</Text>
             </Pressable>
           </Pressable>
         </Pressable>

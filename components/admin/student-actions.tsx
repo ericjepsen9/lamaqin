@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
-
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { AdminButton } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
 import { confirmAsync, notify } from '@/lib/dialog';
@@ -12,6 +11,7 @@ import { usePractices } from '@/lib/queries/practice';
 import { testIds } from '@/lib/testids';
 import { INK, INK2, INK3, SAFFRON_DARK } from '@/lib/theme';
 
+import { TextInput } from '@/components/ui/text-input';
 // 学员屏「管理操作」(审计 P1·2026-07-02:原三个死按钮接线,宽窄两版共用):
 //   批准(一键·可逆)/ 拒绝(终态·必确认)/ 旁听转正(promote_member_role RPC:转正+首发学号+审计)
 //   / 调班=切主班(switch_primary_cohort RPC·限已入的班)/ 设宽限(改 auto 愿 current_end_date·#186,
@@ -178,7 +178,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
           <AdminButton variant="secondary" size="sm" onPress={() => { resetProxyForm(); setProxyOpen(true); }}>代行</AdminButton>
         ) : null}
         {!isPending && memberships.length === 0 ? (
-          <RNText style={styles.hint}>未入班:入班/调班在「班级管理 → 班级详情 → 添加学员」操作。</RNText>
+          <Text style={styles.hint}>未入班:入班/调班在「班级管理 → 班级详情 → 添加学员」操作。</Text>
         ) : null}
       </View>
 
@@ -187,7 +187,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
         <Pressable style={styles.backdrop} onPress={() => setSwitchOpen(false)}>
           <Pressable style={styles.card} onPress={() => {}}>
             <Text className="font-serif" style={styles.cardTitle}>切换主班</Text>
-            <RNText style={styles.cardSub}>主班=主修归属(升学锚定);只能在 TA 已加入的班里挑。</RNText>
+            <Text style={styles.cardSub}>主班=主修归属(升学锚定);只能在 TA 已加入的班里挑。</Text>
             <View style={{ gap: 8, marginTop: 12 }}>
               {memberships.map((m) => (
                 <Pressable
@@ -202,8 +202,8 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                     },
                   )}
                 >
-                  <RNText style={{ flex: 1, fontSize: 14, fontWeight: '600', color: INK }}>{m.cohortName}</RNText>
-                  {m.isPrimary ? <RNText style={{ fontSize: 11, fontWeight: '700', color: SAFFRON_DARK }}>当前主班</RNText> : null}
+                  <Text style={{ flex: 1, fontSize: 14, fontWeight: '600', color: INK }}>{m.cohortName}</Text>
+                  {m.isPrimary ? <Text style={{ fontSize: 11, fontWeight: '700', color: SAFFRON_DARK }}>当前主班</Text> : null}
                 </Pressable>
               ))}
             </View>
@@ -218,9 +218,9 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
         <Pressable style={styles.backdrop} onPress={() => setGraceOpen(false)}>
           <Pressable style={styles.card} onPress={() => {}}>
             <Text className="font-serif" style={styles.cardTitle}>设宽限 / 暂停 / 纠正目标</Text>
-            <RNText style={styles.cardSub}>只对自动指派的功课(auto);师兄自定功课私密、不代改。设宽限自动记入审计;暂停不顺延截止日、不进状态机与关怀名单;锁定修法的每日目标纠错仅系统管理员可见。</RNText>
+            <Text style={styles.cardSub}>只对自动指派的功课(auto);师兄自定功课私密、不代改。设宽限自动记入审计;暂停不顺延截止日、不进状态机与关怀名单;锁定修法的每日目标纠错仅系统管理员可见。</Text>
             {autoVows.length === 0 ? (
-              <RNText style={[styles.hint, { marginTop: 12 }]}>TA 当前没有进行中的自动功课。</RNText>
+              <Text style={[styles.hint, { marginTop: 12 }]}>TA 当前没有进行中的自动功课。</Text>
             ) : (
               <ScrollView style={{ maxHeight: 360, marginTop: 12 }}>
                 <View style={{ gap: 8 }}>
@@ -229,15 +229,15 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                     return (
                       <View key={v.id} style={[styles.opt, graceVowId === v.id && styles.optPick]}>
                         <Pressable style={{ flex: 1 }} onPress={() => { setGraceVowId(v.id); setGraceDate(v.currentEndDate ?? ''); setMinSessionInput(v.minSessionMinutes != null ? String(v.minSessionMinutes) : ''); setDailyTargetPick(v.dailyTarget); }}>
-                          <RNText style={{ fontSize: 14, fontWeight: '600', color: INK }}>{v.practiceName}{paused ? '(已暂停)' : ''}</RNText>
-                          <RNText style={{ fontSize: 11, color: INK3, marginTop: 1 }}>现截止 {v.currentEndDate ?? '—'}{v.originalEndDate && v.originalEndDate !== v.currentEndDate ? `(原 ${v.originalEndDate})` : ''}</RNText>
+                          <Text style={{ fontSize: 14, fontWeight: '600', color: INK }}>{v.practiceName}{paused ? '(已暂停)' : ''}</Text>
+                          <Text style={{ fontSize: 11, color: INK3, marginTop: 1 }}>现截止 {v.currentEndDate ?? '—'}{v.originalEndDate && v.originalEndDate !== v.currentEndDate ? `(原 ${v.originalEndDate})` : ''}</Text>
                         </Pressable>
                         <Pressable
                           style={[styles.pauseBtn, paused && styles.pauseBtnResume]}
                           disabled={pauseVow.isPending || resumeVow.isPending}
                           onPress={() => onTogglePause(v.id, v.practiceName, paused)}
                         >
-                          <RNText style={{ fontSize: 11, fontWeight: '700', color: paused ? '#2f6b4f' : SAFFRON_DARK }}>{paused ? '恢复' : '暂停'}</RNText>
+                          <Text style={{ fontSize: 11, fontWeight: '700', color: paused ? '#2f6b4f' : SAFFRON_DARK }}>{paused ? '恢复' : '暂停'}</Text>
                         </Pressable>
                       </View>
                     );
@@ -258,7 +258,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                       </AdminButton>
                       {isAdmin ? (
                         <>
-                          <RNText style={[styles.hint, { marginTop: 6 }]}>座次门槛(仅系统管理员可改·比宽限更紧):</RNText>
+                          <Text style={[styles.hint, { marginTop: 6 }]}>座次门槛(仅系统管理员可改·比宽限更紧):</Text>
                           <TextInput
                             value={minSessionInput}
                             onChangeText={setMinSessionInput}
@@ -268,7 +268,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                             style={styles.dateInput}
                           />
                           {minSessionInput.trim() && !minSessionValid ? (
-                            <RNText style={{ fontSize: 11, color: '#a13c2e' }}>门槛不能低于 30 分钟(大纲底线)</RNText>
+                            <Text style={{ fontSize: 11, color: '#a13c2e' }}>门槛不能低于 30 分钟(大纲底线)</Text>
                           ) : null}
                           <AdminButton variant="secondary" size="sm" disabled={!minSessionValid || updateMinSession.isPending} onPress={onMinSessionSubmit}>
                             {updateMinSession.isPending ? '保存中…' : '更新门槛(只影响新打卡)'}
@@ -277,17 +277,17 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                       ) : null}
                       {isAdmin && graceVow?.dailyTargetLocked ? (
                         <>
-                          <RNText style={[styles.hint, { marginTop: 6 }]}>每日目标已锁定(PD-6 三选一),师兄不可自改;纠错只能选以下白名单值:</RNText>
+                          <Text style={[styles.hint, { marginTop: 6 }]}>每日目标已锁定(PD-6 三选一),师兄不可自改;纠错只能选以下白名单值:</Text>
                           {graceVow.allowedDailyTargets && graceVow.allowedDailyTargets.length > 0 ? (
                             <View style={styles.chipRow}>
                               {graceVow.allowedDailyTargets.map((t) => (
                                 <Pressable key={t} style={[styles.chip, dailyTargetPick === t && styles.chipOn]} onPress={() => setDailyTargetPick(t)}>
-                                  <RNText style={[styles.chipTxt, dailyTargetPick === t && styles.chipTxtOn]}>{t}</RNText>
+                                  <Text style={[styles.chipTxt, dailyTargetPick === t && styles.chipTxtOn]}>{t}</Text>
                                 </Pressable>
                               ))}
                             </View>
                           ) : (
-                            <RNText style={{ fontSize: 11, color: '#a13c2e' }}>该修法已锁定但未配置白名单值,无法纠错(请先在功课配置里补白名单)。</RNText>
+                            <Text style={{ fontSize: 11, color: '#a13c2e' }}>该修法已锁定但未配置白名单值,无法纠错(请先在功课配置里补白名单)。</Text>
                           )}
                           <AdminButton
                             variant="secondary" size="sm"
@@ -314,34 +314,34 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
         <Pressable style={styles.backdrop} onPress={() => setProxyOpen(false)}>
           <Pressable style={[styles.card, { maxHeight: '86%' }]} onPress={() => {}}>
             <Text className="font-serif" style={styles.cardTitle}>代行操作</Text>
-            <RNText style={styles.cardSub}>为 {name} 代行替代 / 追溯认可 / 豁免,必须写明理由,永久留痕(决策121)。</RNText>
+            <Text style={styles.cardSub}>为 {name} 代行替代 / 追溯认可 / 豁免,必须写明理由,永久留痕(决策121)。</Text>
             <ScrollView style={{ marginTop: 12 }}>
-              <RNText style={styles.fieldLabel}>类型</RNText>
+              <Text style={styles.fieldLabel}>类型</Text>
               <View style={styles.chipRow}>
                 {(Object.keys(ACTION_TYPE_LABEL) as ProxyActionType[]).map((t) => (
                   <Pressable key={t} style={[styles.chip, proxyType === t && styles.chipOn]} onPress={() => setProxyType(t)}>
-                    <RNText style={[styles.chipTxt, proxyType === t && styles.chipTxtOn]}>{ACTION_TYPE_LABEL[t]}</RNText>
+                    <Text style={[styles.chipTxt, proxyType === t && styles.chipTxtOn]}>{ACTION_TYPE_LABEL[t]}</Text>
                   </Pressable>
                 ))}
               </View>
 
-              <RNText style={styles.fieldLabel}>对象</RNText>
+              <Text style={styles.fieldLabel}>对象</Text>
               <View style={styles.chipRow}>
                 {(Object.keys(TARGET_KIND_LABEL) as ProxyTargetKind[]).map((k) => (
                   <Pressable key={k} style={[styles.chip, proxyKind === k && styles.chipOn]} onPress={() => { setProxyKind(k); setProxyVowId(null); }}>
-                    <RNText style={[styles.chipTxt, proxyKind === k && styles.chipTxtOn]}>{TARGET_KIND_LABEL[k]}</RNText>
+                    <Text style={[styles.chipTxt, proxyKind === k && styles.chipTxtOn]}>{TARGET_KIND_LABEL[k]}</Text>
                   </Pressable>
                 ))}
               </View>
 
               {proxyKind === 'vow' ? (
                 autoVows.length === 0 ? (
-                  <RNText style={styles.hint}>TA 当前没有进行中的自动功课(自定功课不接受代行)。</RNText>
+                  <Text style={styles.hint}>TA 当前没有进行中的自动功课(自定功课不接受代行)。</Text>
                 ) : (
                   <View style={{ gap: 6, marginTop: 4 }}>
                     {autoVows.map((v) => (
                       <Pressable key={v.id} style={[styles.opt, proxyVowId === v.id && styles.optPick]} onPress={() => setProxyVowId(v.id)}>
-                        <RNText style={{ fontSize: 13, fontWeight: '600', color: INK }}>{v.practiceName}</RNText>
+                        <Text style={{ fontSize: 13, fontWeight: '600', color: INK }}>{v.practiceName}</Text>
                       </Pressable>
                     ))}
                   </View>
@@ -358,12 +358,12 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
 
               {proxyType === 'substitute' ? (
                 <>
-                  <RNText style={styles.fieldLabel}>替代修法 + 数量</RNText>
+                  <Text style={styles.fieldLabel}>替代修法 + 数量</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 6 }}>
                     <View style={{ flexDirection: 'row', gap: 6 }}>
                       {practices.map((p) => (
                         <Pressable key={p.id} style={[styles.chip, proxyPracticeId === p.id && styles.chipOn]} onPress={() => setProxyPracticeId(p.id)}>
-                          <RNText style={[styles.chipTxt, proxyPracticeId === p.id && styles.chipTxtOn]}>{p.name}</RNText>
+                          <Text style={[styles.chipTxt, proxyPracticeId === p.id && styles.chipTxtOn]}>{p.name}</Text>
                         </Pressable>
                       ))}
                     </View>
@@ -379,7 +379,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                 </>
               ) : null}
 
-              <RNText style={styles.fieldLabel}>理由(必填)</RNText>
+              <Text style={styles.fieldLabel}>理由(必填)</Text>
               <TextInput
                 value={proxyReason}
                 onChangeText={setProxyReason}
@@ -388,7 +388,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                 multiline
                 style={[styles.textInput, { minHeight: 60, textAlignVertical: 'top' }]}
               />
-              <RNText style={styles.fieldLabel}>依据(选填)</RNText>
+              <Text style={styles.fieldLabel}>依据(选填)</Text>
               <TextInput
                 value={proxyBasis}
                 onChangeText={setProxyBasis}

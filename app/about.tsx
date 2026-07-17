@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Flower2 } from 'lucide-react-native';
-import { Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -30,7 +30,7 @@ export default function About() {
         <View className="items-center" style={{ gap: 10, paddingVertical: 14 }}>
           <View style={styles.logo}><Flower2 size={38} color={SAFFRON_DARK} /></View>
           <Text className="font-serif" style={{ fontSize: 24, fontWeight: '700', color: INK, letterSpacing: 2 }}>纽约佛学会 · 闻思修</Text>
-          <RNText style={{ fontSize: 13, color: INK3, letterSpacing: 1 }}>学修端 · v1.0.0</RNText>
+          <Text style={{ fontSize: 13, color: INK3, letterSpacing: 1 }}>学修端 · v1.0.0</Text>
         </View>
 
         {/* 三殊胜总纲 */}
@@ -39,7 +39,7 @@ export default function About() {
           {THREE.map(([t, d]) => (
             <View key={t} style={styles.card}>
               <Text className="font-serif" style={{ fontSize: 16, fontWeight: '700', color: SAFFRON_DARK }}>{t}</Text>
-              <RNText style={{ fontSize: 14, color: INK2, lineHeight: 23, marginTop: 5 }}>{d}</RNText>
+              <Text style={{ fontSize: 14, color: INK2, lineHeight: 23, marginTop: 5 }}>{d}</Text>
             </View>
           ))}
         </View>
@@ -47,12 +47,12 @@ export default function About() {
         {/* 应用定位 */}
         <View style={styles.card}>
           <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: INK }}>关于本应用</Text>
-          <RNText style={{ fontSize: 14, color: INK2, lineHeight: 23, marginTop: 6 }}>
+          <Text style={{ fontSize: 14, color: INK2, lineHeight: 23, marginTop: 6 }}>
             本应用是面向已入学师兄的学修端,陪伴你完成闻思修的日常:听课、思考、答题、观修、计数、共修与回向。愿它伴你日日增上,让修行融入生活。
-          </RNText>
+          </Text>
         </View>
 
-        <RNText style={{ fontSize: 11, color: INK3, textAlign: 'center', lineHeight: 18 }}>愿以此功德,普及于一切,{'\n'}我等与众生,皆共成佛道。</RNText>
+        <Text style={{ fontSize: 11, color: INK3, textAlign: 'center', lineHeight: 18 }}>愿以此功德,普及于一切,{'\n'}我等与众生,皆共成佛道。</Text>
       </ScrollView>
     </SafeAreaView>
   );

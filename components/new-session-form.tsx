@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
-
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { AdminButton, SegmentedControl } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
 import { notify } from '@/lib/dialog';
@@ -10,6 +9,7 @@ import { useCurrentUser } from '@/lib/queries/profile';
 import { INK, INK2, INK3, INK4, SAFFRON, SAFFRON_DARK, SAFFRON_LIGHT } from '@/lib/theme';
 import { bookTitle } from '@/lib/utils';
 
+import { TextInput } from '@/components/ui/text-input';
 const CREAM = '#FBF4E9';
 type SessionType = 'regular' | 'practice';
 const TYPE_LABEL: Record<SessionType, string> = { regular: '共修', practice: '习题课' };

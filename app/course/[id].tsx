@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ChevronLeft, Share2 } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Image, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, Text as RNText, View } from 'react-native';
+import { ActivityIndicator, Image, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { LessonStatusBadge } from '@/components/lesson-status-badge';
@@ -166,13 +166,13 @@ export default function CourseDetail() {
             <View style={{ paddingVertical: 80, alignItems: 'center' }}><ActivityIndicator color={SAFFRON_DARK} /></View>
           ) : isError ? (
             <View style={{ paddingVertical: 80, alignItems: 'center', paddingHorizontal: 24 }}>
-              <RNText style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>加载失败,请检查网络后重试(不代表课程不存在)</RNText>
-              <RNText style={{ fontSize: 12, color: INK3, textAlign: 'center', marginTop: 6 }}>请从「全部课程」进入</RNText>
+              <Text style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>加载失败,请检查网络后重试(不代表课程不存在)</Text>
+              <Text style={{ fontSize: 12, color: INK3, textAlign: 'center', marginTop: 6 }}>请从「全部课程」进入</Text>
             </View>
           ) : !course ? (
             <View style={{ paddingVertical: 80, alignItems: 'center', paddingHorizontal: 24 }}>
-              <RNText style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>课程不存在</RNText>
-              <RNText style={{ fontSize: 12, color: INK3, textAlign: 'center', marginTop: 6 }}>请从「全部课程」进入</RNText>
+              <Text style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>课程不存在</Text>
+              <Text style={{ fontSize: 12, color: INK3, textAlign: 'center', marginTop: 6 }}>请从「全部课程」进入</Text>
             </View>
           ) : (
             <>
@@ -190,17 +190,17 @@ export default function CourseDetail() {
                 <View style={{ flex: 1, paddingTop: 6 }}>
                   <Text className="font-serif" style={{ fontSize: 21, fontWeight: '700', color: INK, letterSpacing: 1 }}>{bookTitle(course.name)}</Text>
                   {courseCompletion?.isComplete ? (
-                    <View style={styles.completeBadge}><RNText style={styles.completeBadgeText}>本书圆满 ✓</RNText></View>
+                    <View style={styles.completeBadge}><Text style={styles.completeBadgeText}>本书圆满 ✓</Text></View>
                   ) : null}
-                  {course.author ? <RNText style={{ fontSize: 12, color: INK2, marginTop: 4 }}>{course.author}</RNText> : null}
+                  {course.author ? <Text style={{ fontSize: 12, color: INK2, marginTop: 4 }}>{course.author}</Text> : null}
                   <View style={styles.actionRow}>
                     {ctaTarget ? (
                       <Pressable style={styles.cta} onPress={() => router.push(`/lesson/${ctaTarget}?step=wensi` as never)}>
-                        <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{ctaLabel}</RNText>
+                        <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{ctaLabel}</Text>
                       </Pressable>
                     ) : null}
                     <Pressable testID={testIds.courseDetail.startSelfStudyButton} style={styles.selfStudyBtn} disabled={startSS.isPending} onPress={onStartSelfStudy}>
-                      <RNText style={{ color: SAFFRON_DARK, fontWeight: '700', fontSize: 13 }}>＋ 加入自学</RNText>
+                      <Text style={{ color: SAFFRON_DARK, fontWeight: '700', fontSize: 13 }}>＋ 加入自学</Text>
                     </Pressable>
                   </View>
                 </View>
@@ -229,16 +229,16 @@ export default function CourseDetail() {
             {tab === 'toc' ? (
               grouped.length === 0 ? (
                 <View style={{ paddingVertical: 40, alignItems: 'center' }}>
-                  <RNText style={{ fontSize: 13, color: INK3 }}>暂无课时</RNText>
+                  <Text style={{ fontSize: 13, color: INK3 }}>暂无课时</Text>
                 </View>
               ) : (
                 <View style={{ gap: 6 }}>
                   {grouped.map((ch, idx) => (
                     <View key={ch.id} style={{ gap: 6 }}>
                       <View style={styles.sectionHeader}>
-                        <View style={styles.chapNo}><RNText style={{ fontSize: 12, fontWeight: '700', color: SAGE }}>{idx + 1}</RNText></View>
+                        <View style={styles.chapNo}><Text style={{ fontSize: 12, fontWeight: '700', color: SAGE }}>{idx + 1}</Text></View>
                         <Text className="font-serif" style={{ flex: 1, fontSize: 14, fontWeight: '700', color: INK }}>{ch.title}</Text>
-                        <RNText style={{ fontSize: 11, color: INK3 }}>{ch.lessons.length} 课</RNText>
+                        <Text style={{ fontSize: 11, color: INK3 }}>{ch.lessons.length} 课</Text>
                       </View>
                       {ch.lessons.map((l) => (
                         <LessonRow
@@ -274,16 +274,16 @@ export default function CourseDetail() {
         <Pressable style={styles.infoBackdrop} onPress={() => setEnrollOpen(false)}>
           <Pressable style={styles.infoCard} onPress={() => {}}>
             <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>选择自学专业</Text>
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 4, marginBottom: 12 }}>本课程归属多个专业,选一个开始自学:</RNText>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 4, marginBottom: 12 }}>本课程归属多个专业,选一个开始自学:</Text>
             <View style={{ gap: 8 }}>
               {coursePrograms.map((p) => (
                 <Pressable key={p.programId} testID={testIds.courseDetail.enrollProgramOption(p.programId)} style={styles.enrollOpt} onPress={() => { setEnrollOpen(false); doEnroll(p.programId, p.programName); }}>
-                  <RNText style={{ fontSize: 15, fontWeight: '600', color: INK }}>{p.programName}</RNText>
+                  <Text style={{ fontSize: 15, fontWeight: '600', color: INK }}>{p.programName}</Text>
                 </Pressable>
               ))}
             </View>
             <Pressable style={styles.infoClose} onPress={() => setEnrollOpen(false)}>
-              <RNText style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>取消</RNText>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>取消</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -294,9 +294,9 @@ export default function CourseDetail() {
         <Pressable style={styles.infoBackdrop} onPress={() => setShareText(null)}>
           <Pressable style={styles.infoCard} onPress={() => {}}>
             <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>分享给师兄</Text>
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 4 }}>当前环境无法直接调起分享,文案已备好,选中复制发出去就行:</RNText>
+            <Text style={{ fontSize: 12, color: INK3, marginTop: 4 }}>当前环境无法直接调起分享,文案已备好,选中复制发出去就行:</Text>
             <View style={styles.shareTextBox}>
-              <RNText selectable style={{ fontSize: 14, lineHeight: 22, color: INK2 }}>{shareText}</RNText>
+              <Text selectable style={{ fontSize: 14, lineHeight: 22, color: INK2 }}>{shareText}</Text>
             </View>
             <View className="flex-row" style={{ gap: 10, marginTop: 14 }}>
               <Pressable
@@ -308,10 +308,10 @@ export default function CourseDetail() {
                   notify('复制不了', '这个环境暂不支持一键复制,长按上面的文字手动选取复制。');
                 }}
               >
-                <RNText style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>一键复制</RNText>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>一键复制</Text>
               </Pressable>
               <Pressable style={styles.sharePillGhost} onPress={() => setShareText(null)}>
-                <RNText style={{ fontSize: 14, fontWeight: '700', color: INK2 }}>关闭</RNText>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: INK2 }}>关闭</Text>
               </Pressable>
             </View>
           </Pressable>
@@ -326,7 +326,7 @@ export default function CourseDetail() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.statCol}>
-      <RNText style={{ fontSize: 11, color: INK3, letterSpacing: 1 }}>{label}</RNText>
+      <Text style={{ fontSize: 11, color: INK3, letterSpacing: 1 }}>{label}</Text>
       <Text className="font-serif" style={{ fontSize: 20, fontWeight: '700', color: INK, marginTop: 3 }}>{value}</Text>
     </View>
   );
@@ -339,13 +339,13 @@ function LessonRow({ num, title, status, isCurrent, resourceCount, onPress }: {
   return (
     <Pressable style={[styles.lessonRow, isCurrent && styles.lessonRowCurrent]} onPress={onPress}>
       <View style={[styles.lessonNoBox, isCurrent && { backgroundColor: SAFFRON }]}>
-        <RNText style={{ fontSize: 11, fontWeight: '700', color: isCurrent ? '#fff' : INK3 }}>{num}</RNText>
+        <Text style={{ fontSize: 11, fontWeight: '700', color: isCurrent ? '#fff' : INK3 }}>{num}</Text>
       </View>
-      <RNText numberOfLines={1} style={{ flex: 1, fontSize: 14, fontWeight: isCurrent ? '700' : '500', color: isCurrent ? INK : INK2 }}>{title}</RNText>
-      {isCurrent ? <RNText style={{ fontSize: 10, fontWeight: '700', color: SAFFRON_DARK }}>当前</RNText> : null}
+      <Text numberOfLines={1} style={{ flex: 1, fontSize: 14, fontWeight: isCurrent ? '700' : '500', color: isCurrent ? INK : INK2 }}>{title}</Text>
+      {isCurrent ? <Text style={{ fontSize: 10, fontWeight: '700', color: SAFFRON_DARK }}>当前</Text> : null}
       <LessonStatusBadge st={status} />
-      {resourceCount && resourceCount > 0 ? <RNText style={{ fontSize: 11, color: INK3 }}>{resourceCount} 讲</RNText> : null}
-      <RNText style={{ fontSize: 14, color: INK3 }}>›</RNText>
+      {resourceCount && resourceCount > 0 ? <Text style={{ fontSize: 11, color: INK3 }}>{resourceCount} 讲</Text> : null}
+      <Text style={{ fontSize: 14, color: INK3 }}>›</Text>
     </Pressable>
   );
 }
@@ -370,7 +370,7 @@ function ThisWeek({ weekLessons, weekNumber, statusMap, currentLessonId, fallbac
   if (list.length === 0) {
     return (
       <View style={{ paddingVertical: 32, alignItems: 'center' }}>
-        <RNText style={{ fontSize: 13, color: INK3 }}>请从「目录」选择课时开始学修</RNText>
+        <Text style={{ fontSize: 13, color: INK3 }}>请从「目录」选择课时开始学修</Text>
       </View>
     );
   }
@@ -381,10 +381,10 @@ function ThisWeek({ weekLessons, weekNumber, statusMap, currentLessonId, fallbac
       {hasWeek ? (
         <View style={styles.weekSummary}>
           <Text className="font-serif" style={{ fontSize: 16, fontWeight: '700', color: SAFFRON_DARK, letterSpacing: 1 }}>{weekNumber ? `第 ${weekNumber} 周` : '本周'}</Text>
-          <RNText style={{ fontSize: 12, color: INK2 }}>需学 {list.length} · 已学 {doneCount}</RNText>
+          <Text style={{ fontSize: 12, color: INK2 }}>需学 {list.length} · 已学 {doneCount}</Text>
         </View>
       ) : (
-        <RNText style={{ fontSize: 12, color: INK3, paddingHorizontal: 4, paddingVertical: 6 }}>本课暂未排课,从第 {list[0].num} 课开始</RNText>
+        <Text style={{ fontSize: 12, color: INK3, paddingHorizontal: 4, paddingVertical: 6 }}>本课暂未排课,从第 {list[0].num} 课开始</Text>
       )}
 
       {list.map((l) => (
@@ -398,7 +398,7 @@ function ThisWeek({ weekLessons, weekNumber, statusMap, currentLessonId, fallbac
         />
       ))}
 
-      <RNText style={{ fontSize: 11, color: INK3, marginTop: 6, paddingHorizontal: 2 }}>圆满 = 闻思(听+看)+ 答题;法师辅导可选不计;观修单独计入升学统计。</RNText>
+      <Text style={{ fontSize: 11, color: INK3, marginTop: 6, paddingHorizontal: 2 }}>圆满 = 闻思(听+看)+ 答题;法师辅导可选不计;观修单独计入升学统计。</Text>
     </View>
   );
 }

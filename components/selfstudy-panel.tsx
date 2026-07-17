@@ -1,11 +1,11 @@
 import { useRouter } from 'expo-router';
 import { Calendar, ChevronRight, Minus, Plus, X } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
-
+import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { notify } from '@/lib/dialog';
 import { useAddSelfStudyRestWeek, useRemoveSelfStudyRestWeek, useSetPrimarySelfStudyProgram, useSetSelfStudyPace } from '@/lib/mutations/self-study';
+import { TextInput } from '@/components/ui/text-input';
 import {
   useMySelfStudyPrograms,
   useSelfStudyPlan,
@@ -38,9 +38,9 @@ export function SelfStudyPanel() {
     return (
       <View style={styles.card}>
         <Text className="font-serif" style={{ fontSize: 16, fontWeight: '700', color: INK }}>还未开始自学</Text>
-        <RNText style={{ fontSize: 13, color: INK3, marginTop: 6, lineHeight: 20 }}>去闻思页选一门课,点「加入自学」即可开始(需自学资格;没有请联系管理员开通)。</RNText>
+        <Text style={{ fontSize: 13, color: INK3, marginTop: 6, lineHeight: 20 }}>去闻思页选一门课,点「加入自学」即可开始(需自学资格;没有请联系管理员开通)。</Text>
         <Pressable style={styles.primaryBtn} onPress={() => router.push('/courses' as never)}>
-          <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>去闻思选课</RNText>
+          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>去闻思选课</Text>
         </Pressable>
       </View>
     );
@@ -67,38 +67,38 @@ function PrimaryCard({ program, onRest }: { program: SelfStudyProgramRow; onRest
     <View style={styles.card}>
       <View className="flex-row items-center" style={{ gap: 6 }}>
         <Text className="font-serif" style={{ fontSize: 16, fontWeight: '700', color: INK }}>{program.programName}</Text>
-        <View style={styles.primaryTag}><RNText style={{ fontSize: 10, fontWeight: '700', color: '#fff' }}>主修</RNText></View>
+        <View style={styles.primaryTag}><Text style={{ fontSize: 10, fontWeight: '700', color: '#fff' }}>主修</Text></View>
       </View>
-      <RNText style={{ fontSize: 12, color: INK3, marginTop: 2 }}>起修日 {program.startDate}{rests.length ? ` · 已请假 ${rests.length} 周` : ''}{plan && plan.totalLessons > 0 ? ` · 全 ${plan.totalLessons} 节` : ''}</RNText>
+      <Text style={{ fontSize: 12, color: INK3, marginTop: 2 }}>起修日 {program.startDate}{rests.length ? ` · 已请假 ${rests.length} 周` : ''}{plan && plan.totalLessons > 0 ? ` · 全 ${plan.totalLessons} 节` : ''}</Text>
 
       {/* 本周计划(决策157:起修日 + 节奏 + 休息周顺延) */}
       <View style={styles.planBox}>
-        <RNText style={{ fontSize: 11, color: SAFFRON_DARK, fontWeight: '700' }}>{plan?.started ? `本周计划 · 第 ${plan.weekNumber} 周` : '本周计划'}</RNText>
+        <Text style={{ fontSize: 11, color: SAFFRON_DARK, fontWeight: '700' }}>{plan?.started ? `本周计划 · 第 ${plan.weekNumber} 周` : '本周计划'}</Text>
         {plan && plan.started && lessons.length > 0 ? (
           <>
             <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: INK, marginTop: 4 }}>学第 {plan.fromSeq}–{plan.toSeq} 节 · 共 {plan.pace} 节/周</Text>
             <View style={{ gap: 6, marginTop: 10 }}>
               {lessons.map((l) => (
                 <Pressable key={l.lessonId} style={styles.lessonRow} onPress={() => router.push(`/lesson/${l.lessonId}?step=wensi` as never)}>
-                  <View style={styles.lessonNoBox}><RNText style={{ fontSize: 11, fontWeight: '700', color: INK3 }}>{l.seq}</RNText></View>
-                  <RNText numberOfLines={1} style={{ flex: 1, fontSize: 13, color: INK2 }}>{l.lessonTitle}</RNText>
-                  <RNText style={{ fontSize: 14, color: INK3 }}>›</RNText>
+                  <View style={styles.lessonNoBox}><Text style={{ fontSize: 11, fontWeight: '700', color: INK3 }}>{l.seq}</Text></View>
+                  <Text numberOfLines={1} style={{ flex: 1, fontSize: 13, color: INK2 }}>{l.lessonTitle}</Text>
+                  <Text style={{ fontSize: 14, color: INK3 }}>›</Text>
                 </Pressable>
               ))}
             </View>
             {cont ? (
               <Pressable style={styles.continueBtn} onPress={() => router.push(`/lesson/${cont.lessonId}?step=wensi` as never)}>
-                <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>继续学习</RNText>
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>继续学习</Text>
               </Pressable>
             ) : null}
           </>
         ) : plan && !plan.started ? (
-          <RNText style={{ fontSize: 13, color: INK2, marginTop: 6 }}>还没到起修日({program.startDate}),到日子按节奏开始。</RNText>
+          <Text style={{ fontSize: 13, color: INK2, marginTop: 6 }}>还没到起修日({program.startDate}),到日子按节奏开始。</Text>
         ) : (
           <>
-            <RNText style={{ fontSize: 13, color: INK2, marginTop: 6 }}>本专业暂未排课(无课节序列)。可去课程目录自选。</RNText>
+            <Text style={{ fontSize: 13, color: INK2, marginTop: 6 }}>本专业暂未排课(无课节序列)。可去课程目录自选。</Text>
             <Pressable style={styles.continueBtn} onPress={() => router.push('/catalog' as never)}>
-              <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>去课程目录</RNText>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>去课程目录</Text>
             </Pressable>
           </>
         )}
@@ -106,14 +106,14 @@ function PrimaryCard({ program, onRest }: { program: SelfStudyProgramRow; onRest
 
       {/* 节奏调整(决策157:大纲默认 + 可自定) */}
       <Pressable style={styles.paceRow} onPress={() => setPaceOpen(true)}>
-        <RNText style={{ fontSize: 13, color: INK2 }}>节奏:每周 {plan?.pace ?? '—'} 节{plan ? (plan.paceSource === 'default' ? '(大纲默认)' : '(自定)') : ''}</RNText>
-        <RNText style={{ fontSize: 13, color: SAFFRON_DARK, fontWeight: '700' }}>调整 ▾</RNText>
+        <Text style={{ fontSize: 13, color: INK2 }}>节奏:每周 {plan?.pace ?? '—'} 节{plan ? (plan.paceSource === 'default' ? '(大纲默认)' : '(自定)') : ''}</Text>
+        <Text style={{ fontSize: 13, color: SAFFRON_DARK, fontWeight: '700' }}>调整 ▾</Text>
       </Pressable>
 
       {/* 请假 / 休息周 */}
       <Pressable style={styles.restRow} onPress={onRest}>
         <Calendar size={15} color={INK3} />
-        <RNText style={{ fontSize: 13, color: INK3 }}>请假 / 休息周{rests.length ? `(已设 ${rests.length} 周)` : '(进度顺延)'}</RNText>
+        <Text style={{ fontSize: 13, color: INK3 }}>请假 / 休息周{rests.length ? `(已设 ${rests.length} 周)` : '(进度顺延)'}</Text>
         <ChevronRight size={15} color={INK3} />
       </Pressable>
 
@@ -135,23 +135,23 @@ function PaceModal({ open, onClose, programId, pace, isCustom }: { open: boolean
         <Pressable style={styles.sheet} onPress={() => {}}>
           <View style={styles.handle} />
           <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>调整学习节奏</Text>
-          <RNText style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 14 }}>本周计划按节奏 + 起修日算;大纲给默认节奏,你可自定。自学不限快慢,按你的时间走。</RNText>
+          <Text style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 14 }}>本周计划按节奏 + 起修日算;大纲给默认节奏,你可自定。自学不限快慢,按你的时间走。</Text>
           <Pressable style={[styles.paceOpt, mode === 'default' && styles.paceOptOn]} onPress={() => setMode('default')}>
-            <RNText style={{ fontSize: 15, fontWeight: '600', color: mode === 'default' ? '#fff' : INK }}>跟随大纲默认</RNText>
+            <Text style={{ fontSize: 15, fontWeight: '600', color: mode === 'default' ? '#fff' : INK }}>跟随大纲默认</Text>
           </Pressable>
           <View style={[styles.paceOpt, mode === 'custom' && styles.paceOptOn, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
-            <Pressable style={{ flex: 1 }} onPress={() => setMode('custom')}><RNText style={{ fontSize: 15, fontWeight: '600', color: mode === 'custom' ? '#fff' : INK }}>自定:每周</RNText></Pressable>
+            <Pressable style={{ flex: 1 }} onPress={() => setMode('custom')}><Text style={{ fontSize: 15, fontWeight: '600', color: mode === 'custom' ? '#fff' : INK }}>自定:每周</Text></Pressable>
             <View className="flex-row items-center" style={{ gap: 14 }}>
               <Pressable onPress={() => { setMode('custom'); setN((c) => Math.max(1, c - 1)); }}><Minus size={18} color={mode === 'custom' ? '#fff' : INK2} /></Pressable>
-              <RNText style={{ fontSize: 18, fontWeight: '700', color: mode === 'custom' ? '#fff' : INK, minWidth: 20, textAlign: 'center' }}>{n}</RNText>
+              <Text style={{ fontSize: 18, fontWeight: '700', color: mode === 'custom' ? '#fff' : INK, minWidth: 20, textAlign: 'center' }}>{n}</Text>
               <Pressable onPress={() => { setMode('custom'); setN((c) => Math.min(21, c + 1)); }}><Plus size={18} color={mode === 'custom' ? '#fff' : INK2} /></Pressable>
-              <RNText style={{ fontSize: 14, color: mode === 'custom' ? '#fff' : INK2 }}>节</RNText>
+              <Text style={{ fontSize: 14, color: mode === 'custom' ? '#fff' : INK2 }}>节</Text>
             </View>
           </View>
           <Pressable style={[styles.doneBtn, setPace.isPending && { opacity: 0.5 }]} disabled={setPace.isPending} onPress={() => {
             setPace.mutate({ programId, weeklyTarget: mode === 'default' ? null : n }, { onSuccess: onClose, onError: (e) => notify('保存失败', (e as Error)?.message ?? '请重试') });
           }}>
-            <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>保存</RNText>
+            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>保存</Text>
           </Pressable>
         </Pressable>
       </Pressable>
@@ -169,15 +169,15 @@ function OthersCard({ others }: { others: SelfStudyProgramRow[] }) {
         {others.map((p) => (
           <View key={p.programId} className="flex-row items-center" style={{ gap: 10 }}>
             <View style={{ flex: 1 }}>
-              <RNText style={{ fontSize: 14, color: INK, fontWeight: '600' }}>{p.programName}</RNText>
-              <RNText style={{ fontSize: 11, color: INK3, marginTop: 1 }}>起修日 {p.startDate}</RNText>
+              <Text style={{ fontSize: 14, color: INK, fontWeight: '600' }}>{p.programName}</Text>
+              <Text style={{ fontSize: 11, color: INK3, marginTop: 1 }}>起修日 {p.startDate}</Text>
             </View>
             <Pressable
               style={styles.setPrimaryBtn}
               disabled={setPrimary.isPending}
               onPress={() => setPrimary.mutate({ programId: p.programId }, { onError: (e) => notify('切换失败', (e as Error)?.message ?? '请重试') })}
             >
-              <RNText style={{ fontSize: 12, fontWeight: '700', color: SAFFRON_DARK }}>设为主修</RNText>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: SAFFRON_DARK }}>设为主修</Text>
             </Pressable>
           </View>
         ))}
@@ -202,13 +202,13 @@ function RestModal({ open, onClose, programId }: { open: boolean; onClose: () =>
         <Pressable style={styles.sheet} onPress={() => {}}>
           <View style={styles.handle} />
           <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>请假 / 休息周</Text>
-          <RNText style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>登记你休息的那一周(填该周任一天即可)。每登记一周,大纲进度顺延一周、不催。</RNText>
+          <Text style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>登记你休息的那一周(填该周任一天即可)。每登记一周,大纲进度顺延一周、不催。</Text>
 
           {rests.length > 0 ? (
             <View style={{ gap: 8, marginBottom: 12 }}>
               {rests.map((r) => (
                 <View key={r.id} style={styles.restItem}>
-                  <RNText style={{ flex: 1, fontSize: 14, color: INK }}>{r.restStartDate} 那一周</RNText>
+                  <Text style={{ flex: 1, fontSize: 14, color: INK }}>{r.restStartDate} 那一周</Text>
                   <Pressable hitSlop={8} disabled={remove.isPending} onPress={() => remove.mutate({ id: r.id, programId })}>
                     <X size={16} color={INK3} />
                   </Pressable>
@@ -216,7 +216,7 @@ function RestModal({ open, onClose, programId }: { open: boolean; onClose: () =>
               ))}
             </View>
           ) : (
-            <RNText style={{ fontSize: 12, color: INK3, marginBottom: 12 }}>还没有登记休息周。</RNText>
+            <Text style={{ fontSize: 12, color: INK3, marginBottom: 12 }}>还没有登记休息周。</Text>
           )}
 
           <Text style={{ fontSize: 12, fontWeight: '600', color: INK3, marginBottom: 6 }}>新增休息周(YYYY-MM-DD)</Text>
@@ -236,11 +236,11 @@ function RestModal({ open, onClose, programId }: { open: boolean; onClose: () =>
               disabled={!valid || add.isPending}
               onPress={() => add.mutate({ programId, restStartDate: date }, { onError: (e) => notify('登记失败', (e as Error)?.message ?? '请重试') })}
             >
-              <Plus size={16} color="#fff" /><RNText style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>登记</RNText>
+              <Plus size={16} color="#fff" /><Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>登记</Text>
             </Pressable>
           </View>
 
-          <Pressable style={styles.doneBtn} onPress={onClose}><RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>完成</RNText></Pressable>
+          <Pressable style={styles.doneBtn} onPress={onClose}><Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>完成</Text></Pressable>
         </Pressable>
       </Pressable>
       </KeyboardAvoidingView>

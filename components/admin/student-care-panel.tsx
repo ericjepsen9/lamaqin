@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
-
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { AdminButton, Badge, EmptyState, type BadgeTone } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
 import { useAddFollowup } from '@/lib/mutations/care';
@@ -9,6 +8,7 @@ import { testIds } from '@/lib/testids';
 import { GOLD_DARK as GOLD, GOLD_PALE, INK, INK2, INK3, INK4, SAFFRON, SAFFRON_DARK, SAFFRON_LIGHT, SAGE_DARK, SAGE_PALE } from '@/lib/theme';
 import { genClientToken } from '@/lib/utils';
 
+import { TextInput } from '@/components/ui/text-input';
 // 5维滞后 + 跟进记录(设计②关怀详情页内容,2026-07-10 抽成共享组件同时喂 care/[studentId] 和
 //   students/[id] 两处——后者这两块此前一直是"待接入"占位文案,数据层/交互其实早就现成,只是
 //   没人接到这个页面。跟进记录写权对齐 RLS(care_followups 写=本班 zhumai/aixin;决策035/044-046,

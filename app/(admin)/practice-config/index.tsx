@@ -476,7 +476,16 @@ function PaceChannelChips({ practiceId, channel, label, locked, allowed }: {
   practiceId: string; channel: PracticePaceChannel; label: string; locked: boolean; allowed: number[] | null;
 }) {
   const update = useUpdatePracticePaceLock();
-  const mode = paceModeOf(locked, allowed);
+  // mode 是本地态,不是直接算 paceModeOf(locked, allowed)——2026-07-17 e2e实测揭出的真bug:
+  // 点"限定值"这个分支本身不写库(等填完数字点"应用"才写),如果mode只是服务端值的纯派生,
+  // 点了"限定值"因为服务端值没变,mode不会变,输入框永远不会出现,整个"限定值"这条路径
+  // 从当年(单通道版)上线起就是个死胡同,一直没测到才没被发现。改成本地态:初始值取服务端
+  // 派生值,点chip立刻切本地态(不管这个模式要不要立刻写库),服务端值真正变了再对齐回来。
+  const savedMode = paceModeOf(locked, allowed);
+  const [mode, setMode_] = useState<PaceMode>(savedMode);
+  const [prevSavedMode, setPrevSavedMode] = useState(savedMode);
+  if (savedMode !== prevSavedMode) { setPrevSavedMode(savedMode); setMode_(savedMode); }
+
   const [whitelistDraft, setWhitelistDraft] = useState(() => (allowed ?? []).join(','));
   // practices-master 刷新后(如别处也在改)重新对齐草稿——渲染期间比对上一次的 allowed
   // (react-hooks/set-state-in-effect 同款写法,同文件其它弹层已用)。
@@ -484,6 +493,7 @@ function PaceChannelChips({ practiceId, channel, label, locked, allowed }: {
   if (allowed !== prevAllowed) { setPrevAllowed(allowed); setWhitelistDraft((allowed ?? []).join(',')); }
 
   const setMode = (m: PaceMode) => {
+    setMode_(m); // 先切本地UI态——'whitelist'分支下面故意不写库,没有这行输入框永远不会出现
     if (m === 'free') update.mutate({ practiceId, channel, dailyTargetLocked: false, allowedDailyTargets: null });
     else if (m === 'locked') update.mutate({ practiceId, channel, dailyTargetLocked: true, allowedDailyTargets: allowed });
     // 'whitelist':只切UI态,真正写库等填完数字点"应用"(见下方 applyWhitelist)——避免切过来

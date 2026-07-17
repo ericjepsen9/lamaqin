@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ChevronLeft, Pin } from 'lucide-react-native';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -29,27 +29,27 @@ export default function AnnouncementDetail() {
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color={SAFFRON} /></View>
       ) : isError ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <RNText style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>加载失败,请检查网络后重试(不代表公告不存在)。</RNText>
+          <Text style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>加载失败,请检查网络后重试(不代表公告不存在)。</Text>
         </View>
       ) : !data ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <RNText style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>公告不存在,或不属于你的班级。</RNText>
+          <Text style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>公告不存在,或不属于你的班级。</Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             {data.isPinned ? (
-              <View style={styles.pinTag}><Pin size={11} color={SAFFRON_DARK} /><RNText style={{ fontSize: 11, fontWeight: '700', color: SAFFRON_DARK }}>置顶</RNText></View>
+              <View style={styles.pinTag}><Pin size={11} color={SAFFRON_DARK} /><Text style={{ fontSize: 11, fontWeight: '700', color: SAFFRON_DARK }}>置顶</Text></View>
             ) : null}
-            {data.cohortName ? <RNText style={{ fontSize: 12, color: INK3 }}>{data.cohortName}</RNText> : null}
+            {data.cohortName ? <Text style={{ fontSize: 12, color: INK3 }}>{data.cohortName}</Text> : null}
           </View>
           <Text className="font-serif" style={{ fontSize: 21, fontWeight: '700', color: INK, marginTop: 8, lineHeight: 30 }}>
             {data.title || '班级公告'}
           </Text>
-          <RNText style={{ fontSize: 12, color: INK3, marginTop: 6 }}>
+          <Text style={{ fontSize: 12, color: INK3, marginTop: 6 }}>
             {data.postedByName ? `${data.postedByName} · ` : ''}{data.postedAt ? data.postedAt.slice(0, 10) : ''}
-          </RNText>
-          <RNText style={{ fontSize: 15, color: INK2, lineHeight: 26, marginTop: 18 }}>{data.content}</RNText>
+          </Text>
+          <Text style={{ fontSize: 15, color: INK2, lineHeight: 26, marginTop: 18 }}>{data.content}</Text>
         </ScrollView>
       )}
     </SafeAreaView>

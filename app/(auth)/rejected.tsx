@@ -1,5 +1,5 @@
 import { CircleAlert } from 'lucide-react-native';
-import { Text as RNText, View } from 'react-native';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -16,7 +16,7 @@ export default function Rejected() {
           <CircleAlert size={34} color={INK3} />
         </View>
         <Text className="font-serif" style={{ fontSize: 20, fontWeight: '700', color: INK }}>报名暂未通过</Text>
-        <RNText style={{ fontSize: 14, color: INK3, textAlign: 'center', lineHeight: 24 }}>如有疑问,请联系你的辅导员了解详情。</RNText>
+        <Text style={{ fontSize: 14, color: INK3, textAlign: 'center', lineHeight: 24 }}>如有疑问,请联系你的辅导员了解详情。</Text>
       </View>
     </SafeAreaView>
   );

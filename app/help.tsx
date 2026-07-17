@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { ChevronDown, ChevronLeft, MessageCircle } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -10,6 +10,7 @@ import { useMyCoaches } from '@/lib/queries/community';
 import { testIds } from '@/lib/testids';
 import { genClientToken } from '@/lib/utils';
 
+import { TextInput } from '@/components/ui/text-input';
 // 帮助与反馈(设置 → 账号与隐私)。审计 P0「纠错走库」落地 2026-07-02:
 //   意见反馈接真(feedback 表·决策117,类型可选);联系辅导员卡接真(本班 class_admins,无班则提示走反馈)。
 // 守:关怀靠人工——联系辅导员是入口,不是 App 自动判别。
@@ -66,10 +67,10 @@ export default function Help() {
             {FAQ.map(([q, a], i) => (
               <View key={q} style={i < FAQ.length - 1 ? styles.rowBorder : null}>
                 <Pressable style={styles.qRow} onPress={() => setOpen(open === i ? null : i)}>
-                  <RNText style={{ flex: 1, fontSize: 14, fontWeight: '600', color: INK }}>{q}</RNText>
+                  <Text style={{ flex: 1, fontSize: 14, fontWeight: '600', color: INK }}>{q}</Text>
                   <ChevronDown size={18} color={INK3} style={{ transform: [{ rotate: open === i ? '180deg' : '0deg' }] }} />
                 </Pressable>
-                {open === i ? <RNText style={styles.answer}>{a}</RNText> : null}
+                {open === i ? <Text style={styles.answer}>{a}</Text> : null}
               </View>
             ))}
           </View>
@@ -84,7 +85,7 @@ export default function Help() {
                 <View style={styles.contactIcon}><MessageCircle size={20} color={SAFFRON} /></View>
                 <View style={{ flex: 1 }}>
                   <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: INK }}>{c.name}</Text>
-                  <RNText style={{ fontSize: 12, color: INK3, marginTop: 1 }}>{c.cohortName} 辅导员 · 学修 / 关怀疑问都可以问</RNText>
+                  <Text style={{ fontSize: 12, color: INK3, marginTop: 1 }}>{c.cohortName} 辅导员 · 学修 / 关怀疑问都可以问</Text>
                 </View>
               </View>
             ))
@@ -92,16 +93,16 @@ export default function Help() {
             // 查询失败别落进"你当前自学、还没有班级辅导员"——那对有班的师兄是假消息(全文件审计 2026-07-12)
             <View style={styles.contactCard}>
               <View style={styles.contactIcon}><MessageCircle size={20} color={SAFFRON} /></View>
-              <RNText style={{ flex: 1, fontSize: 13, color: INK2, lineHeight: 20 }}>
+              <Text style={{ flex: 1, fontSize: 13, color: INK2, lineHeight: 20 }}>
                 加载失败,请检查网络后重试(不代表你没有班级辅导员)。也可直接在下方留言,管理员会看到。
-              </RNText>
+              </Text>
             </View>
           ) : (
             <View style={styles.contactCard}>
               <View style={styles.contactIcon}><MessageCircle size={20} color={SAFFRON} /></View>
-              <RNText style={{ flex: 1, fontSize: 13, color: INK2, lineHeight: 20 }}>
+              <Text style={{ flex: 1, fontSize: 13, color: INK2, lineHeight: 20 }}>
                 你当前自学、还没有班级辅导员。有任何问题可在下方留言,管理员会看到并与你联系。
-              </RNText>
+              </Text>
             </View>
           )}
         </View>
@@ -111,10 +112,10 @@ export default function Help() {
           <Text className="font-serif" style={styles.section}>意见反馈</Text>
           {sent ? (
             <View style={[styles.card, { alignItems: 'center', paddingVertical: 22 }]}>
-              <RNText style={{ fontSize: 15, fontWeight: '700', color: INK }}>已收到,随喜你的反馈 🙏</RNText>
-              <RNText style={{ fontSize: 12, color: INK3, marginTop: 4 }}>管理员会认真查看</RNText>
+              <Text style={{ fontSize: 15, fontWeight: '700', color: INK }}>已收到,随喜你的反馈 🙏</Text>
+              <Text style={{ fontSize: 12, color: INK3, marginTop: 4 }}>管理员会认真查看</Text>
               <Pressable style={{ marginTop: 12 }} onPress={() => { setToken(genClientToken()); setSent(false); }}>
-                <RNText style={{ fontSize: 13, fontWeight: '700', color: SAFFRON_DARK }}>再写一条</RNText>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: SAFFRON_DARK }}>再写一条</Text>
               </Pressable>
             </View>
           ) : (
@@ -122,7 +123,7 @@ export default function Help() {
               <View style={{ flexDirection: 'row', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
                 {FB_TYPES.map((t) => (
                   <Pressable key={t.key} style={[styles.typeChip, fbType === t.key && styles.typeChipOn]} onPress={() => setFbType(t.key)}>
-                    <RNText style={{ fontSize: 13, fontWeight: '600', color: fbType === t.key ? '#fff' : INK2 }}>{t.label}</RNText>
+                    <Text style={{ fontSize: 13, fontWeight: '600', color: fbType === t.key ? '#fff' : INK2 }}>{t.label}</Text>
                   </Pressable>
                 ))}
               </View>
@@ -141,9 +142,9 @@ export default function Help() {
                 disabled={!feedback.trim() || submit.isPending}
                 onPress={onSubmit}
               >
-                <RNText style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>{submit.isPending ? '提交中…' : '提交反馈'}</RNText>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>{submit.isPending ? '提交中…' : '提交反馈'}</Text>
               </Pressable>
-              {submit.isError ? <RNText style={{ fontSize: 11, color: SAFFRON_DARK, marginTop: 8, textAlign: 'center' }}>提交失败,请检查网络后重试。</RNText> : null}
+              {submit.isError ? <Text style={{ fontSize: 11, color: SAFFRON_DARK, marginTop: 8, textAlign: 'center' }}>提交失败,请检查网络后重试。</Text> : null}
             </View>
           )}
         </View>

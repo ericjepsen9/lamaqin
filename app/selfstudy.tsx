@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
-import { Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SelfStudyPanel } from '@/components/selfstudy-panel';
@@ -20,7 +20,7 @@ export default function SelfStudy() {
         <Text className="font-serif" style={{ fontSize: 18, fontWeight: '700', color: INK }}>自学</Text>
       </View>
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 14 }}>
-        <RNText style={{ fontSize: 12, color: INK3 }}>无班自学:按教学大纲的节奏走,完成本节圆满即可继续;可快可慢、可补录,请假可顺延进度。</RNText>
+        <Text style={{ fontSize: 12, color: INK3 }}>无班自学:按教学大纲的节奏走,完成本节圆满即可继续;可快可慢、可补录,请假可顺延进度。</Text>
         <SelfStudyPanel />
       </ScrollView>
     </SafeAreaView>

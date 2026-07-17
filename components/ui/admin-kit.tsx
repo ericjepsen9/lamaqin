@@ -15,7 +15,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  TextInput,
   View,
   type StyleProp,
   type TextStyle,
@@ -24,6 +23,7 @@ import {
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
+import { TextInput } from '@/components/ui/text-input';
 import {
   BORDER,
   BORDER_LIGHT,

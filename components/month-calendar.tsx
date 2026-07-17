@@ -1,8 +1,7 @@
 import { addDays, addMonths, format, isSameDay, isSameMonth, isToday, startOfMonth, startOfWeek } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text as RNText, View } from 'react-native';
-
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
 // 轻量月历(纯 RN + date-fns,无新依赖;web/iOS 一致)。日期选择:截止日(未来)/ 补录日(过去)复用。
@@ -34,7 +33,7 @@ export function MonthCalendar({ value, onChange, minDate, maxDate }: {
         <Pressable hitSlop={8} onPress={() => setVisible((m) => addMonths(m, 1))}><ChevronRight size={20} color={INK} /></Pressable>
       </View>
       <View style={styles.wkRow}>
-        {WEEKDAYS.map((w) => <RNText key={w} style={styles.wk}>{w}</RNText>)}
+        {WEEKDAYS.map((w) => <Text key={w} style={styles.wk}>{w}</Text>)}
       </View>
       <View style={styles.grid}>
         {days.map((day) => {
@@ -50,9 +49,9 @@ export function MonthCalendar({ value, onChange, minDate, maxDate }: {
               onPress={() => onChange(day)}
               style={[styles.cell, selected && styles.cellSel, !selected && today && styles.cellToday]}
             >
-              <RNText style={{ fontSize: 14, fontWeight: selected ? '700' : '500', color: selected ? '#fff' : disabled ? 'rgba(133,115,96,0.35)' : inMonth ? INK : INK3 }}>
+              <Text style={{ fontSize: 14, fontWeight: selected ? '700' : '500', color: selected ? '#fff' : disabled ? 'rgba(133,115,96,0.35)' : inMonth ? INK : INK3 }}>
                 {day.getDate()}
-              </RNText>
+              </Text>
             </Pressable>
           );
         })}
@@ -77,7 +76,7 @@ export function DatePickerModal({ visible, value, onPick, onClose, minDate, maxD
         <Pressable style={styles.dpCard} onPress={() => {}}>
           <Text className="font-serif" style={styles.dpTitle}>{title ?? '选择日期'}</Text>
           <MonthCalendar value={value} minDate={minDate} maxDate={maxDate} onChange={(d) => { onPick(d); onClose(); }} />
-          <Pressable style={styles.dpCancel} onPress={onClose}><RNText style={{ fontSize: 14, fontWeight: '700', color: INK3 }}>取消</RNText></Pressable>
+          <Pressable style={styles.dpCancel} onPress={onClose}><Text style={{ fontSize: 14, fontWeight: '700', color: INK3 }}>取消</Text></Pressable>
         </Pressable>
       </Pressable>
     </Modal>

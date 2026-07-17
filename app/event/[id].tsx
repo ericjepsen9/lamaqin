@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { CalendarClock, ChevronLeft, HandHeart, Video } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -11,6 +11,7 @@ import { useEventDetail } from '@/lib/queries/events';
 import { testIds } from '@/lib/testids';
 import { genClientToken } from '@/lib/utils';
 
+import { TextInput } from '@/components/ui/text-input';
 // 法会详情(D-8·2026-07-02 接真;决策162/164)。法会=events;参加=法会愿(event_id·054-057,目标自设·056);
 // 计数走现成愿系统(快速计数/愿详情)。⛔ 集体回向只总和·不具名·不排名(#193);无状态色;密法 0 痕迹。
 const INK = '#2b2218';
@@ -61,20 +62,20 @@ export default function EventDetail() {
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color={SAFFRON_DARK} /></View>
       ) : isError ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <RNText style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>加载失败,请检查网络后重试(不代表法会不存在)</RNText>
+          <Text style={{ fontSize: 14, color: INK2, textAlign: 'center' }}>加载失败,请检查网络后重试(不代表法会不存在)</Text>
         </View>
       ) : !ev ? (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <RNText style={{ fontSize: 14, color: INK2 }}>法会不存在或已下架</RNText>
+          <Text style={{ fontSize: 14, color: INK2 }}>法会不存在或已下架</Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 14 }}>
           {/* 法会信息(真) */}
           <View style={styles.card}>
-            <View style={[styles.tagLive, { backgroundColor: statusMeta.bg }]}><RNText style={{ fontSize: 10, fontWeight: '700', color: '#fff' }}>{statusMeta.txt}</RNText></View>
+            <View style={[styles.tagLive, { backgroundColor: statusMeta.bg }]}><Text style={{ fontSize: 10, fontWeight: '700', color: '#fff' }}>{statusMeta.txt}</Text></View>
             <Text className="font-serif" style={{ fontSize: 20, fontWeight: '700', color: INK, marginTop: 8 }}>{ev.name}</Text>
-            <View className="flex-row items-center" style={{ gap: 6, marginTop: 8 }}><CalendarClock size={15} color={INK3} /><RNText style={{ fontSize: 13, color: INK2 }}>{mmdd(ev.startDate)} – {mmdd(ev.endDate)}</RNText></View>
-            {ev.description ? <RNText style={{ fontSize: 13, color: INK2, lineHeight: 21, marginTop: 8 }}>{ev.description}</RNText> : null}
+            <View className="flex-row items-center" style={{ gap: 6, marginTop: 8 }}><CalendarClock size={15} color={INK3} /><Text style={{ fontSize: 13, color: INK2 }}>{mmdd(ev.startDate)} – {mmdd(ev.endDate)}</Text></View>
+            {ev.description ? <Text style={{ fontSize: 13, color: INK2, lineHeight: 21, marginTop: 8 }}>{ev.description}</Text> : null}
           </View>
 
           {/* 场次(有才显) */}
@@ -85,12 +86,12 @@ export default function EventDetail() {
                 {ev.sessions.map((s) => (
                   <View key={s.id} className="flex-row items-center" style={{ gap: 10 }}>
                     <View style={{ flex: 1 }}>
-                      <RNText style={{ fontSize: 14, color: INK, fontWeight: '600' }}>{mmdd(s.sessionDate)}{s.startTime ? ` ${s.startTime}` : ''}{s.title ? ` · ${s.title}` : ''}</RNText>
-                      <RNText style={{ fontSize: 12, color: INK3, marginTop: 1 }}>{s.mode === 'online' ? '线上 Zoom' : s.mode === 'offline' ? (s.location ?? '线下') : '线上 + 线下'}</RNText>
+                      <Text style={{ fontSize: 14, color: INK, fontWeight: '600' }}>{mmdd(s.sessionDate)}{s.startTime ? ` ${s.startTime}` : ''}{s.title ? ` · ${s.title}` : ''}</Text>
+                      <Text style={{ fontSize: 12, color: INK3, marginTop: 1 }}>{s.mode === 'online' ? '线上 Zoom' : s.mode === 'offline' ? (s.location ?? '线下') : '线上 + 线下'}</Text>
                     </View>
                     {s.onlineUrl ? (
                       <Pressable style={styles.joinMeet} onPress={() => Linking.openURL(s.onlineUrl!)}>
-                        <Video size={13} color="#fff" /><RNText style={{ fontSize: 12, fontWeight: '700', color: '#fff' }}>进入</RNText>
+                        <Video size={13} color="#fff" /><Text style={{ fontSize: 12, fontWeight: '700', color: '#fff' }}>进入</Text>
                       </Pressable>
                     ) : null}
                   </View>
@@ -103,8 +104,8 @@ export default function EventDetail() {
           {ev.defaultPractice || joined ? (
           <View style={styles.card}>
             <View className="flex-row" style={{ gap: 10 }}>
-              <View style={styles.stat}><Text className="font-serif" style={styles.statV}>{ev.myCount.toLocaleString()}</Text><RNText style={styles.statK}>我已念(遍)</RNText></View>
-              <View style={styles.stat}><Text className="font-serif" style={[styles.statV, { color: SAFFRON_DARK }]}>{fmtWan(ev.platformTotal)}</Text><RNText style={styles.statK}>全平台共修(遍)</RNText></View>
+              <View style={styles.stat}><Text className="font-serif" style={styles.statV}>{ev.myCount.toLocaleString()}</Text><Text style={styles.statK}>我已念(遍)</Text></View>
+              <View style={styles.stat}><Text className="font-serif" style={[styles.statV, { color: SAFFRON_DARK }]}>{fmtWan(ev.platformTotal)}</Text><Text style={styles.statK}>全平台共修(遍)</Text></View>
             </View>
           </View>
           ) : null}
@@ -117,10 +118,10 @@ export default function EventDetail() {
                 {ev.myVows.map((v) => (
                   <Pressable key={v.vowId} className="flex-row items-center" style={{ gap: 10 }} onPress={() => router.push(`/vow/${v.vowId}` as never)}>
                     <View style={{ flex: 1 }}>
-                      <RNText style={{ fontSize: 14, color: INK, fontWeight: '600' }}>{v.name}</RNText>
-                      <RNText style={{ fontSize: 12, color: INK3, marginTop: 1 }}>已念 {v.currentCount.toLocaleString()}{v.targetCount ? ` / ${v.targetCount.toLocaleString()}` : ''} {v.unit}</RNText>
+                      <Text style={{ fontSize: 14, color: INK, fontWeight: '600' }}>{v.name}</Text>
+                      <Text style={{ fontSize: 12, color: INK3, marginTop: 1 }}>已念 {v.currentCount.toLocaleString()}{v.targetCount ? ` / ${v.targetCount.toLocaleString()}` : ''} {v.unit}</Text>
                     </View>
-                    <RNText style={{ fontSize: 12, fontWeight: '700', color: SAFFRON_DARK }}>去计数 ›</RNText>
+                    <Text style={{ fontSize: 12, fontWeight: '700', color: SAFFRON_DARK }}>去计数 ›</Text>
                   </Pressable>
                 ))}
               </View>
@@ -133,17 +134,17 @@ export default function EventDetail() {
               </View>
               {/* 修法=法会统一(§3.12 愿模板,不选);目标自设,预选=法会建议 */}
               <View style={styles.defaultVowCard}>
-                <RNText style={{ fontSize: 12, color: INK3 }}>本法会共修</RNText>
+                <Text style={{ fontSize: 12, color: INK3 }}>本法会共修</Text>
                 <Text className="font-serif" style={{ fontSize: 19, fontWeight: '700', color: SAFFRON_DARK, marginTop: 3 }}>{ev.defaultPractice.name}</Text>
-                <RNText style={{ fontSize: 12, color: INK2, marginTop: 4 }}>全体师兄同修此功课,法会期间的计数汇入集体回向。</RNText>
+                <Text style={{ fontSize: 12, color: INK2, marginTop: 4 }}>全体师兄同修此功课,法会期间的计数汇入集体回向。</Text>
               </View>
-              <RNText style={styles.pickLabel}>我的目标(可随喜不限,也可自定)</RNText>
+              <Text style={styles.pickLabel}>我的目标(可随喜不限,也可自定)</Text>
               <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                 {TARGETS.map((t) => {
                   const on = !customNum && target === t.value;
                   return (
                     <Pressable key={t.label} style={[styles.chip, on && styles.chipOn]} onPress={() => { setCustomStr(''); setTarget(t.value); }}>
-                      <RNText style={{ fontSize: 13, fontWeight: '600', color: on ? '#fff' : INK2 }}>{t.label}</RNText>
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: on ? '#fff' : INK2 }}>{t.label}</Text>
                     </Pressable>
                   );
                 })}
@@ -158,7 +159,7 @@ export default function EventDetail() {
                   maxLength={9}
                   style={styles.customInput}
                 />
-                {customNum ? <RNText style={{ fontSize: 12, fontWeight: '700', color: SAFFRON_DARK }}>目标 {customNum.toLocaleString()} 遍</RNText> : null}
+                {customNum ? <Text style={{ fontSize: 12, fontWeight: '700', color: SAFFRON_DARK }}>目标 {customNum.toLocaleString()} 遍</Text> : null}
               </View>
               <Pressable
                 testID={testIds.event.joinButton}
@@ -169,12 +170,12 @@ export default function EventDetail() {
                   onError: (e) => notify('发愿失败', (e as Error)?.message ?? '请重试'),
                 })}
               >
-                <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{join.isPending ? '发愿中…' : '发愿 · 参加'}</RNText>
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{join.isPending ? '发愿中…' : '发愿 · 参加'}</Text>
               </Pressable>
             </View>
           ) : null}
 
-          <RNText style={{ fontSize: 11, color: INK3, paddingHorizontal: 4 }}>集体回向只显示全平台总量,不显示任何个人数据(#193)。</RNText>
+          <Text style={{ fontSize: 11, color: INK3, paddingHorizontal: 4 }}>集体回向只显示全平台总量,不显示任何个人数据(#193)。</Text>
         </ScrollView>
       )}
     </SafeAreaView>

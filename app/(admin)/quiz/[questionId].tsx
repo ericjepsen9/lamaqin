@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -21,6 +21,7 @@ import { testIds } from '@/lib/testids';
 import { GOLD_DARK as GOLD, GOLD_PALE, INK, INK2, INK3, INK4 } from '@/lib/theme';
 import { useAdminLayout } from '../_layout';
 
+import { TextInput } from '@/components/ui/text-input';
 const TYPE_LABEL: Record<QuestionType, string> = {
   open: '问答题', single: '单选题', judge: '判断题', fill: '填空题', flip: '翻卡题', verse: '颂词题', chain: '联想题',
 };

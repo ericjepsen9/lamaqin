@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { LayoutChangeEvent, PanResponder, Pressable, Text, View } from 'react-native';
+import { LayoutChangeEvent, PanResponder, Pressable, View } from 'react-native';
 
 import { AudioPlayer as ExpoAudioPlayer, AudioStatus, createAudioPlayer, setAudioModeAsync } from 'expo-audio';
 import { Headphones, Pause, Play } from 'lucide-react-native';
+
+import { Text } from '@/components/ui/text';
 
 import { DownloadButton } from '@/components/download-button';
 import { useDownloadStore } from '@/lib/download-store';

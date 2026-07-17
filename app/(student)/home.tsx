@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { Bell, BookOpen, ClipboardCheck, Flower2, Plus, User } from 'lucide-react-native';
 import { useState, type ReactNode } from 'react';
-import { ImageBackground, Pressable, StyleSheet, Text as RNText, View } from 'react-native';
+import { ImageBackground, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { QuickCountSheet } from '@/components/quick-count-sheet';
@@ -99,8 +99,8 @@ export default function StudentHome() {
             </Link>
             <Link href="/calendar" asChild>
               <Pressable className="pt-0.5" hitSlop={6}>
-                <RNText className="font-serif" style={[styles.overlayWhite, { fontWeight: '700', fontSize: 20, letterSpacing: 1 }]}>{dateLabel}</RNText>
-                <RNText style={[styles.overlayWhite, { marginTop: 2, fontSize: 12 }]}>{tibetanLabel}</RNText>
+                <Text className="font-serif" style={[styles.overlayWhite, { fontWeight: '700', fontSize: 20, letterSpacing: 1 }]}>{dateLabel}</Text>
+                <Text style={[styles.overlayWhite, { marginTop: 2, fontSize: 12 }]}>{tibetanLabel}</Text>
               </Pressable>
             </Link>
           </View>

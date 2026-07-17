@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -42,7 +42,7 @@ export default function Legal() {
         <View style={styles.seg}>
           {([['privacy', '隐私政策'], ['terms', '用户协议']] as const).map(([k, l]) => (
             <Pressable key={k} onPress={() => setTab(k)} style={[styles.segBtn, tab === k && styles.segOn]}>
-              <RNText style={{ fontSize: 14, fontWeight: '700', color: tab === k ? '#fff' : INK3 }}>{l}</RNText>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: tab === k ? '#fff' : INK3 }}>{l}</Text>
             </Pressable>
           ))}
         </View>
@@ -52,10 +52,10 @@ export default function Legal() {
         {data.map(([h, b]) => (
           <View key={h} style={styles.card}>
             <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: INK }}>{h}</Text>
-            <RNText style={{ fontSize: 14, color: INK2, lineHeight: 23, marginTop: 6 }}>{b}</RNText>
+            <Text style={{ fontSize: 14, color: INK2, lineHeight: 23, marginTop: 6 }}>{b}</Text>
           </View>
         ))}
-        <RNText style={{ fontSize: 11, color: INK3, textAlign: 'center', lineHeight: 18 }}>以上为摘要,完整文本以正式发布版本为准。{'\n'}更新日期:待定</RNText>
+        <Text style={{ fontSize: 11, color: INK3, textAlign: 'center', lineHeight: 18 }}>以上为摘要,完整文本以正式发布版本为准。{'\n'}更新日期:待定</Text>
       </ScrollView>
     </SafeAreaView>
   );
