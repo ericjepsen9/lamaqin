@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { LayoutChangeEvent, PanResponder, Pressable, Text, View } from 'react-native';
 
-import { Audio, AVPlaybackStatus } from 'expo-av';
+import { AudioPlayer as ExpoAudioPlayer, AudioStatus, createAudioPlayer, setAudioModeAsync } from 'expo-audio';
 import { Headphones, Pause, Play } from 'lucide-react-native';
 
 import { DownloadButton } from '@/components/download-button';
@@ -33,7 +33,9 @@ export function AudioPlayer({ url, title, subtitle }: Props) {
   // 调用方不用改,下载状态另见 DownloadButton(同一份 Zustand store,下载完成这里自动切换)。
   const localUri = useDownloadStore((s) => s.entries[url]?.localUri);
   const playUri = localUri ?? url;
-  const soundRef = useRef<Audio.Sound | null>(null);
+  // 2026-07: expo-av 停止维护且其安卓预编译包与 SDK56 不兼容(启动即崩),迁移到 expo-audio。
+  // 注意单位差异:expo-audio 的 currentTime/duration/seekTo 用秒,本组件 UI 仍以毫秒计。
+  const playerRef = useRef<ExpoAudioPlayer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [posMs, setPosMs] = useState(0);
   const [durMs, setDurMs] = useState(0);
@@ -51,50 +53,51 @@ export function AudioPlayer({ url, title, subtitle }: Props) {
 
   useEffect(() => {
     let mounted = true;
-    Audio.setAudioModeAsync({ playsInSilentModeIOS: true, staysActiveInBackground: false }).catch(() => {});
+    setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
 
-    Audio.Sound.createAsync(
-      { uri: playUri },
-      { shouldPlay: false, rate, progressUpdateIntervalMillis: 250 },
-      (status: AVPlaybackStatus) => {
-        if (!mounted) return;
-        if (status.isLoaded) {
-          setIsPlaying(status.isPlaying);
-          setPosMs(status.positionMillis);
-          setDurMs(status.durationMillis ?? 0);
-          setLoading(false);
-        }
-      },
-    ).then(({ sound }) => {
-      if (mounted) soundRef.current = sound;
-    }).catch(() => {
-      if (mounted) setLoading(false);
+    const player = createAudioPlayer({ uri: playUri }, { updateInterval: 250 });
+    playerRef.current = player;
+    player.setPlaybackRate(rate);
+
+    const sub = player.addListener('playbackStatusUpdate', (status: AudioStatus) => {
+      if (!mounted) return;
+      if (status.isLoaded) {
+        setIsPlaying(status.playing);
+        setPosMs(status.currentTime * 1000);
+        setDurMs((status.duration || 0) * 1000);
+        setLoading(false);
+      }
     });
 
     return () => {
       mounted = false;
-      soundRef.current?.unloadAsync();
-      soundRef.current = null;
+      sub.remove();
+      playerRef.current = null;
+      try {
+        player.release();
+      } catch {
+        // 已释放时忽略
+      }
     };
   }, [playUri]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const togglePlay = async () => {
-    if (!soundRef.current) return;
-    if (isPlaying) await soundRef.current.pauseAsync();
-    else await soundRef.current.playAsync();
+    if (!playerRef.current) return;
+    if (isPlaying) playerRef.current.pause();
+    else playerRef.current.play();
   };
 
   const cycleRate = async () => {
     const next = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
     setRate(next);
-    if (soundRef.current) await soundRef.current.setRateAsync(next, true);
+    playerRef.current?.setPlaybackRate(next);
   };
 
   const seekToMs = async (ms: number) => {
-    if (!soundRef.current || durRef.current <= 0) return;
+    if (!playerRef.current || durRef.current <= 0) return;
     const clamped = Math.max(0, Math.min(ms, durRef.current));
     setPosMs(clamped); // 乐观更新,避免松手到下次回调间的回跳
-    await soundRef.current.setPositionAsync(Math.floor(clamped));
+    await playerRef.current.seekTo(clamped / 1000);
   };
 
   // 由触点横坐标(相对轨道)算时间。轨道宽来自 onLayout(可靠,不用 hacky measure)。
