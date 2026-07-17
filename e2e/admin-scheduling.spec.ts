@@ -54,14 +54,13 @@ test.describe('一句话排课 + 放假周 + 移除课节 + 清空学期', () =>
       await page.getByTestId(`${testIds.scheduling.perWeekStepper}-plus`).click(); // 每周1→2节
       await expect(page.getByText('每周 2 节', { exact: false })).toBeVisible();
 
-      // click()和dialog等待用Promise.all并发(顺序await会让click()被自己触发的alert卡死,真机CI实测过的坑)
-      const [dialog] = await Promise.all([
-        page.waitForEvent('dialog'),
-        page.getByTestId(testIds.scheduling.generateSubmitButton).click(),
-      ]);
-      expect(dialog.message()).toContain('4 节');
-      expect(dialog.message()).toContain('第 1–2 周'); // 4节/每周2节=2周,注意是半角"–"(en dash)
-      await dialog.accept();
+      // click()和dialog等待用page.once+expect.poll(Promise.all这套在"调整共修日程"真机CI
+      // 复现过90秒超时,证明本身不安全,全项目统一换掉)
+      let genMsg = '';
+      page.once('dialog', (d) => { genMsg = d.message(); void d.accept(); });
+      await page.getByTestId(testIds.scheduling.generateSubmitButton).click();
+      await expect.poll(() => genMsg, { timeout: 15_000 }).toContain('4 节');
+      expect(genMsg).toContain('第 1–2 周'); // 4节/每周2节=2周,注意是半角"–"(en dash)
 
       const { rows: semRows } = await withDb((c) => c.query(`SELECT id, semester_number FROM program_semesters WHERE program_id=$1`, [programId]));
       expect(semRows.length).toBe(1);
@@ -128,13 +127,11 @@ test.describe('排自学读物', () => {
       await page.getByTestId(`${testIds.scheduling.selfStudyWeekCountStepper}-plus`).click();
       await expect(page.getByText('2 周', { exact: false })).toBeVisible();
 
-      // click()和dialog等待用Promise.all并发(顺序await会让click()被自己触发的alert卡死,真机CI实测过的坑)
-      const [dialog] = await Promise.all([
-        page.waitForEvent('dialog'),
-        page.getByTestId(testIds.scheduling.selfStudySubmitButton).click(),
-      ]);
-      expect(dialog.message()).toContain('已排自学读物');
-      await dialog.accept();
+      // click()和dialog等待用page.once+expect.poll(同上,Promise.all这套写法本身不安全)
+      let selfStudyMsg = '';
+      page.once('dialog', (d) => { selfStudyMsg = d.message(); void d.accept(); });
+      await page.getByTestId(testIds.scheduling.selfStudySubmitButton).click();
+      await expect.poll(() => selfStudyMsg, { timeout: 15_000 }).toContain('已排自学读物');
 
       const { rows: semRows } = await withDb((c) => c.query(`SELECT id FROM program_semesters WHERE program_id=$1`, [programId]));
       expect(semRows.length).toBe(1);
@@ -145,6 +142,77 @@ test.describe('排自学读物', () => {
       );
       expect(ssRows.length).toBe(2);
       expect(new Set(ssRows.map((r) => r.week_id))).toEqual(new Set(weekRows.map((r) => r.id)));
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM programs WHERE id=$1`, [programId]));
+      await withDb((c) => c.query(`DELETE FROM self_study_books WHERE id=$1`, [bookId]));
+    }
+  });
+});
+
+// 异常输入扩展(2026-07-17·PM"这两个都要测"·测试计划①):这页数字输入全是Stepper(±按钮),
+// 不是自由文本框,天然结构性挡住非法值——这里验证钳制真的生效,不是假设生效。
+test.describe('异常输入:排课Stepper边界钳制', () => {
+  test('"从第N节到第M节"两个Stepper互相钳制,N>M结构性不可能出现', async ({ page }) => {
+    const programId = await makeThrowawayProgram();
+    const courseId = await makeThrowawayCourse(programId, 4);
+    try {
+      await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
+      await page.goto('/scheduling', { timeout: 45_000 });
+      await page.getByTestId(testIds.scheduling.programOption(programId)).click();
+      await page.getByTestId(testIds.scheduling.generateButton).click();
+      await page.getByTestId(testIds.scheduling.courseOption(courseId)).click();
+      // 选课后from/to自动填满整门:第1–4节(共4节)
+      await expect(page.getByText('第 1–4 节(共 4 节)', { exact: false })).toBeVisible();
+
+      // 先把toN往下减2次 → 第1–2节(共2节)
+      await page.getByTestId(`${testIds.scheduling.toNStepper}-minus`).click();
+      await page.getByTestId(`${testIds.scheduling.toNStepper}-minus`).click();
+      await expect(page.getByText('第 1–2 节(共 2 节)', { exact: false })).toBeVisible();
+
+      // 再把fromN往上加3次,试图超过toN(2)——fromN自身的Stepper上限是total(4),但父组件
+      // 的Math.min(v, toN)会把它钳在2,不会出现fromN(3或4)>toN(2)这种非法状态
+      await page.getByTestId(`${testIds.scheduling.fromNStepper}-plus`).click();
+      await page.getByTestId(`${testIds.scheduling.fromNStepper}-plus`).click();
+      await page.getByTestId(`${testIds.scheduling.fromNStepper}-plus`).click();
+      await expect(page.getByText('第 2–2 节(共 1 节)', { exact: false })).toBeVisible();
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM programs WHERE id=$1`, [programId]));
+      await withDb((c) => c.query(`DELETE FROM courses WHERE id=$1`, [courseId]));
+    }
+  });
+
+  test('每周节数Stepper减到底停在1,到不了0', async ({ page }) => {
+    const programId = await makeThrowawayProgram();
+    const courseId = await makeThrowawayCourse(programId, 2);
+    try {
+      await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
+      await page.goto('/scheduling', { timeout: 45_000 });
+      await page.getByTestId(testIds.scheduling.programOption(programId)).click();
+      await page.getByTestId(testIds.scheduling.generateButton).click();
+      await page.getByTestId(testIds.scheduling.courseOption(courseId)).click();
+      // 默认每周1节,连点3次"-"(min=1兜底,不会变成0/-1/-2)
+      for (let i = 0; i < 3; i++) await page.getByTestId(`${testIds.scheduling.perWeekStepper}-minus`).click();
+      await expect(page.getByText('每周 1 节', { exact: false })).toBeVisible();
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM programs WHERE id=$1`, [programId]));
+      await withDb((c) => c.query(`DELETE FROM courses WHERE id=$1`, [courseId]));
+    }
+  });
+
+  test('自学占用周数Stepper加到底封顶52,到不了200', async ({ page }) => {
+    const programId = await makeThrowawayProgram();
+    const { rows: [{ id: bookId }] } = await withDb((c) =>
+      c.query(`INSERT INTO self_study_books (title) VALUES ($1) RETURNING id`, [`E2E周数边界测试读物-${Date.now()}`]),
+    );
+    try {
+      await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
+      await page.goto('/scheduling', { timeout: 45_000 });
+      await page.getByTestId(testIds.scheduling.programOption(programId)).click();
+      await page.getByTestId(testIds.scheduling.selfStudyButton).click();
+      await page.getByTestId(testIds.scheduling.selfStudyBookOption(bookId)).click();
+      // 默认1周,连点60次"+"(远超52上限,验证真封顶而不是恰好点够52下就不多点了)
+      for (let i = 0; i < 60; i++) await page.getByTestId(`${testIds.scheduling.selfStudyWeekCountStepper}-plus`).click();
+      await expect(page.getByText('52 周', { exact: false })).toBeVisible();
     } finally {
       await withDb((c) => c.query(`DELETE FROM programs WHERE id=$1`, [programId]));
       await withDb((c) => c.query(`DELETE FROM self_study_books WHERE id=$1`, [bookId]));

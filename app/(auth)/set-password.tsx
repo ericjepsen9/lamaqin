@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
@@ -5,7 +6,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/lib/auth';
+import type { CurrentUser } from '@/lib/queries/profile';
 import { supabase } from '@/lib/supabase';
+import { testIds } from '@/lib/testids';
 
 // 验证码登录(找回密码路径)成功后的一次性顺路提示(PM 2026-07-12·选项B):此时已有 session,
 // 但用户走的是"忘了密码"这条路,原密码永远没法再用——这里给个机会设个新密码,可跳过(不强制)。
@@ -23,6 +26,7 @@ const CRIMSON = '#a13c2e';
 export default function SetPassword() {
   const router = useRouter();
   const { session } = useAuth();
+  const qc = useQueryClient();
   const { forced } = useLocalSearchParams<{ forced?: string }>();
   const isForced = forced === '1';
   const [pwd, setPwd] = useState('');
@@ -42,7 +46,15 @@ export default function SetPassword() {
     const { error } = await supabase.auth.updateUser({ password: pwd });
     if (error) { setBusy(false); setErr(error.message); return; }
     if (isForced && session?.user.id) {
-      await supabase.from('profiles').update({ must_change_password: false }).eq('id', session.user.id);
+      const { error: profileError } = await supabase.from('profiles').update({ must_change_password: false }).eq('id', session.user.id);
+      if (profileError) { setBusy(false); setErr(profileError.message); return; }
+      // 2026-07-17·PM报告"无限循环卡在重设密码页面":根因是这里只写了DB,没同步更新
+      // useCurrentUser()的查询缓存——proceed()跳回入口闸门(index.tsx)时,闸门读到的还是
+      // 缓存里旧的 mustChangePassword:true(哪怕后台会自动重取,闸门在重取完成前那一次渲染
+      // 已经用旧值判定、把人redirect回本页),forced 模式又没有跳过按钮,于是死循环。
+      // 这里已经拿到"确定成功"的新值,直接patch缓存,不必等一轮网络重取才生效。
+      qc.setQueryData<CurrentUser | null | undefined>(['current-user', session.user.id], (old) =>
+        (old ? { ...old, mustChangePassword: false } : old));
     }
     setBusy(false);
     proceed();
@@ -60,17 +72,24 @@ export default function SetPassword() {
 
         <View style={{ gap: 12, marginTop: 24 }}>
           <View style={styles.field}>
-            <TextInput value={pwd} onChangeText={(t) => { setPwd(t); setErr(null); }} placeholder="设置新密码(至少 8 位)" placeholderTextColor={INK3} secureTextEntry style={styles.input} />
+            <TextInput testID={testIds.setPassword.pwdInput} value={pwd} onChangeText={(t) => { setPwd(t); setErr(null); }} placeholder="设置新密码(至少 8 位)" placeholderTextColor={INK3} secureTextEntry style={styles.input} />
           </View>
           <View style={styles.field}>
-            <TextInput value={pwd2} onChangeText={(t) => { setPwd2(t); setErr(null); }} placeholder="再输一遍新密码" placeholderTextColor={INK3} secureTextEntry style={styles.input} />
+            <TextInput testID={testIds.setPassword.pwd2Input} value={pwd2} onChangeText={(t) => { setPwd2(t); setErr(null); }} placeholder="再输一遍新密码" placeholderTextColor={INK3} secureTextEntry style={styles.input} />
           </View>
           {pwd2.length > 0 && pwd !== pwd2 ? <RNText style={{ fontSize: 12, color: CRIMSON }}>两次密码不一致</RNText> : null}
           {err ? <RNText style={{ fontSize: 12, color: CRIMSON }}>{err}</RNText> : null}
-          <Pressable style={[styles.primary, (!valid || busy) && { opacity: 0.4 }]} disabled={!valid || busy} onPress={submit}>
+          <Pressable testID={testIds.setPassword.submitButton} style={[styles.primary, (!valid || busy) && { opacity: 0.4 }]} disabled={!valid || busy} onPress={submit}>
             <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{busy ? '设置中…' : '设置新密码'}</RNText>
           </Pressable>
-          {isForced ? null : (
+          {isForced ? (
+            // forced 模式不给"跳过"(必须改密码才放行,见上方注释),但仍需要一条退出路径——
+            // 万一改密码本身出错(网络/服务端),不能把人困死在无返回、无跳过的页面上(2026-07-17
+            // PM报告),给个和 pending.tsx/account-deletion-pending.tsx 一致的"退出登录"逃生口。
+            <Pressable testID={testIds.setPassword.signOutButton} onPress={async () => { await supabase.auth.signOut(); router.replace('/login'); }} style={{ alignItems: 'center', marginTop: 4, padding: 8 }}>
+              <RNText style={{ fontSize: 13, color: INK3 }}>退出登录</RNText>
+            </Pressable>
+          ) : (
             <Pressable onPress={proceed} style={{ alignItems: 'center', marginTop: 4, padding: 8 }}>
               <RNText style={{ fontSize: 13, color: INK2, fontWeight: '600' }}>先跳过,以后再说</RNText>
             </Pressable>

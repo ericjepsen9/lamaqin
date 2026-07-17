@@ -198,20 +198,20 @@ function TemplateFormModal({ initial, defaultProgramId, onClose, onSaved }: {
         </View>
 
         <ModalField label={`目标总数(${unit})`} value={targetCount} onChangeText={setTargetCount} placeholder="如:400000(40万)。终生/每日可留空" keyboardType="numeric" />
-        <ModalField label={`每日目标(${unit})${period === 'daily' ? ' *' : ''}`} value={dailyTarget} onChangeText={setDailyTarget} placeholder="如:1000(每天念诵数)" keyboardType="numeric" />
+        <ModalField testID={testIds.practiceConfig.dailyTargetInput} label={`每日目标(${unit})${period === 'daily' ? ' *' : ''}`} value={dailyTarget} onChangeText={setDailyTarget} placeholder="如:1000(每天念诵数)" keyboardType="numeric" />
         {period === 'weekly' ? (
-          <ModalField label={`每周目标(${unit}) *`} value={weeklyTarget} onChangeText={setWeeklyTarget} placeholder="每周固定数" keyboardType="numeric" />
+          <ModalField testID={testIds.practiceConfig.weeklyTargetInput} label={`每周目标(${unit}) *`} value={weeklyTarget} onChangeText={setWeeklyTarget} placeholder="每周固定数" keyboardType="numeric" />
         ) : null}
 
         {/* 座次门槛(波C双层方案·2026-07-08):新发的愿继承此值;改已发的单条愿另在学员详情页(仅admin) */}
         <View style={{ gap: 6 }}>
-          <ModalField label="每座门槛(分钟)" value={minSessionMinutes} onChangeText={setMinSessionMinutes} placeholder="留空=沿用默认30分钟;填则≥30(大纲行105底线)" keyboardType="numeric" />
+          <ModalField testID={testIds.practiceConfig.minSessionInput} label="每座门槛(分钟)" value={minSessionMinutes} onChangeText={setMinSessionMinutes} placeholder="留空=沿用默认30分钟;填则≥30(大纲行105底线)" keyboardType="numeric" />
           {!minSessionValid ? <Text style={s.err}>门槛不能低于 30 分钟(大纲底线,需教务点头才可放开)</Text> : null}
           <Text style={s.hint}>只影响新发的愿;已发出的愿门槛不受影响,如需单独调整去学员详情页(仅系统管理员)。</Text>
         </View>
 
-        <ModalField label="起修偏移(天)" value={offsetDays} onChangeText={setOffsetDays} placeholder="距开班日多少天起修;第2学期≈196,留空=开班即起" keyboardType="numeric" />
-        <ModalField label="完成天数(天)" value={durationDays} onChangeText={setDurationDays} placeholder="起修后多少天内完成;留空=不限期(限时完成需填)" keyboardType="numeric" />
+        <ModalField testID={testIds.practiceConfig.offsetDaysInput} label="起修偏移(天)" value={offsetDays} onChangeText={setOffsetDays} placeholder="距开班日多少天起修;第2学期≈196,留空=开班即起" keyboardType="numeric" />
+        <ModalField testID={testIds.practiceConfig.durationDaysInput} label="完成天数(天)" value={durationDays} onChangeText={setDurationDays} placeholder="起修后多少天内完成;留空=不限期(限时完成需填)" keyboardType="numeric" />
 
         {/* 适用专业(可多选;空=不限)*/}
         <View style={{ gap: 6 }}>

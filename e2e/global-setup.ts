@@ -146,24 +146,54 @@ async function main() {
   // 不会触发浏览器真正会请求的那份 JS bundle 编译——预热"成功"(200)之后,第一条真实测试仍吃了
   // 72s(比 fetch 版之前的"卡满60s报错"好一点,但离 90s 超时也没多少余量,治标不治本)。改用真实
   // headless 浏览器整页加载(和实际测试走一样的路径),才会真的把 bundle 编译这一步移出计时窗口。
-  await warmUpWebServer('http://127.0.0.1:8082/login');
+  //
+  // ⚠️ 2026-07-17补第二个路由:admin-class-management.spec.ts"调整共修日程"这条测试反复在
+  // 真机CI里间歇性卡到90秒超时(Promise.all等dialog那步,已排查过不是测试代码本身的问题),
+  // 而/classes/[id]这条路由此前完全没被预热过——排查发现全套件里只有admin-class-management/
+  // boundary/smoke三个文件会导航到这条路由,字母序上admin-class-management排最前,"调整共修
+  // 日程"又是该文件第一条测试,大概率是全套件里第一次真正命中这条路由,要现付一次性的bundle
+  // 冷编译成本。这里不需要真的登录:Metro按URL提供/编译对应路由的bundle这一步发生在浏览器
+  // 执行到"未登录跳转/login"这段JS逻辑之前,拿种子建好的E2E班cohortId直接访问、不管会不会被
+  // 重定向,冷编译成本一样能转嫁到这里。加完这一条后,同一晚(2026-07-17)admin-quiz.spec.ts
+  // 的"新建问答题"这条测试又踩到同一类症状的第二次(这次表现不是dialog超时,是"UI显示成功但
+  // 直连DB查不到刚建的行"——具体机制没能100%确定,但/quiz/new同样此前从未被预热、且admin-quiz
+  // 是全套件里唯一会导航到这条路由的文件,跟/classes/[id]那次是同一类"全套件第一次命中未预热
+  // 路由"的怀疑)。与其每次一个个补,这里一次性把已知会被多个测试用到的静态(不需要动态ID)
+  // admin路由都预热一遍,降低今晚(PM离线安排"尽可能多跑几轮")后续再撞见同类间歇性问题的概率
+  // ——多预热几条路由的增量成本很小(每条约1-2秒,观测自/classes/[id]那次的日志),风险很低
+  // (未登录时这些页面正常走 <Redirect> 组件,不是报错,不会卡住)。
+  await warmUpWebServer([
+    'http://127.0.0.1:8082/login',
+    `http://127.0.0.1:8082/classes/${cohortId}`,
+    'http://127.0.0.1:8082/dashboard',
+    'http://127.0.0.1:8082/quiz/new',
+    'http://127.0.0.1:8082/practice-config',
+    'http://127.0.0.1:8082/scheduling',
+    'http://127.0.0.1:8082/students',
+    'http://127.0.0.1:8082/reminder-presets',
+    'http://127.0.0.1:8082/events',
+  ]);
 }
 
-async function warmUpWebServer(url: string, maxWaitMs = 100_000): Promise<void> {
+async function warmUpWebServer(urls: string[], maxWaitMs = 100_000): Promise<void> {
   const browser = await chromium.launch();
   try {
     const page = await browser.newPage();
-    const deadline = Date.now() + maxWaitMs;
-    while (Date.now() < deadline) {
-      try {
-        await page.goto(url, { waitUntil: 'load', timeout: Math.max(deadline - Date.now(), 5_000) });
-        console.log(`[e2e-setup] webServer 已预热(真实浏览器完整加载 ${url})`);
-        return;
-      } catch {
-        await new Promise((r) => setTimeout(r, 2000)); // 服务器还没起来/编译还没完,继续等
+    for (const url of urls) {
+      const deadline = Date.now() + maxWaitMs;
+      let warmed = false;
+      while (Date.now() < deadline) {
+        try {
+          await page.goto(url, { waitUntil: 'load', timeout: Math.max(deadline - Date.now(), 5_000) });
+          console.log(`[e2e-setup] webServer 已预热(真实浏览器完整加载 ${url})`);
+          warmed = true;
+          break;
+        } catch {
+          await new Promise((r) => setTimeout(r, 2000)); // 服务器还没起来/编译还没完,继续等
+        }
       }
+      if (!warmed) console.log(`[e2e-setup] webServer 预热超时(${maxWaitMs}ms 内未加载成功:${url}),交给测试自己的超时兜底`);
     }
-    console.log(`[e2e-setup] webServer 预热超时(${maxWaitMs}ms 内未加载成功),交给测试自己的超时兜底`);
   } finally {
     await browser.close();
   }

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createTestProfile, deleteTestProfile, withDb } from './db';
 import { ADMIN_EMAIL, TEST_PASSWORD } from './global-setup';
-import { loginAs } from './helpers';
+import { expectDisabled, expectEnabled, loginAs } from './helpers';
 import { testIds } from '../lib/testids';
 
 // 学期末升学批处理 系统性覆盖(2026-07-16·PM"继续完成"剩余测试缺口第四批)。
@@ -163,6 +163,44 @@ test.describe('学期末一站式工作流(advancement/semester-end/[cohortId].t
       expect(record[0].to_cohort_id).toBe(cohortToId);
     } finally {
       await withDb((c) => c.query(`DELETE FROM cohorts WHERE id IN ($1,$2)`, [cohortFromId, cohortToId]));
+      await deleteTestProfile(userId);
+    }
+  });
+});
+
+// 异常输入扩展(2026-07-17·PM"这两个都要测"·测试计划①):考试分数-1/101/非数字前端确实
+// 挡住(已有校验);小数(如85.5)不挡——这是记录现状,不是bug断言,升学考试成绩是否该限定
+// 整数属于PM决定——2026-07-17 PM明确要求:不允许小数,已改前端校验(scoreValid加
+// Number.isInteger)+ DB层同口径约束(supabase/migrations/20260717000000_
+// exam_score_integer_check.sql)。这条测试从"确认现状"改成"确认修复生效"。
+test.describe('异常输入:考试分数边界', () => {
+  test('填-1/101/非数字/小数 → 保存按钮禁用;填合法整数85 → 解除禁用,能正常存入', async ({ page }) => {
+    const cohortId = await makeThrowawayCohort(`E2E考试边界一次性班-${Date.now()}`);
+    const userId = await createTestProfile(`e2e-adv-examedge-${Date.now()}@local.test`, `E2E考试边界-${Date.now()}`);
+    await addMember(cohortId, userId, 'formal');
+    try {
+      await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
+      await page.goto(`/advancement/${userId}`, { timeout: 45_000 });
+      await page.getByTestId(testIds.advancement.examEntryButton).click();
+      await page.getByPlaceholder('如:第一次考试 / 加行结业考').fill('E2E边界测试考试');
+
+      for (const bad of ['-1', '101', 'abc', '85.5']) {
+        await page.getByTestId(testIds.advancement.examScoreInput).fill(bad);
+        await expectDisabled(page.getByTestId(testIds.advancement.examSaveButton));
+      }
+      await expect(page.getByText('请输入 0-100 之间的整数,不支持小数', { exact: true })).toBeVisible();
+
+      await page.getByTestId(testIds.advancement.examScoreInput).fill('85');
+      await expect(page.getByText('请输入 0-100 之间的整数,不支持小数', { exact: true })).not.toBeVisible();
+      await expectEnabled(page.getByTestId(testIds.advancement.examSaveButton));
+      await page.getByTestId(testIds.advancement.examSaveButton).click();
+      await expect(page.getByText('再录一次', { exact: true })).toBeVisible({ timeout: 10_000 });
+
+      const { rows } = await withDb((c) => c.query(`SELECT score FROM exam_grades WHERE user_id=$1`, [userId]));
+      expect(rows.length).toBe(1);
+      expect(Number(rows[0].score)).toBe(85);
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM cohorts WHERE id=$1`, [cohortId]));
       await deleteTestProfile(userId);
     }
   });

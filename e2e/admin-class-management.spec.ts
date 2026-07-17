@@ -16,14 +16,8 @@ test.describe('调整共修日程(2026-07-15新增·本班辅导员也能改自�
   test('辅导员(zhumai)能看到"共修设定"入口并成功保存,不是admin专属', async ({ page }) => {
     const { cohortId } = await getSeedIds();
     const newZoom = `https://zoom.example/e2e-${Date.now()}`;
-    // 2026-07-16诊断:这条测试连续两轮干净CI跑都在下面的Promise.all(dialog)卡到90秒超时,
-    // "browser已关闭"只是Playwright超时强制中断时的次生报错,不代表卡的就是dialog那一行本身
-    // ——加时间戳日志,不改变任何实际行为,下一轮CI日志里对时间戳能看出真正卡在哪一段。
-    console.log('[E2E-DIAG] 调整共修日程: before loginAs');
     await loginAs(page, COACH_EMAIL, TEST_PASSWORD);
-    console.log('[E2E-DIAG] 调整共修日程: after loginAs, before goto');
     await page.goto(`/classes/${cohortId}`, { timeout: 45_000 });
-    console.log('[E2E-DIAG] 调整共修日程: after goto');
 
     // 辅导员应该看到独立的"共修设定"区块(不是admin那块"管理操作"里的同名按钮,
     // 那块对非admin不渲染——见 classes/[id].tsx isZhumai && !isAdmin 门控)
@@ -35,19 +29,17 @@ test.describe('调整共修日程(2026-07-15新增·本班辅导员也能改自�
     await expect(page.getByText('调整共修日程', { exact: true }).last()).toBeVisible();
 
     await page.getByPlaceholder('https://…').first().fill(newZoom);
-    // ⚠️notify()在web端走window.alert(),不是DOM文本,getByText找不到——按TESTING.md§4-13
-    // 规范接;⚠️另一个真机CI实测坑:click()触发的原生alert会阻塞页面,若click()和
-    // waitForEvent('dialog')顺序await(先await click再await dialog),click()本身会因为
-    // 页面被弹窗阻塞而挂起,整条测试卡到90秒超时——改用Promise.all并发等待两者,不让click()
-    // 单独卡住。
-    console.log('[E2E-DIAG] 调整共修日程: before Promise.all dialog+click');
-    const [dialog] = await Promise.all([
-      page.waitForEvent('dialog'),
-      page.getByText('保存', { exact: true }).click(),
-    ]);
-    console.log('[E2E-DIAG] 调整共修日程: dialog received');
-    expect(dialog.message()).toContain('已更新');
-    await dialog.accept();
+    // ⚠️notify()在web端走window.alert(),不是DOM文本,getByText找不到——按TESTING.md§4-13规范接。
+    // 2026-07-16曾怀疑Promise.all([waitForEvent('dialog'), click()])在这里不安全(click()触发的
+    // 原生alert阻塞渲染进程,顺序await会让click()本身挂起到90秒超时),当时加时间戳诊断两轮都很快,
+    // 错误地下结论"CI偶发抖动,不是代码问题"——2026-07-17真机CI又复现同一超时(dialog.accept:
+    // Target page ... has been closed),证明当初结论错了,这就是同一个真实的click()/dialog时序
+    // 竞争。改用course-self-study.spec.ts"从讲记提取"验证过的稳妥模式:page.once预先注册监听器
+    // + expect.poll轮询,不用Promise.all。
+    let notifyMsg = '';
+    page.once('dialog', (d) => { notifyMsg = d.message(); void d.accept(); });
+    await page.getByText('保存', { exact: true }).click();
+    await expect.poll(() => notifyMsg, { timeout: 15_000 }).toContain('已更新');
 
     const { rows } = await withDb((c) => c.query(`SELECT cosession_zoom_url FROM cohorts WHERE id=$1`, [cohortId]));
     expect(rows[0].cosession_zoom_url).toBe(newZoom);
@@ -71,14 +63,13 @@ test.describe('添加学员', () => {
       // 这个选项(不是靠猜时序,是靠"弹层在源码里排在roster后面、React按源码顺序挂载DOM"这个
       // 确定性事实)。
       await page.getByText('正式', { exact: true }).last().click(); // SegmentedControl "旁听/正式"
-      // notify()走window.alert,不是DOM文本——同上;click()和dialog等待用Promise.all并发
-      // (顺序await会让click()被自己触发的alert卡死,真机CI实测过的坑)
-      const [dialog] = await Promise.all([
-        page.waitForEvent('dialog'),
-        page.getByTestId(testIds.classDetail.addMembersSubmitButton).click(),
-      ]);
-      expect(dialog.message()).toContain('已添加');
-      await dialog.accept();
+      // notify()走window.alert,不是DOM文本——click()和dialog等待改用page.once+expect.poll
+      // (Promise.all等click()和dialog在"调整共修日程"测试里真机CI复现过90秒超时,证明这个
+      // 写法本身不安全,不是CI偶发抖动,全项目统一换成这套验证过的稳妥模式)
+      let addMemberMsg = '';
+      page.once('dialog', (d) => { addMemberMsg = d.message(); void d.accept(); });
+      await page.getByTestId(testIds.classDetail.addMembersSubmitButton).click();
+      await expect.poll(() => addMemberMsg, { timeout: 15_000 }).toContain('已添加');
 
       const { rows } = await withDb((c) =>
         c.query(`SELECT member_role, status FROM class_members WHERE cohort_id=$1 AND user_id=$2`, [cohortId, userId]),
@@ -158,27 +149,20 @@ test.describe('设休息周', () => {
     const restDate = '2027-03-15'; // 远期日期,避免撞上其它测试依赖"本班当前周"算法的断言
     const reason = `E2E测试休息周-${Date.now()}`;
     try {
-      // 2026-07-16诊断:这条测试连续两轮干净CI跑都在下面的Promise.all(dialog)卡到90秒
-      // 超时,跟"调整共修日程"是同一症状——加时间戳日志,不改变任何实际行为,下一轮CI日志
-      // 里对时间戳能看出真正卡在哪一段。
-      console.log('[E2E-DIAG] 设休息周: before loginAs');
       await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
-      console.log('[E2E-DIAG] 设休息周: after loginAs, before goto');
       await page.goto(`/classes/${cohortId}`, { timeout: 45_000 });
-      console.log('[E2E-DIAG] 设休息周: after goto');
       await page.getByTestId(testIds.classDetail.restButton).click();
       await page.getByTestId(testIds.classDetail.restDateInput).fill(restDate);
       await page.getByPlaceholder('如:春节假期').fill(reason); // 原因字段(选填),按placeholder定位——ModalField的label是纯文本,不是input,不能.fill()
-      // notify()走window.alert,不是DOM文本——添加本身没有前置confirm(删除才有),单次alert;
-      // click()和dialog等待用Promise.all并发(顺序await会卡死,真机CI实测过的坑)
-      console.log('[E2E-DIAG] 设休息周: before Promise.all dialog+click');
-      const [addDialog] = await Promise.all([
-        page.waitForEvent('dialog'),
-        page.getByTestId(testIds.classDetail.restAddButton).click(),
-      ]);
-      console.log('[E2E-DIAG] 设休息周: dialog received');
-      expect(addDialog.message()).toContain('已添加');
-      await addDialog.accept();
+      // notify()走window.alert,不是DOM文本——添加本身没有前置confirm(删除才有),单次alert。
+      // 2026-07-16曾怀疑这里跟"调整共修日程"一样有click()/dialog时序竞争,当时诊断两轮都很快、
+      // 错误下结论"CI偶发抖动"——2026-07-17"调整共修日程"真机复现同一类超时,证明那次结论错了,
+      // 这里虽还没实测复现,但用的是同一种不安全写法(Promise.all等click()和dialog),预防性
+      // 一并换成同一份验证过的稳妥模式:page.once预先注册监听器 + expect.poll轮询。
+      let addMsg = '';
+      page.once('dialog', (d) => { addMsg = d.message(); void d.accept(); });
+      await page.getByTestId(testIds.classDetail.restAddButton).click();
+      await expect.poll(() => addMsg, { timeout: 15_000 }).toContain('已添加');
 
       const { rows } = await withDb((c) =>
         c.query(`SELECT id FROM cohort_rest_weeks WHERE cohort_id=$1 AND rest_start_date=$2`, [cohortId, restDate]),

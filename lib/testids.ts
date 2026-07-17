@@ -70,6 +70,11 @@ export const testIds = {
     newTemplateButton: 'practice-config-new-template-button',
     practiceChip: (practiceId: string) => `practice-config-practice-chip-${practiceId}`,
     nameInput: 'practice-config-name-input',
+    dailyTargetInput: 'practice-config-daily-target-input',
+    weeklyTargetInput: 'practice-config-weekly-target-input',
+    minSessionInput: 'practice-config-min-session-input',
+    offsetDaysInput: 'practice-config-offset-days-input',
+    durationDaysInput: 'practice-config-duration-days-input',
     submitButton: 'practice-config-submit-button',
     // 页面顶层"选择专业"chip——与弹层内"适用专业"chip文案可能相同(同一批programs.map),
     // RN Modal开着时底层DOM不摘除,两处同名chip会撞严格模式,分别给testID区分
@@ -168,6 +173,7 @@ export const testIds = {
     leaveButton: 'advancement-leave-button',
     confirmActionButton: 'advancement-confirm-action-button',
     examEntryButton: 'advancement-exam-entry-button',
+    examScoreInput: 'advancement-exam-score-input',
     examSaveButton: 'advancement-exam-save-button',
   },
   semesterEnd: {
@@ -191,6 +197,8 @@ export const testIds = {
     programOption: (programId: string) => `scheduling-program-${programId}`,
     generateButton: 'scheduling-generate-button',
     courseOption: (courseId: string) => `scheduling-course-option-${courseId}`,
+    fromNStepper: 'scheduling-fromn-stepper',
+    toNStepper: 'scheduling-ton-stepper',
     perWeekStepper: 'scheduling-perweek-stepper',
     generateSubmitButton: 'scheduling-generate-submit-button',
     holidayToggle: (weekId: string) => `scheduling-holiday-toggle-${weekId}`,
@@ -225,6 +233,13 @@ export const testIds = {
     saveReferenceButton: 'quiz-save-reference-button',
     deleteButton: 'quiz-delete-button',
     extractButton: 'quiz-extract-button',
+  },
+  setPassword: {
+    // 强制/顺路改密码页(2026-07-17补·此前0个testID,回归覆盖"无限循环卡在重设密码页面"bug)
+    pwdInput: 'set-password-pwd-input',
+    pwd2Input: 'set-password-pwd2-input',
+    submitButton: 'set-password-submit-button',
+    signOutButton: 'set-password-signout-button',
   },
   students: {
     // 后台创建学员账号(2026-07-15·免手机端注册)

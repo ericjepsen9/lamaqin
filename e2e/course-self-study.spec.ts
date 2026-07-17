@@ -30,25 +30,22 @@ test.describe('加入自学(course/[id].tsx)', () => {
     expect(Number(preExisting[0].count)).toBe(0);
 
     try {
-      // 2026-07-16诊断:第二次Promise.all(dialog2)连续两轮干净CI跑都卡到90秒超时,跟
-      // admin-class-management.spec.ts两条测试是同一症状——加时间戳日志,不改变任何实际
-      // 行为,下一轮CI日志里对时间戳能看出真正卡在哪一段。
-      console.log('[E2E-DIAG] 单专业课程直接报名: before loginAs');
       await loginAs(page, STUDENT_EMAIL, TEST_PASSWORD);
-      console.log('[E2E-DIAG] 单专业课程直接报名: after loginAs, before goto');
       await page.goto(`/course/${courseId}`, { timeout: 45_000 });
-      console.log('[E2E-DIAG] 单专业课程直接报名: after goto');
 
-      // 单专业课程:doEnroll直接触发,不弹"选择自学专业"弹层。click()和dialog等待用Promise.all
-      // 并发(顺序await会让click()被自己触发的alert卡死到90秒超时,真机CI实测过的坑)
-      console.log('[E2E-DIAG] 单专业课程直接报名: before 第1次 Promise.all dialog+click');
-      const [dialog] = await Promise.all([
-        page.waitForEvent('dialog'),
-        page.getByTestId(testIds.courseDetail.startSelfStudyButton).click(),
-      ]);
-      console.log('[E2E-DIAG] 单专业课程直接报名: 第1次dialog received');
-      expect(dialog.message()).toContain('已开始自学');
-      await dialog.accept();
+      // 单专业课程:doEnroll直接触发,不弹"选择自学专业"弹层。
+      // ⚠️ 真机CI两轮实测+时间戳诊断确认:Promise.all([waitForEvent('dialog'), click()])
+      // 这个全项目通用的"安全模式"在这里不成立——第一次点击(mutationFn先INSERT再RPC,两次
+      // 网络往返)用这个模式没问题,但第二次点击(已报名,mutationFn只有一次SELECT就提前
+      // return)会让click()本身卡90+秒才resolve(dialog几乎同时到,不是网络/后端慢)。这跟
+      // admin-quiz.spec.ts"从讲记提取"是同一类坑(click()内部actionability轮询与alert()
+      // 阻塞渲染进程之间的时序竞争,dialog距click()的异步间隙越窄越容易踩中)——用那边验证
+      // 过的办法:page.once预先注册监听器+expect.poll,不搭配Promise.all等待。两次点击统一
+      // 用这个更稳的模式,不只修第二次。
+      let notifyMsg = '';
+      page.once('dialog', (d) => { notifyMsg = d.message(); void d.accept(); });
+      await page.getByTestId(testIds.courseDetail.startSelfStudyButton).click();
+      await expect.poll(() => notifyMsg, { timeout: 15_000 }).toContain('已开始自学');
 
       const { rows } = await withDb((c) =>
         c.query(`SELECT program_id, status, is_primary, start_date::text FROM user_self_study_programs WHERE user_id=$1`, [studentId]),
@@ -59,14 +56,10 @@ test.describe('加入自学(course/[id].tsx)', () => {
       expect(rows[0].is_primary).toBe(true); // 首个自学专业自动设主修
 
       // 重复点击(已报名同一专业)→ 走already分支,不重复插入,dialog文案变"已在自学"
-      console.log('[E2E-DIAG] 单专业课程直接报名: before 第2次 Promise.all dialog+click');
-      const [dialog2] = await Promise.all([
-        page.waitForEvent('dialog'),
-        page.getByTestId(testIds.courseDetail.startSelfStudyButton).click(),
-      ]);
-      console.log('[E2E-DIAG] 单专业课程直接报名: 第2次dialog received');
-      expect(dialog2.message()).toContain('已在自学');
-      await dialog2.accept();
+      let notifyMsg2 = '';
+      page.once('dialog', (d) => { notifyMsg2 = d.message(); void d.accept(); });
+      await page.getByTestId(testIds.courseDetail.startSelfStudyButton).click();
+      await expect.poll(() => notifyMsg2, { timeout: 15_000 }).toContain('已在自学');
       const { rows: afterRepeat } = await withDb((c) => c.query(`SELECT count(*) FROM user_self_study_programs WHERE user_id=$1`, [studentId]));
       expect(Number(afterRepeat[0].count)).toBe(1); // 没有变成2行
     } finally {

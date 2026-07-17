@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/admin-kit';
 import { QuestionPayloadEditor, isPayloadComplete } from '@/components/admin/question-payload-editor';
 import { Text } from '@/components/ui/text';
+import { QUIZ_TEXT_MAX_LENGTH } from '@/lib/admin-thresholds';
 import { useCurrentUser } from '@/lib/queries/profile';
-import { confirmAsync } from '@/lib/dialog';
+import { confirmAsync, notify } from '@/lib/dialog';
 import { useAdminQuestion,
   useQuestionResponses, useDeleteQuestion, useUpdateQuestion, useUpsertQuestionReference, type QuestionPayload, type QuestionType } from '@/lib/queries/admin/quiz';
 import { testIds } from '@/lib/testids';
@@ -75,13 +76,22 @@ export default function QuestionDetail() {
     );
   }
 
-  const savePrompt = () => updateQuestion.mutate({ id: q.id, prompt: promptText }, { onSuccess: () => setEditingPrompt(false) });
-  const savePayload = () => updateQuestion.mutate({ id: q.id, payload: payloadDraft }, { onSuccess: () => setEditingPayload(false) });
-  const handleSaveRef = () => upsertRef.mutate({ questionId: q.id, referenceText: refText }, { onSuccess: () => setEditingRef(false) });
+  const savePrompt = () => updateQuestion.mutate(
+    { id: q.id, prompt: promptText },
+    { onSuccess: () => setEditingPrompt(false), onError: (e) => notify('保存失败', (e as Error)?.message ?? '请重试') },
+  );
+  const savePayload = () => updateQuestion.mutate(
+    { id: q.id, payload: payloadDraft },
+    { onSuccess: () => setEditingPayload(false), onError: (e) => notify('保存失败', (e as Error)?.message ?? '请重试') },
+  );
+  const handleSaveRef = () => upsertRef.mutate(
+    { questionId: q.id, referenceText: refText },
+    { onSuccess: () => setEditingRef(false), onError: (e) => notify('保存失败', (e as Error)?.message ?? '请重试') },
+  );
   const onDelete = async () => {
     const ok = await confirmAsync('删除题目', '确定删除这道题?师兄对它的作答记录也会一并删除,不可恢复。', '删除');
     if (!ok) return;
-    deleteQuestion.mutate(q.id, { onSuccess: () => router.back() });
+    deleteQuestion.mutate(q.id, { onSuccess: () => router.back(), onError: (e) => notify('删除失败', (e as Error)?.message ?? '请重试') });
   };
 
   return (
@@ -117,6 +127,7 @@ export default function QuestionDetail() {
               onChangeText={setPromptText}
               placeholderTextColor={INK4}
               textAlignVertical="top"
+              maxLength={QUIZ_TEXT_MAX_LENGTH}
             />
           ) : (
             <Text style={styles.prompt}>{q.prompt}</Text>
@@ -193,6 +204,7 @@ export default function QuestionDetail() {
                 placeholder="输入参考答案…"
                 placeholderTextColor={INK4}
                 textAlignVertical="top"
+                maxLength={QUIZ_TEXT_MAX_LENGTH}
               />
               <AdminButton
                 testID={testIds.quiz.saveReferenceButton}

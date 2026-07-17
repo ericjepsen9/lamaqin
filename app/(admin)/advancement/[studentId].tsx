@@ -25,7 +25,7 @@ import { useRecordProxyAction } from '@/lib/mutations/proxy';
 import { useProgramPracticeCompletion, useStudentAdvancement, type AdvDetail, type MemberStatus } from '@/lib/queries/advancement';
 import { useCurrentUser } from '@/lib/queries/profile';
 import { testIds } from '@/lib/testids';
-import { GOLD_DARK as GOLD, GOLD_PALE, INK, INK2, INK3, INK4, SAFFRON, SAFFRON_DARK, SAFFRON_LIGHT, SAGE_DARK } from '@/lib/theme';
+import { CRIMSON, GOLD_DARK as GOLD, GOLD_PALE, INK, INK2, INK3, INK4, SAFFRON, SAFFRON_DARK, SAFFRON_LIGHT, SAGE_DARK } from '@/lib/theme';
 import { genClientToken } from '@/lib/utils';
 import { useAdminLayout } from '../_layout';
 
@@ -123,11 +123,14 @@ function ExamModal({ visible, onClose, onSubmit, pending }: {
   const [token, setToken] = useState('');
   useEffect(() => { if (visible) { setName(''); setScore(''); setExamFormat('closed'); setToken(genClientToken()); } }, [visible]);
   const n = Number(score.trim());
-  const valid = name.trim().length > 0 && score.trim() !== '' && Number.isFinite(n) && n >= 0 && n <= 100;
+  // 2026-07-17·PM决定:考试分数不允许小数(此前85.5这类小数能存进去,PM明确要求改掉)
+  const scoreValid = score.trim() !== '' && Number.isFinite(n) && Number.isInteger(n) && n >= 0 && n <= 100;
+  const valid = name.trim().length > 0 && scoreValid;
   return (
     <AdminModal visible={visible} onClose={onClose} title="录入考试成绩" dismissOnOverlay={false}>
       <ModalField label="考试名称 *" value={name} onChangeText={setName} placeholder="如:第一次考试 / 加行结业考" />
-      <ModalField label="分数 *(0-100)" value={score} onChangeText={setScore} placeholder="如:85" keyboardType="numeric" />
+      <ModalField testID={testIds.advancement.examScoreInput} label="分数 *(0-100整数)" value={score} onChangeText={setScore} placeholder="如:85" keyboardType="numeric" />
+      {score.trim() !== '' && !scoreValid ? <Text style={{ fontSize: 12, color: CRIMSON, marginTop: -4, marginBottom: 6 }}>请输入 0-100 之间的整数,不支持小数</Text> : null}
       <Text style={{ fontSize: 12, color: INK3, marginTop: 8, marginBottom: 4 }}>考试形式(共修出勤未达93次时决定合格线,达到则恒30分合格)</Text>
       <SegmentedControl items={[{ key: 'closed', label: '闭卷(60分合格)' }, { key: 'open', label: '开卷(72分合格)' }]} value={examFormat} onChange={setExamFormat} />
       <ModalActions>

@@ -278,9 +278,9 @@ function GenerateModal({
         <Text style={styles.stepLabel}>2 · 学多少?</Text>
         <View style={styles.rangeRow}>
           <Text style={styles.inlineText}>从第</Text>
-          <Stepper value={fromN} onChange={(v) => setFromN(Math.min(v, toN))} min={1} max={total ?? 999} />
+          <Stepper testID={testIds.scheduling.fromNStepper} value={fromN} onChange={(v) => setFromN(Math.min(v, toN))} min={1} max={total ?? 999} />
           <Text style={styles.inlineText}>节 到第</Text>
-          <Stepper value={toN} onChange={(v) => setToN(Math.max(v, fromN))} min={1} max={total ?? 999} />
+          <Stepper testID={testIds.scheduling.toNStepper} value={toN} onChange={(v) => setToN(Math.max(v, fromN))} min={1} max={total ?? 999} />
           <Text style={styles.inlineText}>节</Text>
         </View>
         {total ? <Text style={styles.hintTiny}>整门共 {total} 节;只排前半段就把"到第几节"调小。</Text> : null}

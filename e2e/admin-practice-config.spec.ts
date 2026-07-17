@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createTestProfile, deleteTestProfile, withDb } from './db';
 import { ADMIN_EMAIL, TEST_PASSWORD } from './global-setup';
-import { loginAs } from './helpers';
+import { expectDisabled, expectEnabled, loginAs } from './helpers';
 import { testIds } from '../lib/testids';
 
 // 功课模板配置(practice-config/index.tsx)剩余交互 系统性覆盖(2026-07-16·PM"继续完成"
@@ -196,6 +196,130 @@ test.describe('自选经候选清单', () => {
       }, { timeout: 10_000 }).toBe(0);
     } finally {
       await withDb((c) => c.query(`DELETE FROM program_optional_practices WHERE program_id=$1`, [programId]));
+      await withDb((c) => c.query(`DELETE FROM programs WHERE id=$1`, [programId]));
+    }
+  });
+});
+
+// 异常输入扩展(2026-07-17·PM"这两个都要测"·测试计划①):每座门槛30分钟大纲底线的前端
+// 校验、以及"负数会被静默转null"这个现状(不是bug断言,是记录当前行为——是否要改成显式报错
+// 属于PM决定,这里先如实确认现在到底是怎样)。
+test.describe('异常输入:每座门槛大纲底线', () => {
+  test('填29 → 保存按钮禁用+显示底线提示;填30 → 解除禁用,可正常保存', async ({ page }) => {
+    const { rows: [{ id: practiceId }] } = await withDb((c) => c.query(`SELECT id FROM practices LIMIT 1`));
+    const tplName = `E2E门槛测试模板-${Date.now()}`;
+    try {
+      await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
+      await page.goto('/practice-config', { timeout: 45_000 });
+      await page.getByTestId(testIds.practiceConfig.newTemplateButton).click();
+      await page.getByTestId(testIds.practiceConfig.practiceChip(practiceId)).click();
+      await page.getByTestId(testIds.practiceConfig.nameInput).fill(tplName);
+
+      await page.getByTestId(testIds.practiceConfig.minSessionInput).fill('29');
+      await expect(page.getByText('门槛不能低于 30 分钟', { exact: false })).toBeVisible();
+      await expectDisabled(page.getByTestId(testIds.practiceConfig.submitButton));
+
+      await page.getByTestId(testIds.practiceConfig.minSessionInput).fill('30');
+      await expect(page.getByText('门槛不能低于 30 分钟', { exact: false })).not.toBeVisible();
+      await expectEnabled(page.getByTestId(testIds.practiceConfig.submitButton));
+      await page.getByTestId(testIds.practiceConfig.submitButton).click();
+      await expect(page.getByText(tplName, { exact: true })).toBeVisible({ timeout: 10_000 });
+
+      const { rows } = await withDb((c) => c.query(`SELECT default_min_session_minutes FROM practice_templates WHERE template_name=$1`, [tplName]));
+      expect(rows.length).toBe(1);
+      expect(rows[0].default_min_session_minutes).toBe(30);
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM practice_templates WHERE template_name=$1`, [tplName]));
+    }
+  });
+});
+
+test.describe('异常输入:数字框填负数(确认现状——静默转null,不报错)', () => {
+  test('每日目标/起修偏移/完成天数填负数 → 前端toNum()静默当成"不设",不阻止保存,DB里对应列是NULL不是负数', async ({ page }) => {
+    const { rows: [{ id: practiceId }] } = await withDb((c) => c.query(`SELECT id FROM practices LIMIT 1`));
+    const tplName = `E2E负数测试模板-${Date.now()}`;
+    try {
+      await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
+      await page.goto('/practice-config', { timeout: 45_000 });
+      await page.getByTestId(testIds.practiceConfig.newTemplateButton).click();
+      await page.getByTestId(testIds.practiceConfig.practiceChip(practiceId)).click();
+      await page.getByTestId(testIds.practiceConfig.nameInput).fill(tplName);
+
+      // 默认周期是until_complete,每日目标非必填——负数在这个周期下不会挡住提交,
+      // 这正是要确认的现状(如果周期是"每日",toNum()判空会挡,但那是另一条路径)。
+      await page.getByTestId(testIds.practiceConfig.dailyTargetInput).fill('-5');
+      await page.getByTestId(testIds.practiceConfig.offsetDaysInput).fill('-10');
+      await page.getByTestId(testIds.practiceConfig.durationDaysInput).fill('-20');
+      await expectEnabled(page.getByTestId(testIds.practiceConfig.submitButton));
+      await page.getByTestId(testIds.practiceConfig.submitButton).click();
+      await expect(page.getByText(tplName, { exact: true })).toBeVisible({ timeout: 10_000 });
+
+      const { rows } = await withDb((c) =>
+        c.query(`SELECT default_daily_target, starts_offset_days, duration_days FROM practice_templates WHERE template_name=$1`, [tplName]),
+      );
+      expect(rows.length).toBe(1);
+      // 不是-5/-10/-20,是null——toNum()把负数判成非法值,静默转null(="不设"),不是报错拒绝
+      // ⚠️真机CI实测踩过的坑:数据库列名是default_daily_target(带前缀),不是daily_target——
+      // 跟starts_offset_days/duration_days(不带default_前缀)命名不一致,第一版测试想当然拼错了列名
+      expect(rows[0].default_daily_target).toBeNull();
+      expect(rows[0].starts_offset_days).toBeNull();
+      expect(rows[0].duration_days).toBeNull();
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM practice_templates WHERE template_name=$1`, [tplName]));
+    }
+  });
+});
+
+// 并发/竞态(2026-07-17·测试计划④场景2):useUpdateTemplate是整行UPDATE(rowFromInput()把
+// 表单当前全部字段都打包进payload),没有字段级合并。这条测试目的是确认这条已知设计现状,
+// 不是找bug——但值得让PM知道:两个管理员前后脚各改一个不同字段,后保存的会把前一个人刚保存
+// 的改动悄悄覆盖回自己模态框打开时的旧值,即使他根本没碰那个字段。不需要真的两个浏览器上下文
+// 抢时序才能测出来(这条不像study_records那样有窄窗口的竞态,是任何时序下都必然发生的
+// 确定性行为)——用DB直接模拟"另一个管理员在我提交前抢先改了别的字段"即可可靠复现。
+test.describe('并发/竞态:整行UPDATE没有字段级合并(测试计划④场景2·确认已知设计,非bug)', () => {
+  test('admin甲打开编辑框后,admin乙抢先改了每日目标 → 甲只改名称提交 → 乙刚改的每日目标被甲悄悄覆盖回旧值', async ({ page }) => {
+    const programId = await makeThrowawayProgram();
+    const { rows: [{ id: practiceId }] } = await withDb((c) => c.query(`SELECT id FROM practices LIMIT 1`));
+    const originalName = `E2E并发覆盖测试模板-${Date.now()}`;
+    const staleDailyTarget = 100;
+    // ⚠️真机CI实测踩过的坑:practice-config/index.tsx列表按当前选中的专业chip过滤
+    // (t.appliesToPrograms ?? []).includes(progId)——不选专业progId是null直接显示空列表,
+    // appliesToPrograms不填(NULL)也一样匹配不上任何专业(?? []是空数组,恒不包含任何id)。
+    // 跟"编辑模板+停用/启用"那条测试一样,必须显式挂上一个专业+选中对应chip才能让卡片出现。
+    const { rows: [{ id: templateId }] } = await withDb((c) =>
+      c.query(
+        `INSERT INTO practice_templates (practice_id, template_name, target_period, default_daily_target, applies_to_programs, is_active)
+         VALUES ($1,$2,'lifetime',$3,$4,true) RETURNING id`,
+        [practiceId, originalName, staleDailyTarget, [programId]],
+      ),
+    );
+    try {
+      await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
+      await page.goto('/practice-config', { timeout: 45_000 });
+      await page.getByTestId(testIds.practiceConfig.programChip(programId)).click();
+      await expect(page.getByText(originalName, { exact: true })).toBeVisible({ timeout: 10_000 });
+      // admin甲打开编辑框:表单此刻把每日目标灌成100(editingTpl快照)
+      await page.getByTestId(testIds.practiceConfig.editButton(templateId)).click();
+      await expect(page.getByTestId(testIds.practiceConfig.dailyTargetInput)).toHaveValue(String(staleDailyTarget));
+
+      // 模拟admin乙在甲的编辑框开着的这段时间,已经把每日目标改成999并保存成功了
+      // (甲的表单不会自动感知这个外部变化,input里显示的还是100)
+      await withDb((c) => c.query(`UPDATE practice_templates SET default_daily_target=999 WHERE id=$1`, [templateId]));
+
+      // 甲全程没碰每日目标这个字段,只改了名称就提交——payload里"每日目标"这一项仍是甲表单
+      // 里的旧快照100,不是乙刚存进去的999
+      const newName = `${originalName}-甲改的名字`;
+      await page.getByTestId(testIds.practiceConfig.nameInput).fill(newName);
+      await page.getByTestId(testIds.practiceConfig.submitButton).click();
+      await expect(page.getByText(newName, { exact: true })).toBeVisible({ timeout: 10_000 });
+
+      const { rows } = await withDb((c) => c.query(`SELECT template_name, default_daily_target FROM practice_templates WHERE id=$1`, [templateId]));
+      expect(rows[0].template_name).toBe(newName); // 甲的改动生效了
+      // 确认已知现状:乙的999被甲的旧快照100悄悄覆盖回去,不是保留乙的改动、也不是报错提醒甲
+      // "有别人改过"——整行UPDATE没有版本冲突检测,后保存者的全量快照总是赢。
+      expect(rows[0].default_daily_target).toBe(staleDailyTarget);
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM practice_templates WHERE id=$1`, [templateId]));
       await withDb((c) => c.query(`DELETE FROM programs WHERE id=$1`, [programId]));
     }
   });

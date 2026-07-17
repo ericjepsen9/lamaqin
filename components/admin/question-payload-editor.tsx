@@ -131,7 +131,8 @@ export function isPayloadComplete(type: QuestionType, p: QuestionPayload): boole
     case 'judge': return p.answer === '正确' || p.answer === '错误';
     case 'fill': return !!p.answer?.trim();
     case 'flip': return !!p.back?.trim();
-    case 'verse': case 'chain': return (p.tokens?.length ?? 0) >= 1;
+    // 2026-07-17·PM决定:排序题至少要有2个词块才有意义(只有1项没有"排序"可言,此前门槛太松)
+    case 'verse': case 'chain': return (p.tokens?.length ?? 0) >= 2;
     default: return false;
   }
 }

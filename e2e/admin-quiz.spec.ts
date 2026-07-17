@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { withDb } from './db';
 import { ADMIN_EMAIL, TEST_PASSWORD } from './global-setup';
-import { loginAs } from './helpers';
+import { expectDisabled, loginAs } from './helpers';
 import { testIds } from '../lib/testids';
 
 // 思考题管理(quiz/index.tsx + new.tsx + [questionId].tsx)系统性覆盖(2026-07-16·PM"继续
@@ -35,8 +35,18 @@ test.describe('新建问答题 → 详情页编辑/删除(quiz全链路)', () =>
 
       // 创建成功静默:先upsert参考答案再router.replace进详情页,没有notify——用详情页内容出现作为真实落地信号
       await expect(page.getByText(originalPrompt, { exact: true })).toBeVisible({ timeout: 10_000 });
-      const { rows: created } = await withDb((c) => c.query(`SELECT id FROM questions WHERE prompt=$1`, [originalPrompt]));
-      expect(created.length).toBe(1);
+      // 2026-07-17·这条"UI已确认成功、紧接着单次查DB查不到"的现象在这条创建链路上真机CI
+      // 三度出现(这条 + 下面"客观题payload编辑器"的"颂词续接"用例),读过useCreateQuestion/
+      // useAdminQuestion两处代码,都是走真实INSERT/SELECT,没有乐观缓存捷径,没找到能100%
+      // 解释的应用层根因——但3次都是"查一次没有、不是永久查不到",改成expect.poll重试
+      // (同admin-scheduling.spec.ts等既有先例的写法,不是放宽断言,是承认"刚提交、DB可见性
+      // 要过一下才追上"这个环节值得允许短暂重试)。
+      let created: { id: string }[] = [];
+      await expect.poll(async () => {
+        const res = await withDb((c) => c.query(`SELECT id FROM questions WHERE prompt=$1`, [originalPrompt]));
+        created = res.rows as { id: string }[];
+        return created.length;
+      }, { timeout: 10_000 }).toBe(1);
       const questionId = created[0].id as string;
       await expect(page).toHaveURL(new RegExp(`/quiz/${questionId}$`));
 
@@ -161,8 +171,13 @@ test.describe('客观题payload编辑器(6种题型新建)', () => {
         await page.getByTestId(testIds.quiz.createButton).click();
 
         await expect(page.getByText(prompt, { exact: true })).toBeVisible({ timeout: 10_000 });
-        const { rows } = await withDb((c2) => c2.query(`SELECT payload FROM questions WHERE prompt=$1`, [prompt]));
-        expect(rows.length).toBe(1);
+        // 同上"新建问答题"测试那条注释:这类现象已3次出现在这条创建链路上,改expect.poll重试。
+        let rows: { payload: unknown }[] = [];
+        await expect.poll(async () => {
+          const res = await withDb((c2) => c2.query(`SELECT payload FROM questions WHERE prompt=$1`, [prompt]));
+          rows = res.rows as { payload: unknown }[];
+          return rows.length;
+        }, { timeout: 10_000 }).toBe(1);
         expect(rows[0].payload).toEqual(c.expectPayload);
       } finally {
         await withDb((c2) => c2.query(`DELETE FROM courses WHERE id=$1`, [courseId]));
@@ -228,6 +243,152 @@ test.describe('从讲记提取思考题(useExtractQuestionsFromBlocks)', () => {
       await expect.poll(() => notifyMsg2, { timeout: 15_000 }).toContain('没有新的思考题');
       const { rows: afterRerun } = await withDb((c) => c.query(`SELECT count(*) FROM questions WHERE lesson_id=$1`, [lessonId]));
       expect(Number(afterRerun[0].count)).toBe(2);
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM courses WHERE id=$1`, [courseId]));
+    }
+  });
+});
+
+// 异常输入扩展(2026-07-17·PM"这两个都要测"·测试计划①):单选题少于2个选项确实挡住创建
+// (已有校验);题干/参考答案没有长度上限,超长文本完整存入不截断——这是记录现状,不是bug
+// 断言,是否要限制长度属于PM决定。
+test.describe('异常输入:客观题选项数 + 超长文本', () => {
+  test('单选题只填1个选项 → isPayloadComplete判定不完整,创建按钮保持禁用', async ({ page }) => {
+    const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const { rows: [{ id: courseId }] } = await withDb((c) =>
+      c.query(`INSERT INTO courses (name, slug, course_type, is_required) VALUES ($1,$2,'formal',true) RETURNING id`,
+        [`E2E单选边界测试课程-${suffix}`, `e2e-single-edge-${suffix}`]),
+    );
+    const { rows: [{ id: lessonId }] } = await withDb((c) =>
+      c.query(`INSERT INTO course_lessons (course_id, lesson_number, title) VALUES ($1,1,'E2E测试课节') RETURNING id`, [courseId]),
+    );
+    try {
+      await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
+      await page.goto('/quiz/new', { timeout: 45_000 });
+      await page.getByTestId(testIds.quiz.coursePickerTrigger).click();
+      await page.getByTestId(testIds.quiz.courseOption(courseId)).click();
+      await page.getByTestId(testIds.quiz.lessonPickerTrigger).click();
+      await page.getByTestId(testIds.quiz.lessonOption(lessonId)).click();
+      await page.getByText('单选', { exact: true }).click();
+      await page.getByPlaceholder('选项A\n选项B\n选项C').fill('只有一个选项');
+      await page.getByTestId(testIds.quiz.promptInput).fill(`E2E单选少选项-${suffix}`);
+      // 没选正确答案+只有1个选项,两者都不满足isPayloadComplete,创建按钮应保持禁用
+      await expectDisabled(page.getByTestId(testIds.quiz.createButton));
+
+      // ⚠️真机CI实测发现的坑:选项文本填的字符串跟自己撞了——textarea当前值就是"只有一个选项"
+      // 本身,getByText同时命中textarea的内容和下方答案chip两处(resolved to 2 elements)。chip
+      // 在JSX里排在textarea后面挂载,.last()按挂载顺序取,不是猜时序。
+      await page.getByText('只有一个选项', { exact: true }).last().click(); // 补选正确答案,选项数仍是1
+      await expectDisabled(page.getByTestId(testIds.quiz.createButton)); // 单选<2项,仍然禁用
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM courses WHERE id=$1`, [courseId]));
+    }
+  });
+
+  test('颂词组句题只填1个词块 → 排序题少于2项没有意义,创建按钮保持禁用(2026-07-17门槛从>=1提到>=2)', async ({ page }) => {
+    const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const { rows: [{ id: courseId }] } = await withDb((c) =>
+      c.query(`INSERT INTO courses (name, slug, course_type, is_required) VALUES ($1,$2,'formal',true) RETURNING id`,
+        [`E2E颂词边界测试课程-${suffix}`, `e2e-verse-edge-${suffix}`]),
+    );
+    const { rows: [{ id: lessonId }] } = await withDb((c) =>
+      c.query(`INSERT INTO course_lessons (course_id, lesson_number, title) VALUES ($1,1,'E2E测试课节') RETURNING id`, [courseId]),
+    );
+    try {
+      await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
+      await page.goto('/quiz/new', { timeout: 45_000 });
+      await page.getByTestId(testIds.quiz.coursePickerTrigger).click();
+      await page.getByTestId(testIds.quiz.courseOption(courseId)).click();
+      await page.getByTestId(testIds.quiz.lessonPickerTrigger).click();
+      await page.getByTestId(testIds.quiz.lessonOption(lessonId)).click();
+      await page.getByText('颂词组句', { exact: true }).click();
+      await page.getByPlaceholder('第一块\n第二块\n第三块').fill('只有一块');
+      await page.getByTestId(testIds.quiz.promptInput).fill(`E2E颂词少词块-${suffix}`);
+      await expectDisabled(page.getByTestId(testIds.quiz.createButton));
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM courses WHERE id=$1`, [courseId]));
+    }
+  });
+
+  test('题干/参考答案填超长字符串(6000字符)→ 前端maxLength挡在5000,DB也存不进超过5000的', async ({ page }) => {
+    // 2026-07-17·PM决定加上限后从"确认现状"改成"确认挡住"。QUIZ_TEXT_MAX_LENGTH=5000
+    // (lib/admin-thresholds.ts,占位·待核)。填6000个字符(明显超限),读回输入框实际值来做
+    // 断言——不假设具体是"精确截断在5000"还是别的行为,用真实读回的值去核对DB,自洽。
+    const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const { rows: [{ id: courseId }] } = await withDb((c) =>
+      c.query(`INSERT INTO courses (name, slug, course_type, is_required) VALUES ($1,$2,'formal',true) RETURNING id`,
+        [`E2E超长文本测试课程-${suffix}`, `e2e-longtext-${suffix}`]),
+    );
+    const { rows: [{ id: lessonId }] } = await withDb((c) =>
+      c.query(`INSERT INTO course_lessons (course_id, lesson_number, title) VALUES ($1,1,'E2E测试课节') RETURNING id`, [courseId]),
+    );
+    const marker = `E2E超长-${suffix}`;
+    const longPrompt = `${marker}-${'甲'.repeat(6000)}`;
+    const longRef = `${marker}参考-${'乙'.repeat(6000)}`;
+    try {
+      await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
+      await page.goto('/quiz/new', { timeout: 45_000 });
+      await page.getByTestId(testIds.quiz.coursePickerTrigger).click();
+      await page.getByTestId(testIds.quiz.courseOption(courseId)).click();
+      await page.getByTestId(testIds.quiz.lessonPickerTrigger).click();
+      await page.getByTestId(testIds.quiz.lessonOption(lessonId)).click();
+      await page.getByTestId(testIds.quiz.promptInput).fill(longPrompt);
+      await page.getByTestId(testIds.quiz.referenceInput).fill(longRef);
+
+      const actualPrompt = await page.getByTestId(testIds.quiz.promptInput).inputValue();
+      const actualRef = await page.getByTestId(testIds.quiz.referenceInput).inputValue();
+      expect(actualPrompt.length).toBeLessThanOrEqual(5000);
+      expect(actualRef.length).toBeLessThanOrEqual(5000);
+
+      await page.getByTestId(testIds.quiz.createButton).click();
+      await expect(page.getByText(marker, { exact: false }).first()).toBeVisible({ timeout: 10_000 });
+
+      const { rows } = await withDb((c) => c.query(`SELECT id, prompt FROM questions WHERE prompt=$1`, [actualPrompt]));
+      expect(rows.length).toBe(1); // 精确匹配"输入框实际接受的那段"(被maxLength挡过的),不是原始6000字符
+      const { rows: refRows } = await withDb((c) => c.query(`SELECT reference_text FROM question_references WHERE question_id=$1`, [rows[0].id]));
+      expect(refRows[0].reference_text).toBe(actualRef);
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM courses WHERE id=$1`, [courseId]));
+    }
+  });
+});
+
+// 权限边界·写层面场景4的次生发现(2026-07-17·PM"这两个都要测"·测试计划②):调研aixin改
+// 参考答案这条时发现handleSaveRef没有onError,保存失败admin本人也看不到任何提示——跟本页
+// 其它mutation(如删除题目)以及全项目其它页面的一致做法不同,不是aixin权限问题本身,是
+// 这一处遗漏,已补上onError+notify()(与项目既有一致性对齐,不是新的产品决策)。这里用"并发
+// 删除"这个真实场景触发一次真正的失败(question_id外键约束),验证admin确实会看到提示,
+// 不是静默失败。
+test.describe('保存参考答案失败时的错误提示(此前遗漏,已补onError)', () => {
+  test('编辑参考答案时题目被并发删除 → 保存触发外键约束失败,admin看到"保存失败"提示', async ({ page }) => {
+    const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const { rows: [{ id: courseId }] } = await withDb((c) =>
+      c.query(`INSERT INTO courses (name, slug, course_type, is_required) VALUES ($1,$2,'formal',true) RETURNING id`,
+        [`E2E参考答案失败测试课程-${suffix}`, `e2e-refail-${suffix}`]),
+    );
+    const { rows: [{ id: lessonId }] } = await withDb((c) =>
+      c.query(`INSERT INTO course_lessons (course_id, lesson_number, title) VALUES ($1,1,'E2E测试课节') RETURNING id`, [courseId]),
+    );
+    const prompt = `E2E参考答案失败测试-${suffix}`;
+    const { rows: [{ id: questionId }] } = await withDb((c) =>
+      c.query(`INSERT INTO questions (lesson_id, question_number, prompt, question_type) VALUES ($1,1,$2,'open') RETURNING id`, [lessonId, prompt]),
+    );
+    try {
+      await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
+      await page.goto(`/quiz/${questionId}`, { timeout: 45_000 });
+      await page.getByTestId(testIds.quiz.editReferenceButton).click();
+      await page.getByTestId(testIds.quiz.referenceEditInput).fill('E2E参考答案内容');
+
+      // 模拟另一个admin在这一刻把题目删了——question_references.question_id外键约束
+      // (REFERENCES questions(id))会让接下来的upsert真的失败,不是伪造的错误
+      await withDb((c) => c.query(`DELETE FROM questions WHERE id=$1`, [questionId]));
+
+      // click()和dialog等待用page.once+expect.poll(Promise.all这套在"调整共修日程"真机CI
+      // 复现过90秒超时,证明本身不安全,全项目统一换掉)
+      let failMsg = '';
+      page.once('dialog', (d) => { failMsg = d.message(); void d.accept(); });
+      await page.getByTestId(testIds.quiz.saveReferenceButton).click();
+      await expect.poll(() => failMsg, { timeout: 15_000 }).toContain('保存失败');
     } finally {
       await withDb((c) => c.query(`DELETE FROM courses WHERE id=$1`, [courseId]));
     }

@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { QuestionPayloadEditor, isPayloadComplete } from '@/components/admin/question-payload-editor';
 import { AdminButton, DetailHeader, SCREEN_BG } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
+import { QUIZ_TEXT_MAX_LENGTH } from '@/lib/admin-thresholds';
 import { useCreateQuestion, useUpsertQuestionReference, type QuestionPayload, type QuestionType } from '@/lib/queries/admin/quiz';
 import { useCourseDetail, useCourses } from '@/lib/queries/courses';
 import { testIds } from '@/lib/testids';
@@ -116,14 +117,14 @@ export default function NewQuestion() {
 
         {/* 题干 */}
         <Text style={styles.label}>题目</Text>
-        <TextInput testID={testIds.quiz.promptInput} style={styles.textarea} multiline value={prompt} onChangeText={setPrompt} placeholder="输入思考题题干…" placeholderTextColor={INK4} textAlignVertical="top" />
+        <TextInput testID={testIds.quiz.promptInput} style={styles.textarea} multiline value={prompt} onChangeText={setPrompt} placeholder="输入思考题题干…" placeholderTextColor={INK4} textAlignVertical="top" maxLength={QUIZ_TEXT_MAX_LENGTH} />
 
         {/* 客观题选项/答案编辑器 */}
         {type !== 'open' ? <QuestionPayloadEditor type={type} initial={payload} onChange={setPayload} /> : null}
 
         {/* 参考答案 */}
         <Text style={styles.label}>{type === 'open' ? '参考答案(可选 · 仅 admin/辅导员可见)' : '解析/参考(可选)'}</Text>
-        <TextInput testID={testIds.quiz.referenceInput} style={styles.textarea} multiline value={reference} onChangeText={setReference} placeholder="可留空,稍后在题目页补充…" placeholderTextColor={INK4} textAlignVertical="top" />
+        <TextInput testID={testIds.quiz.referenceInput} style={styles.textarea} multiline value={reference} onChangeText={setReference} placeholder="可留空,稍后在题目页补充…" placeholderTextColor={INK4} textAlignVertical="top" maxLength={QUIZ_TEXT_MAX_LENGTH} />
 
         <AdminButton testID={testIds.quiz.createButton} variant="primary" onPress={onCreate} disabled={!canCreate} style={{ marginTop: 8 }}>
           {createQuestion.isPending ? '创建中…' : '创建题目'}
