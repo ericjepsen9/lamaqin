@@ -51,10 +51,16 @@ export default function AttendanceDetail() {
   const [dirty, setDirty] = useState(false);
 
   useEffect(() => { setTitle('出勤点名'); }, [setTitle]);
-  // 数据到达 / 刷新后,用真实出勤态初始化(未脏时)
-  useEffect(() => {
+  // 数据到达/刷新后,用真实出勤态初始化(未脏时)——换成渲染期间比对上一次的session/dirty
+  // (react-hooks/set-state-in-effect·2026-07-17 lint债清理),逐项对应原effect的依赖数组,
+  // 行为不变:session或dirty任一变化都重新判定,session存在且未脏才真的同步。
+  const [prevSession, setPrevSession] = useState(session);
+  const [prevDirty, setPrevDirty] = useState(dirty);
+  if (session !== prevSession || dirty !== prevDirty) {
+    setPrevSession(session);
+    setPrevDirty(dirty);
     if (session && !dirty) setMarks(Object.fromEntries(session.members.map((m) => [m.userId, m.status])));
-  }, [session, dirty]);
+  }
 
   const counts = useMemo(() => {
     const vals = Object.values(marks);

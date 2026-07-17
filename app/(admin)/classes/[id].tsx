@@ -34,6 +34,7 @@ import {
   useUpdateCohortSchedule,
   useUpdateMemberRole,
   useUpdateMemberStatus,
+  useUpdateReminderSettings,
 } from '@/lib/mutations/classes';
 import {
   useActiveProfilesSearch,
@@ -273,6 +274,75 @@ function ScheduleModal({ cohort, onClose }: { cohort: CohortDetail; onClose: () 
   );
 }
 
+// ── 学习提醒(决策188方案A,PM 2026-07-12三点拍板)──────────────────
+// 只管"这个班要不要提醒、星期几、几点、文案"这4项配置;推送权限请求/token注册在登录时
+// 就已经问过(lib/push-notifications.ts),不在这里重复问。默认文案跟Edge Function
+// (supabase/functions/send-cohort-reminders)里的DEFAULT_REMINDER_MESSAGE保持一致
+// (占位符提示用,实际留空即由后端套用默认文案,不需要这里也import那份Deno代码)。
+const DEFAULT_REMINDER_MESSAGE_HINT = '本周共修时间快到了,愿大家精进闻思,同沾法喜。';
+
+function ReminderModal({ cohort, onClose }: { cohort: CohortDetail; onClose: () => void }) {
+  const upd = useUpdateReminderSettings();
+  const [enabled, setEnabled] = useState(cohort.reminderEnabled);
+  const [weekday, setWeekday] = useState<number | null>(cohort.reminderWeekday);
+  const [time, setTime] = useState((cohort.reminderTime ?? '').slice(0, 5));
+  const [message, setMessage] = useState(cohort.reminderMessage ?? '');
+
+  const timeOk = time.trim() === '' || /^([01]?\d|2[0-3]):[0-5]\d$/.test(time.trim());
+  const canSave = !upd.isPending && (!enabled || (weekday !== null && timeOk && time.trim() !== ''));
+
+  const save = () => {
+    if (!canSave) return;
+    upd.mutate(
+      {
+        cohortId: cohort.id,
+        enabled,
+        weekday: enabled ? weekday : null,
+        time: enabled && time.trim() ? `${time.trim()}:00` : null,
+        message: message.trim() || null,
+      },
+      { onSuccess: () => { onClose(); notify('已更新', '学习提醒设置已保存。'); }, onError: (e) => notifyErr('保存失败', e) },
+    );
+  };
+
+  return (
+    <AdminModal visible onClose={onClose} title="学习提醒" dismissOnOverlay={false}>
+      <ScrollView style={{ maxHeight: 420 }} showsVerticalScrollIndicator={false}>
+        <Text style={styles.fieldHint}>本班学习提醒</Text>
+        <View style={styles.dowRow}>
+          <Pressable testID={testIds.classDetail.reminderEnabledToggle} style={[styles.dowChip, !enabled && styles.dowChipOn]} onPress={() => setEnabled(false)}>
+            <Text style={[styles.dowChipText, !enabled && styles.dowChipTextOn]}>关闭</Text>
+          </Pressable>
+          <Pressable style={[styles.dowChip, enabled && styles.dowChipOn]} onPress={() => setEnabled(true)}>
+            <Text style={[styles.dowChipText, enabled && styles.dowChipTextOn]}>开启</Text>
+          </Pressable>
+        </View>
+        {enabled ? (
+          <>
+            <Text style={styles.fieldHint}>星期</Text>
+            <DowPicker value={weekday} onChange={setWeekday} />
+            <ModalField testID={testIds.classDetail.reminderTimeInput} label="时间(24 小时制,如 19:30)" value={time} onChangeText={setTime} placeholder="必填,如 19:30" />
+            {!timeOk ? <Text style={styles.errText}>时间格式应为 HH:MM</Text> : null}
+            <ModalField
+              testID={testIds.classDetail.reminderMessageInput}
+              label="提醒文案(留空用默认文案)"
+              value={message}
+              onChangeText={setMessage}
+              placeholder={DEFAULT_REMINDER_MESSAGE_HINT}
+              multiline
+            />
+          </>
+        ) : null}
+        <ModalFootnote>提醒每15分钟由系统扫描一次(非精确到秒),按本班时区({cohort.timezone ?? '未设'})判断;同一天只发一次,不会重复打扰。</ModalFootnote>
+      </ScrollView>
+      <ModalActions>
+        <AdminButton variant="negative" onPress={onClose} style={{ flex: 1 }}>取消</AdminButton>
+        <AdminButton testID={testIds.classDetail.reminderSaveButton} variant="primary" disabled={!canSave} onPress={save} style={{ flex: 1 }}>{upd.isPending ? '保存中…' : '保存'}</AdminButton>
+      </ModalActions>
+    </AdminModal>
+  );
+}
+
 // ── 设休息周 ─────────────────────────────────────────────────────────
 function RestWeeksModal({ cohortId, onClose }: { cohortId: string; onClose: () => void }) {
   const { data: weeks = [], error: weeksError } = useCohortRestWeeks(cohortId);
@@ -437,7 +507,7 @@ export function ClassDetailPanel({ cohortId }: { cohortId: string }) {
     cohort ? { cohortId: cohort.id, programId: cohort.programId, startDate: cohort.startDate, timezone: cohort.timezone } : undefined,
   );
   const setActive = useSetCohortActive();
-  const [modal, setModal] = useState<null | 'members' | 'schedule' | 'rest' | 'staff'>(null);
+  const [modal, setModal] = useState<null | 'members' | 'schedule' | 'rest' | 'staff' | 'reminder'>(null);
   const [memberModal, setMemberModal] = useState<RosterMember | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
 
@@ -517,6 +587,7 @@ export function ClassDetailPanel({ cohortId }: { cohortId: string }) {
                   <AdminButton testID={testIds.classDetail.staffButton} variant="negative" onPress={() => setModal('staff')}>设辅导员 / 爱心</AdminButton>
                   <AdminButton testID={testIds.classDetail.scheduleButton} variant="negative" onPress={() => setModal('schedule')}>调整共修日程</AdminButton>
                   <AdminButton testID={testIds.classDetail.restButton} variant="negative" onPress={() => setModal('rest')}>设休息周</AdminButton>
+                  <AdminButton testID={testIds.classDetail.reminderButton} variant="negative" onPress={() => setModal('reminder')}>学习提醒</AdminButton>
                   <AdminButton variant="negative" onPress={() => router.push(`/(admin)/advancement/semester-end/${cohort.id}` as never)}>学期末处理</AdminButton>
                   <AdminButton testID={testIds.classDetail.endClassButton} variant="danger" onPress={endClass}>标记结班</AdminButton>
                 </View>
@@ -528,13 +599,16 @@ export function ClassDetailPanel({ cohortId }: { cohortId: string }) {
             </SectionCard>
           ) : null}
 
-          {/* 本班辅导员(非 admin)只放行"调整共修日程"这一项(三易审计孤儿函数跟进·PM 2026-07-15
-              裁定):不给上面那一整块"管理操作"(添加学员/设辅导员/学期末处理/标记结班等仍
-              admin-only),权限判断在 update_cosession_settings RPC 内部,这里只是给个入口。 */}
+          {/* 本班辅导员(非 admin)只放行"调整共修日程"+"学习提醒"这两项(三易审计孤儿函数
+              跟进·PM 2026-07-15裁定;学习提醒2026-07-17随决策188补入,同一套权限口径):
+              不给上面那一整块"管理操作"(添加学员/设辅导员/学期末处理/标记结班等仍
+              admin-only),权限判断在 update_cosession_settings/update_reminder_settings
+              这两个 RPC 内部,这里只是给个入口。 */}
           {isZhumai && !isAdmin && cohort.isActive ? (
             <SectionCard title="共修设定">
               <View style={styles.actionRow}>
                 <AdminButton testID={testIds.classDetail.scheduleButton} variant="negative" onPress={() => setModal('schedule')}>调整共修日程</AdminButton>
+                <AdminButton testID={testIds.classDetail.reminderButton} variant="negative" onPress={() => setModal('reminder')}>学习提醒</AdminButton>
               </View>
             </SectionCard>
           ) : null}
@@ -623,6 +697,7 @@ export function ClassDetailPanel({ cohortId }: { cohortId: string }) {
 
       {modal === 'members' && cohort ? <AddMembersModal cohortId={cohort.id} onClose={() => setModal(null)} /> : null}
       {modal === 'schedule' && cohort ? <ScheduleModal cohort={cohort} onClose={() => setModal(null)} /> : null}
+      {modal === 'reminder' && cohort ? <ReminderModal cohort={cohort} onClose={() => setModal(null)} /> : null}
       {modal === 'rest' && cohort ? <RestWeeksModal cohortId={cohort.id} onClose={() => setModal(null)} /> : null}
       {modal === 'staff' && cohort ? <StaffModal cohortId={cohort.id} onClose={() => setModal(null)} /> : null}
       {memberModal && cohort ? (

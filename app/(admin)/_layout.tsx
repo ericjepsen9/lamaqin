@@ -1,6 +1,6 @@
 import { Redirect, Stack, usePathname, useRouter } from 'expo-router';
 import { Bell, BookOpen, CalendarDays, CalendarRange, ChartBar, ChevronUp, ClipboardList, FileQuestionMark, GraduationCap, Heart, LayoutDashboard, Menu, MessageSquare, Repeat2, Sprout, Users, X } from 'lucide-react-native';
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { Animated, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -8,7 +8,7 @@ import { Text } from '@/components/ui/text';
 import { useAuth } from '@/lib/auth';
 import { useCurrentUser } from '@/lib/queries/profile';
 import { supabase } from '@/lib/supabase';
-import { INK, INK2, INK3, SAFFRON, SAFFRON_DARK, SAFFRON_LIGHT } from '@/lib/theme';
+import { INK, INK3, SAFFRON, SAFFRON_DARK } from '@/lib/theme';
 
 const CREAM = '#FBF4E9';
 const PREVIEW = process.env.EXPO_PUBLIC_PREVIEW === '1';
@@ -152,8 +152,12 @@ function TopBar({ role, title, onHamburger }: { role: string; title: string; onH
 
 // ─── 移动端抽屉 ───────────────────────────────────────────────────────
 function Drawer({ role, name, pathname, open, onClose, onNav, onSignOut }: { role: string; name: string | null; pathname: string; open: boolean; onClose: () => void; onNav: (href: string) => void; onSignOut: () => void }) {
-  const translateX = useRef(new Animated.Value(-SIDEBAR_W)).current;
-  const overlayOpacity = useRef(new Animated.Value(0)).current;
+  // useState 惰性初始化取代 useRef(...).current(react-hooks/refs·2026-07-17 lint债清理):
+  // Animated.Value 只需要创建一次、之后不再重建的稳定引用,不需要 setter,借 useState 的
+  // 惰性初始化只在挂载时跑一次这个特性,而不是渲染期间读 ref.current(新版react-hooks lint
+  // 规则视为impure)。
+  const [translateX] = useState(() => new Animated.Value(-SIDEBAR_W));
+  const [overlayOpacity] = useState(() => new Animated.Value(0));
   const insets = useSafeAreaInsets();
 
   useEffect(() => {

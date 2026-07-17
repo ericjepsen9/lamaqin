@@ -9,7 +9,6 @@ import { Text } from '@/components/ui/text';
 const INK = '#2b2218';
 const INK2 = '#55463a';
 const INK3 = '#7e6d5b';
-const SAFFRON = '#e07856';
 const SAFFRON_DARK = '#b35535';
 
 const THREE = [
@@ -30,7 +29,7 @@ export default function About() {
         {/* 标识 */}
         <View className="items-center" style={{ gap: 10, paddingVertical: 14 }}>
           <View style={styles.logo}><Flower2 size={38} color={SAFFRON_DARK} /></View>
-          <Text className="font-serif" style={{ fontSize: 24, fontWeight: '700', color: INK, letterSpacing: 2 }}>三殊胜 · 闻思修</Text>
+          <Text className="font-serif" style={{ fontSize: 24, fontWeight: '700', color: INK, letterSpacing: 2 }}>纽约佛学会 · 闻思修</Text>
           <RNText style={{ fontSize: 13, color: INK3, letterSpacing: 1 }}>学修端 · v1.0.0</RNText>
         </View>
 

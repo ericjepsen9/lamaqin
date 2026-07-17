@@ -308,7 +308,11 @@ const styles = StyleSheet.create({
 
   // 月网格(固定区)
   gridFixed: { backgroundColor: '#fff', borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: 'rgba(43,34,24,0.14)', paddingHorizontal: 14, paddingTop: 10, paddingBottom: 14 },
-  gcell: { width: `${100 / 7}%`, alignItems: 'center', paddingTop: 3, paddingBottom: 1, height: 44 },
+  // width用14.28%而非100/7算出来的长小数(2026-07-17 PM反馈"藏历页面周六不显示"根因排查):
+  // 100/7=14.285714...是无限小数,7个格子按这个宽度累加在安卓上会有浮点误差,累计超出100%导致
+  // flex-wrap判定"第7个放不下"提前换行——整月每一行都只排6格,周六被挤到下一行开头(顶到周日
+  // 那一列),看起来"周六列永远空+日期整体错位一格"。14.28%×7=99.96%,留一点余量,不会溢出。
+  gcell: { width: '14.28%', alignItems: 'center', paddingTop: 3, paddingBottom: 1, height: 44 },
   gnum: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
   gnumSel: { backgroundColor: SAFFRON },
   gDot: { width: 4, height: 4, borderRadius: 2, marginTop: 2 },

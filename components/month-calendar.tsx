@@ -92,9 +92,12 @@ const styles = StyleSheet.create({
   dpCancel: { marginTop: 12, paddingVertical: 11, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(43,34,24,0.15)', alignItems: 'center' },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 6, paddingVertical: 4 },
   wkRow: { flexDirection: 'row', marginTop: 6 },
-  wk: { width: `${100 / 7}%`, textAlign: 'center', fontSize: 11, color: INK3, fontWeight: '600' },
+  wk: { flex: 1, textAlign: 'center', fontSize: 11, color: INK3, fontWeight: '600' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 2 },
-  cell: { width: `${100 / 7}%`, aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 9999 },
+  // width用14.28%而非100/7(同app/calendar.tsx"藏历页周六不显示"根因·2026-07-17):100/7是
+  // 无限小数,安卓上7格累加浮点误差会让flex-wrap提前换行,丢一整列——这个组件被vow/[id].tsx
+  // /practice.tsx复用做日期选择器,影响面比藏历页更广。wkRow不换行,改flex:1即可,不用担心这个问题。
+  cell: { width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 9999 },
   cellSel: { backgroundColor: SAFFRON },
   cellToday: { borderWidth: 1, borderColor: SAFFRON_DARK },
 });

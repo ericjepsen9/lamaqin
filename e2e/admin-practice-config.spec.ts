@@ -324,3 +324,48 @@ test.describe('并发/竞态:整行UPDATE没有字段级合并(测试计划④�
     }
   });
 });
+
+// 修法节奏权限:班级/自学双通道独立设置(2026-07-17·PM决策方案3)。此前该功能上线时(20260717000400)
+// 一直没补e2e——这次趁着改成双通道一并补上,同时验证两条通道互不覆盖这个核心诉求。
+// 自建一条一次性修法专测,不碰种子自带的13条真实修法(尤其阿弥陀佛号/心经那两条已有生产配置)。
+test.describe('修法节奏权限:班级/自学双通道独立设置(方案3)', () => {
+  test('班级通道设锁定 + 自学通道设限定值 → 两条通道各自独立落库,互不覆盖', async ({ page }) => {
+    const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const { rows: [{ id: practiceId }] } = await withDb((c) =>
+      c.query(`INSERT INTO practices (name, measurement, unit) VALUES ($1,'count','遍') RETURNING id`, [`E2E节奏权限测试修法-${suffix}`]),
+    );
+    try {
+      await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
+      await page.goto('/practice-config', { timeout: 45_000 });
+      await page.getByTestId(testIds.practiceConfig.paceLockButton).click();
+
+      // 班级通道:切"锁定"
+      await page.getByTestId(testIds.practiceConfig.paceLockModeChip(practiceId, 'auto', 'locked')).click();
+      await expect.poll(async () => {
+        const { rows } = await withDb((c) => c.query(`SELECT daily_target_locked, allowed_daily_targets FROM practices WHERE id=$1`, [practiceId]));
+        return rows[0]?.daily_target_locked;
+      }, { timeout: 10_000 }).toBe(true);
+
+      // 自学通道:切"限定值",填白名单,点应用——班级通道此刻应该保持"锁定"不受影响
+      await page.getByTestId(testIds.practiceConfig.paceLockModeChip(practiceId, 'custom', 'whitelist')).click();
+      await page.getByTestId(testIds.practiceConfig.paceLockWhitelistInput(practiceId, 'custom')).fill('3,7,21');
+      await page.getByTestId(testIds.practiceConfig.paceLockApplyButton(practiceId, 'custom')).click();
+
+      await expect.poll(async () => {
+        const { rows } = await withDb((c) =>
+          c.query(`SELECT daily_target_locked, self_study_daily_target_locked, self_study_allowed_daily_targets FROM practices WHERE id=$1`, [practiceId]));
+        return rows[0]?.self_study_allowed_daily_targets;
+      }, { timeout: 10_000 }).toEqual([3, 7, 21]);
+
+      const { rows: final } = await withDb((c) =>
+        c.query(`SELECT daily_target_locked, allowed_daily_targets, self_study_daily_target_locked, self_study_allowed_daily_targets FROM practices WHERE id=$1`, [practiceId]));
+      // 班级通道(前一步设的"锁定")没被自学通道那次更新连带改动——两组字段各自独立的核心诉求
+      expect(final[0].daily_target_locked).toBe(true);
+      expect(final[0].allowed_daily_targets).toBeNull();
+      expect(final[0].self_study_daily_target_locked).toBe(false);
+      expect(final[0].self_study_allowed_daily_targets).toEqual([3, 7, 21]);
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM practices WHERE id=$1`, [practiceId]));
+    }
+  });
+});

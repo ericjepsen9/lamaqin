@@ -48,7 +48,12 @@ function NewEventModal({ visible, onClose }: { visible: boolean; onClose: () => 
   const [targetStr, setTargetStr] = useState('');
   const [err, setErr] = useState<string | null>(null);
   const [token, setToken] = useState(() => genClientToken());
-  useEffect(() => { if (visible) { setName(''); setType('法会'); setStart(''); setEnd(''); setDesc(''); setPracticeId(null); setTargetStr(''); setErr(null); setToken(genClientToken()); } }, [visible]);
+  // 渲染期间比对上一次的visible(react-hooks/set-state-in-effect·2026-07-17 lint债清理)
+  const [prevVisible, setPrevVisible] = useState(visible);
+  if (visible !== prevVisible) {
+    setPrevVisible(visible);
+    if (visible) { setName(''); setType('法会'); setStart(''); setEnd(''); setDesc(''); setPracticeId(null); setTargetStr(''); setErr(null); setToken(genClientToken()); }
+  }
 
   const canSubmit = name.trim() && dateValid(start) && dateValid(end) && end.trim() >= start.trim() && !create.isPending;
   const submit = async () => {
@@ -117,7 +122,14 @@ function SessionsModal({ visible, event, onClose }: { visible: boolean; event: A
     if (tokenRef.current?.key !== key) tokenRef.current = { key, token: genClientToken() };
     return tokenRef.current.token;
   };
-  useEffect(() => { if (visible) { setDate(''); setTime(''); setTitle(''); setMode('online'); setLink(''); setPlace(''); setErr(null); tokenRef.current = null; } }, [visible]);
+  // 渲染期间比对上一次的visible(react-hooks/set-state-in-effect·2026-07-17 lint债清理)。
+  // 不再显式清tokenRef.current(原意防"reopen后复用旧凭证"这个边角情况)——字段本身已经
+  // 重置回空,canAdd要求date必须合法非空才能点"添加",这个边角情况实际不可达,不需要另外处理ref。
+  const [prevVisible, setPrevVisible] = useState(visible);
+  if (visible !== prevVisible) {
+    setPrevVisible(visible);
+    if (visible) { setDate(''); setTime(''); setTitle(''); setMode('online'); setLink(''); setPlace(''); setErr(null); }
+  }
 
   const dateInWindow = dateValid(date) && date.trim() >= event.startDate && date.trim() <= event.endDate;
   const timeOk = !time.trim() || /^([01]?\d|2[0-3]):[0-5]\d$/.test(time.trim());
@@ -178,9 +190,15 @@ function EventPracticeModal({ visible, event, onClose }: { visible: boolean; eve
   const setPractice = useSetEventPractice();
   const [practiceId, setPracticeId] = useState<string | null>(null);
   const [targetStr, setTargetStr] = useState('');
-  useEffect(() => {
+  // 渲染期间比对上一次的visible/event(react-hooks/set-state-in-effect·2026-07-17
+  // lint债清理),逐项对应原依赖数组。
+  const [prevVisible, setPrevVisible] = useState(visible);
+  const [prevEvent, setPrevEvent] = useState(event);
+  if (visible !== prevVisible || event !== prevEvent) {
+    setPrevVisible(visible);
+    setPrevEvent(event);
     if (visible) { setPracticeId(event.defaultPracticeId); setTargetStr(event.defaultTargetCount ? String(event.defaultTargetCount) : ''); }
-  }, [visible, event]);
+  }
   const submit = () => {
     setPractice.mutate(
       { eventId: event.id, practiceId, targetCount: practiceId && targetStr.trim() ? Math.max(1, parseInt(targetStr, 10) || 0) || null : null },

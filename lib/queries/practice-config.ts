@@ -14,6 +14,12 @@ export type PracticeMaster = {
   measurement: 'count' | 'duration'; // 计数(遍/声)/计时(座)
   unit: string;
   category: string | null;
+  // 节奏权限(2026-07-17·迁移20260717000400/600):班级(source='auto')/自学(source='custom')
+  // 两条独立通道各自的锁定+白名单,互不影响(方案3双通道,判断逻辑在 app/vow/[id].tsx)。
+  dailyTargetLocked: boolean;
+  allowedDailyTargets: number[] | null;
+  selfStudyDailyTargetLocked: boolean;
+  selfStudyAllowedDailyTargets: number[] | null;
 };
 
 export function usePracticesMaster() {
@@ -23,7 +29,7 @@ export function usePracticesMaster() {
     queryFn: async (): Promise<PracticeMaster[]> => {
       const { data, error } = await supabase
         .from('practices')
-        .select('id, name, measurement, unit, category, is_active, display_order')
+        .select('id, name, measurement, unit, category, is_active, display_order, daily_target_locked, allowed_daily_targets, self_study_daily_target_locked, self_study_allowed_daily_targets')
         .eq('is_active', true)
         .order('display_order');
       if (error) throw error;
@@ -33,6 +39,10 @@ export function usePracticesMaster() {
         measurement: (p.measurement as 'count' | 'duration') ?? 'count',
         unit: p.unit,
         category: p.category,
+        dailyTargetLocked: !!p.daily_target_locked,
+        allowedDailyTargets: p.allowed_daily_targets ?? null,
+        selfStudyDailyTargetLocked: !!p.self_study_daily_target_locked,
+        selfStudyAllowedDailyTargets: p.self_study_allowed_daily_targets ?? null,
       }));
     },
   });

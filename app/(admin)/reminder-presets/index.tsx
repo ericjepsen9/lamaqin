@@ -36,7 +36,15 @@ function PresetFormModal({ visible, preset, nextOrder, onClose }: {
   const [token, setToken] = useState(() => genClientToken());
   const isEdit = !!preset;
 
-  useEffect(() => {
+  // 渲染期间比对上一次的visible/preset/nextOrder(react-hooks/set-state-in-effect·
+  // 2026-07-17 lint债清理),逐项对应原依赖数组。
+  const [prevVisible, setPrevVisible] = useState(visible);
+  const [prevPreset, setPrevPreset] = useState(preset);
+  const [prevNextOrder, setPrevNextOrder] = useState(nextOrder);
+  if (visible !== prevVisible || preset !== prevPreset || nextOrder !== prevNextOrder) {
+    setPrevVisible(visible);
+    setPrevPreset(preset);
+    setPrevNextOrder(nextOrder);
     if (visible) {
       setLabel(preset?.label ?? '');
       setCategory(preset?.category ?? '');
@@ -44,7 +52,7 @@ function PresetFormModal({ visible, preset, nextOrder, onClose }: {
       setErr(null);
       setToken(genClientToken());
     }
-  }, [visible, preset, nextOrder]);
+  }
 
   const pending = create.isPending || update.isPending;
   const canSubmit = label.trim().length > 0 && !pending;

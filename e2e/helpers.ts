@@ -28,3 +28,16 @@ export async function expectDisabled(locator: Locator) {
 export async function expectEnabled(locator: Locator) {
   await expect(locator).not.toHaveAttribute('aria-disabled', 'true');
 }
+
+// 键盘可达性测试用(测试计划⑥·2026-07-17):真按Tab键顺序移动焦点直到落在目标testID上,
+// 不用locator.focus()走捷径——.focus()能强制把焦点怼到任何元素上,连"这个元素压根没被
+// 排进Tab顺序(没有tabIndex)"这类真实bug都会被掩盖过去,而这恰恰是键盘可达性测试真正要
+// 揪出来的问题(RN-Web的Pressable默认键盘可达性不保证,见文件顶部测试计划⑥注释)。
+export async function tabTo(page: Page, testId: string, maxTabs = 25) {
+  for (let i = 0; i < maxTabs; i++) {
+    const focused = await page.evaluate(() => document.activeElement?.getAttribute('data-testid'));
+    if (focused === testId) return;
+    await page.keyboard.press('Tab');
+  }
+  throw new Error(`Tab导航${maxTabs}次仍未到达 testID="${testId}"(可能没被排进Tab顺序,或压根不是可聚焦元素)`);
+}

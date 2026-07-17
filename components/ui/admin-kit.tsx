@@ -9,7 +9,9 @@
 import { ChevronLeft, X } from 'lucide-react-native';
 import { type ReactNode } from 'react';
 import {
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -285,22 +287,26 @@ export function AdminModal({ visible, onClose, title, children, maxWidth = 460, 
 }) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={styles.modalOverlay} onPress={dismissOnOverlay ? onClose : undefined}>
-        {/* 内层 Pressable 拦截点击冒泡,点卡片内部不触发遮罩关闭 */}
-        <Pressable style={[styles.modalCard, { maxWidth }]} onPress={() => {}}>
-          <View style={styles.modalHeader}>
-            <Text className="font-serif" style={styles.modalTitle}>{title}</Text>
-            <Pressable onPress={onClose} hitSlop={8}>
-              <X size={20} color={INK3} />
-            </Pressable>
-          </View>
-          {/* 内容区补ScrollView(2026-07-14 e2e首次测到admin端长表单发现):此前无maxHeight/无滚动,
-              字段多的表单(如新建法会)内容比视口高时,底部提交按钮会被推到视口外且点不到。 */}
-          <ScrollView contentContainerStyle={styles.modalScrollContent} showsVerticalScrollIndicator={false}>
-            {children}
-          </ScrollView>
+      {/* KeyboardAvoidingView(2026-07-17·PM真机实测"调整节奏"弹层键盘挡住输入框):Modal 是独立
+          原生层,系统不会自动帮它让位给键盘,所有含 TextInput 的弹窗都要显式包一层。 */}
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <Pressable style={styles.modalOverlay} onPress={dismissOnOverlay ? onClose : undefined}>
+          {/* 内层 Pressable 拦截点击冒泡,点卡片内部不触发遮罩关闭 */}
+          <Pressable style={[styles.modalCard, { maxWidth }]} onPress={() => {}}>
+            <View style={styles.modalHeader}>
+              <Text className="font-serif" style={styles.modalTitle}>{title}</Text>
+              <Pressable onPress={onClose} hitSlop={8}>
+                <X size={20} color={INK3} />
+              </Pressable>
+            </View>
+            {/* 内容区补ScrollView(2026-07-14 e2e首次测到admin端长表单发现):此前无maxHeight/无滚动,
+                字段多的表单(如新建法会)内容比视口高时,底部提交按钮会被推到视口外且点不到。 */}
+            <ScrollView contentContainerStyle={styles.modalScrollContent} showsVerticalScrollIndicator={false}>
+              {children}
+            </ScrollView>
+          </Pressable>
         </Pressable>
-      </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

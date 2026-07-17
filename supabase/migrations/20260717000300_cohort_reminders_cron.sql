@@ -1,0 +1,24 @@
+-- 学习提醒·定时扫描(决策188方案A,平台专属隔离——同20260710000000_account_deletion.sql/
+-- 20260715000200_search_log_retention_cron.sql先例)。
+--
+-- 谁调它:pg_cron 每15分钟(决策记录建议频率)HTTP敲 send-cohort-reminders Edge Function,
+-- 该函数自己按每个班的cohort.timezone算"现在是不是到点了",cron只负责"定期敲一下"。
+--
+-- ⚠️ 以下 pg_net 排程需要 Eric 在 sss-dev 手动执行(同account_deletion先例,原因一致):
+--   1) CREATE EXTENSION IF NOT EXISTS pg_cron;
+--      CREATE EXTENSION IF NOT EXISTS pg_net;
+--   2) 部署 Edge Function 后,把 <PROJECT_REF> 换成真实项目 ref、<SERVICE_ROLE_KEY> 换成
+--      部署后从 Supabase Dashboard 复制的值(不要把真实值提交进仓库):
+--
+--   SELECT cron.schedule(
+--     'send-cohort-reminders', '*/15 * * * *',
+--     $cron$
+--       SELECT net.http_post(
+--         url := 'https://<PROJECT_REF>.supabase.co/functions/v1/send-cohort-reminders',
+--         headers := jsonb_build_object('Authorization', 'Bearer <SERVICE_ROLE_KEY>')
+--       );
+--     $cron$
+--   );
+--
+-- 原因同account_deletion:pg_cron/pg_net是否已开启因项目而异,且这条SQL含项目专属
+-- URL/密钥占位符,写进自动迁移会在别的环境报错或误导,留给Eric部署那一步一并手动执行。

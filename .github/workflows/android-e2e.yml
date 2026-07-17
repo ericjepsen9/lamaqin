@@ -1,0 +1,114 @@
+name: android-e2e
+
+# 方案B第一步(2026-07-17·PM 拍板"跳过本地手动跑,直接上CI全自动"):
+#   验证"安卓模拟器 + Maestro"这条管线本身能不能跑起来——先只跑一个最小烟雾测试
+#   (装上app、能启动),不追求一次到位测出键盘遮挡/flex-wrap这些具体bug。
+#   管线证明能跑之后,再往 .maestro/ 加真正对着这次3个bug写的flow、再考虑要不要
+#   接成push自动跑(现在故意只用workflow_dispatch手动触发,免得没调通之前污染每次push的CI)。
+# 已知不确定、按走到哪一步失败来诊断,不预先假设:
+#   - assembleDebug是否需要配合Metro才能加载JS(多个现行Maestro+Android教程显示
+#     不需要,先按不需要走,若烟雾测试卡在白屏/连不上packager再补adb reverse)。
+#   - 这次没接本地Supabase栈/不登录——只验证"装得上、启动得起来",数据相关的flow
+#     等这一步过了再加。
+# 2026-07-17 第一轮实测复盘(超过40分钟超时被强制取消,日志显示真实原因):
+#   Gradle 默认给 arm64-v8a/armeabi-v7a/x86/x86_64 全部4个ABI都编译一遍原生C++模块
+#   (reanimated/gesture-handler/expo-modules-core/worklets 的CMake+ninja+clang构建),
+#   而下面模拟器只用 x86_64 一种架构——armeabi-v7a那颗reanimated原生库单独就编译了近5分钟,
+#   4个架构全编下来时间×4还不止,顺带把runner磁盘空间也快挤爆(取消时只剩77MB)。
+#   用 reactNativeArchitectures 只编模拟器真正用得到的那一个架构,原生编译量降到1/4。
+# 2026-07-17 第二轮实测复盘(单架构后 Gradle 构建本身22分45秒真的编完了,新问题在后面):
+#   到了起模拟器那步,下载模拟器自己要用的系统镜像(system-images;android-33)时报
+#   "No space left on device"——单架构确实把构建过程的磁盘占用降下来了,但 GitHub
+#   runner 本身预装的东西(.NET/Haskell/各种语言工具链)+ 刚编译出来的一堆原生模块
+#   中间产物(各模块 .cxx 目录下的 CMake/ninja 对象文件,构建完APK后就没用了)加起来
+#   还是把盘挤满了,轮到模拟器系统镜像下载时已经没地方放。加一步:构建APK后清掉这些
+#   不再需要的中间产物,再加一步在最前面清掉预装但这条流水线用不上的大型工具链。
+# 2026-07-17 第三轮实测复盘(前两处修完,构建+清理都成功了,又推进了一步、新问题在起模拟器本身):
+#   日志显示"FATAL Not enough space to create userdata partition. Available: 5127.54 MB ...
+#   need 7372.80 MB"——构建后确实腾出了空间(df显示还有11G),但action接下来自己又要装一遍
+#   SDK系统镜像等东西,装完真正轮到建AVD磁盘分区时又吃掉了一截,只剩5.1G,不够默认7.3G的
+#   userdata分区。这次不再跟"总共腾出多少空间"死磕,直接把AVD磁盘配额显式设小(disk-size)——
+#   一个装包+启动+截图的烟雾测试,用不到7.3G那么大的模拟磁盘。
+on:
+  workflow_dispatch: {}
+  # workflow_dispatch 要工作流文件先在默认分支(main)注册才能被API/界面发现触发——
+  # 这条还在当前分支调试阶段,没到能提PR合并main的程度,改用push触发但按路径收窄
+  # (只改这条流水线自己的文件才触发,不会在其它无关push上多跑一份重活儿)。
+  # 调通、决定要不要长期接进CI后,再收窄/去掉这段、改回纯手动或接on:push全量。
+  push:
+    paths:
+      - '.github/workflows/android-e2e.yml'
+      - '.maestro/**'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      # 腾地方:这条流水线用不上的预装大型工具链,清掉能立刻回收好几个G(常见于安卓CI recipe)。
+      - name: Free disk space(清预装工具链)
+        # ⚠️ 别删 android sdk 下的 ndk——后面 Gradle 编译 reanimated 等原生模块要用,
+        # 删了这步会让本来能过的构建反而失败。只清和这条安卓RN流水线完全不相关的东西。
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL || true
+          df -h /
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Install deps
+        run: npm ci
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      # Ubuntu runner 默认不放行 KVM 权限,安卓模拟器硬件加速需要这一步
+      # (来源:reactivecircus/android-emulator-runner 官方 README)。
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install Maestro CLI
+        run: |
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+      # Expo 托管工作流没有checked-in的android/原生目录(.gitignore 排除),现场生成。
+      - name: Expo prebuild (生成 android/ 原生工程)
+        run: npx expo prebuild --platform android --no-install
+      - name: Build debug APK(只编 x86_64,匹配下面模拟器架构)
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon -PreactNativeArchitectures=x86_64
+      # APK 已经产出,各原生模块 .cxx 目录下的 CMake/ninja 中间产物(大量 .o/.a 文件)用不上了——
+      # 上一轮实测:构建刚编完就轮到模拟器系统镜像下载时报"没地方放",这些中间产物是主要占用源。
+      - name: 清编译中间产物,给模拟器系统镜像腾地方
+        run: |
+          find . -type d -name '.cxx' -prune -exec rm -rf {} + 2>/dev/null || true
+          rm -rf android/app/build/intermediates
+          df -h /
+      - name: Boot emulator + install APK + run Maestro 烟雾测试
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: default
+          arch: x86_64
+          profile: pixel_7_pro
+          # 第三轮实测复盘:前两处磁盘修复(单ABI+清中间产物)让构建本身不再爆盘,但到这步日志显示
+          # "FATAL Not enough space to create userdata partition. Available: 5127.54 MB ... need
+          # 7372.80 MB"——action默认给AVD开的userdata分区要7.3G,构建后腾出的空间还剩5.1G不够。
+          # 一个烟雾测试(装包、启动、截图)用不到那么大的模拟磁盘,直接把AVD磁盘配额砍到明显够用
+          # 又留足余量的档位,不用再继续跟"构建产物腾了多少空间"死磕。
+          disk-size: 3072M
+          script: |
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            maestro test .maestro/smoke.yaml
+      - name: 上传 Maestro 测试证据(截图/日志)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-smoke-evidence
+          path: |
+            ~/.maestro/tests/**
+            *.png
+          if-no-files-found: ignore

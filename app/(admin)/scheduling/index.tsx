@@ -204,13 +204,18 @@ function GenerateModal({
   const selected = courses.find((c) => c.courseId === courseId);
   const total = selected?.totalLessons ?? null;
 
-  // 选课时自动把"学到第几节"填成整门(从第1节到末节)
-  useEffect(() => {
+  // 选课时自动把"学到第几节"填成整门(从第1节到末节)——渲染期间比对上一次的courseId
+  // (react-hooks/set-state-in-effect·2026-07-17 lint债清理)。刻意只跟courseId比,不跟
+  // selected比(原exhaustive-deps disable注释的既有用意):courses查询结果每次可能给新的
+  // 对象引用,跟着selected比会导致courseId没变也重新触发。
+  const [prevCourseId, setPrevCourseId] = useState(courseId);
+  if (courseId !== prevCourseId) {
+    setPrevCourseId(courseId);
     if (selected) {
       setFromN(1);
       setToN(selected.totalLessons ?? 1);
     }
-  }, [courseId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }
 
   const autoName = `${program.name}·第${semNum}学期`;
   // 起始周:该学期已排到的最大周 + 1(没有就第1周)。高级里可手动改。
@@ -283,7 +288,7 @@ function GenerateModal({
           <Stepper testID={testIds.scheduling.toNStepper} value={toN} onChange={(v) => setToN(Math.max(v, fromN))} min={1} max={total ?? 999} />
           <Text style={styles.inlineText}>节</Text>
         </View>
-        {total ? <Text style={styles.hintTiny}>整门共 {total} 节;只排前半段就把"到第几节"调小。</Text> : null}
+        {total ? <Text style={styles.hintTiny}>整门共 {total} 节;只排前半段就把&ldquo;到第几节&rdquo;调小。</Text> : null}
 
         {/* 3. 排进哪个学期 */}
         <Text style={[styles.stepLabel, { marginTop: 14 }]}>3 · 排进第几学期?</Text>

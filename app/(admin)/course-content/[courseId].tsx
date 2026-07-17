@@ -44,7 +44,10 @@ export default function CourseDetail() {
   const name = course?.name ?? '课程';
   useEffect(() => { setTitle(name); }, [setTitle, name]);
 
-  const allLessons = course?.lessons ?? [];
+  // allLessons单独包一层useMemo(react-hooks/exhaustive-deps·2026-07-17 lint债清理):
+  // `?? []`这个兜底会在course为空时每次渲染都造一个新数组,把它直接列进下面useMemo的依赖
+  // 会让那层memo形同虚设(每次渲染都判定"变了"、重新filter)。
+  const allLessons = useMemo(() => course?.lessons ?? [], [course?.lessons]);
   const lessons = useMemo(
     () => allLessons.filter((l) => !search || l.title.includes(search) || String(l.lessonNumber).includes(search)),
     [allLessons, search],

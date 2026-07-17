@@ -92,6 +92,14 @@ export const testIds = {
     provisionButton: 'practice-config-provision-button',
     // 自选经候选清单
     optionalPracticeChip: (practiceId: string) => `practice-config-optional-practice-chip-${practiceId}`,
+    // 修法节奏权限(2026-07-17·PM决策方案3:班级/自学双通道独立设置,各自三态自由/限定值/锁定)
+    paceLockButton: 'practice-config-pace-lock-button',
+    paceLockModeChip: (practiceId: string, channel: 'auto' | 'custom', mode: 'free' | 'whitelist' | 'locked') =>
+      `practice-config-pace-lock-mode-${practiceId}-${channel}-${mode}`,
+    paceLockWhitelistInput: (practiceId: string, channel: 'auto' | 'custom') =>
+      `practice-config-pace-lock-whitelist-input-${practiceId}-${channel}`,
+    paceLockApplyButton: (practiceId: string, channel: 'auto' | 'custom') =>
+      `practice-config-pace-lock-apply-${practiceId}-${channel}`,
   },
   reminderPresets: {
     // 提醒语预设库(2026-07-14补·A3幂等e2e覆盖)
@@ -149,6 +157,12 @@ export const testIds = {
     memberHoldBackButton: 'class-member-holdback-button',
     memberResumeButton: 'class-member-resume-button',
     memberLeaveButton: 'class-member-leave-button',
+    // 学习提醒弹层(决策188方案A·2026-07-17补)
+    reminderButton: 'class-reminder-button',
+    reminderEnabledToggle: 'class-reminder-enabled-toggle',
+    reminderTimeInput: 'class-reminder-time-input',
+    reminderMessageInput: 'class-reminder-message-input',
+    reminderSaveButton: 'class-reminder-save-button',
   },
   attendance: {
     // 出勤逐人点名(2026-07-16补·此前0个testID)
@@ -233,6 +247,10 @@ export const testIds = {
     saveReferenceButton: 'quiz-save-reference-button',
     deleteButton: 'quiz-delete-button',
     extractButton: 'quiz-extract-button',
+  },
+  settings: {
+    // 通知区·学习提醒权限状态(决策188方案A·2026-07-17补)
+    enableNotificationsButton: 'settings-enable-notifications-button',
   },
   setPassword: {
     // 强制/顺路改密码页(2026-07-17补·此前0个testID,回归覆盖"无限循环卡在重设密码页面"bug)

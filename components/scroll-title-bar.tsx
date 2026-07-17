@@ -38,7 +38,9 @@ export function useScrollTitleBar() {
 }
 
 export function ScrollTitleBar({ title, shown, onBack, topInset = 0 }: { title: string; shown: boolean; onBack?: () => void; topInset?: number }) {
-  const opacity = useRef(new Animated.Value(0)).current;
+  // useState 惰性初始化取代 useRef(...).current(react-hooks/refs·2026-07-17 lint债清理),
+  // 同 app/(admin)/_layout.tsx Drawer 组件的Animated.Value先例。
+  const [opacity] = useState(() => new Animated.Value(0));
   useEffect(() => {
     Animated.timing(opacity, { toValue: shown ? 1 : 0, duration: 180, useNativeDriver: true }).start();
   }, [shown, opacity]);

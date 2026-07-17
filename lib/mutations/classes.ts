@@ -112,6 +112,29 @@ export function useUpdateCohortSchedule() {
   });
 }
 
+// ── 学习提醒(决策188方案A)─────────────────────────────────────────
+// 同useUpdateCohortSchedule先例:权限判断在update_reminder_settings这个RPC内部
+// (has_class_role 'zhumai' OR is_system_admin),不靠放宽cohorts_write这条admin-only的RLS。
+export function useUpdateReminderSettings() {
+  const inval = useInvalidateCohort();
+  return useMutation({
+    mutationFn: async (p: {
+      cohortId: string;
+      enabled: boolean; weekday: number | null; time: string | null; message: string | null;
+    }) => {
+      const { error } = await supabase.rpc('update_reminder_settings', {
+        p_cohort_id: p.cohortId,
+        p_enabled: p.enabled,
+        p_weekday: p.weekday,
+        p_time: p.time,
+        p_message: p.message,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_r, p) => inval(p.cohortId),
+  });
+}
+
 // ── 标记结班 / 恢复在读 ─────────────────────────────────────────────
 export function useSetCohortActive() {
   const inval = useInvalidateCohort();

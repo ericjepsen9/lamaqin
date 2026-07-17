@@ -328,7 +328,9 @@ export default function ClassTab() {
 
 function Section({ icon, title, sub, action, children }: { icon: React.ReactNode; title: string; sub?: string; action?: string; children: React.ReactNode }) {
   return (
-    <View style={{ paddingHorizontal: 16, marginTop: 18 }}>
+    // 板块间距 18→30(PM 2026-07-17:「课程页面」实指本页,下方几个板块太紧凑)——对齐修持页
+    // 板块间的 marginTop:30,全 app 统一这档"仪表盘式板块"间距,不止本页单独改一个数字。
+    <View style={{ paddingHorizontal: 16, marginTop: 30 }}>
       <View className="flex-row items-center justify-between" style={{ marginBottom: 10 }}>
         <View className="flex-row items-center" style={{ gap: 8, flex: 1 }}>
           {icon}

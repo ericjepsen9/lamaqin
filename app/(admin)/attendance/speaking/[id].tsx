@@ -59,9 +59,15 @@ export default function SpeakingDetail() {
   const [pendingGroupSessionId, setPendingGroupSessionId] = useState('');
 
   useEffect(() => { setTitle('讲考记录'); }, [setTitle]);
-  useEffect(() => {
+  // 换成渲染期间比对(同attendance/[id].tsx先例,react-hooks/set-state-in-effect·
+  // 2026-07-17 lint债清理),逐项对应原依赖数组,行为不变。
+  const [prevSession, setPrevSession] = useState(session);
+  const [prevDirty, setPrevDirty] = useState(dirty);
+  if (session !== prevSession || dirty !== prevDirty) {
+    setPrevSession(session);
+    setPrevDirty(dirty);
     if (session && !dirty) setMarks(Object.fromEntries(session.members.map((m) => [m.userId, { status: m.status, grade: m.grade }])));
-  }, [session, dirty]);
+  }
 
   const counts = useMemo(() => {
     const vals = Object.values(marks);

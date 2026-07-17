@@ -78,8 +78,9 @@ export default function Notifications() {
   }, [rows]);
   type DisplayNotif = (typeof notifs)[number];
 
-  const isUnread = (n: DisplayNotif) => !n.read;
-  const unreadCount = useMemo(() => notifs.filter(isUnread).length, [notifs]);
+  // isUnread直接inline(react-hooks/exhaustive-deps·2026-07-17 lint债清理):它是无状态纯判断
+  // (!n.read),每次渲染都重建、列进useMemo依赖会让memo形同虚设,不如干脆去掉这层indirection。
+  const unreadCount = useMemo(() => notifs.filter((n) => !n.read).length, [notifs]);
   const counts = useMemo(() => ({
     all: notifs.length,
     study: notifs.filter((n) => n.category === 'study').length,
@@ -90,7 +91,7 @@ export default function Notifications() {
 
   const filtered = useMemo(() => {
     if (filter === 'all') return notifs;
-    if (filter === 'unread') return notifs.filter(isUnread);
+    if (filter === 'unread') return notifs.filter((n) => !n.read);
     return notifs.filter((n) => n.category === filter);
   }, [filter, notifs]);
 
@@ -152,7 +153,7 @@ export default function Notifications() {
                 <RNText style={styles.groupLabel}>{GROUP_LABEL[g]}</RNText>
                 <View style={{ gap: 8 }}>
                   {items.map((n) => {
-                    const unread = isUnread(n);
+                    const unread = !n.read;
                     return (
                       <Pressable key={n.id} style={[styles.card, unread && styles.cardUnread]} onPress={() => onTap(n)}>
                         <CatIcon cat={n.category} />

@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ScrollTitleBar, useScrollTitleBar } from '@/components/scroll-title-bar';
 import { Text } from '@/components/ui/text';
@@ -80,15 +80,19 @@ export default function Courses() {
   const others = list.filter((c) => courseCatIndex(c.programs) === CATS.length);
   const nothing = !showSelfStudy && list.length === 0;
   const bar = useScrollTitleBar(); // 头图滚出后顶部淡入细标题栏(PM 2026-07-02)
+  const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
+    <SafeAreaView className="flex-1 bg-background" edges={['left', 'right']}>
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }} onScroll={bar.onScroll} scrollEventThrottle={16}>
 
-        {/* 蓝色渐变头 + 海螺(法螺·闻法之声遍十方)·PM 2026-06-30 */}
+        {/* 蓝色渐变头 + 海螺(法螺·闻法之声遍十方)·PM 2026-06-30。
+            edges 去掉 'top'、渐变改绝对定位铺到状态栏高度(同 practice.tsx/class.tsx 手法·2026-07-17
+            修"顶部与状态栏断开"):此前 SafeAreaView 自己吃掉顶部安全区、渐变只铺在安全区下方的
+            内容里,状态栏那一段留白是 SafeAreaView 自己的背景色,和渐变蓝在安全区边界处有明显接缝。 */}
         <View onLayout={bar.onHeaderLayout}>
-          <LinearGradient colors={WENSI_GRAD} style={StyleSheet.absoluteFill} />
-          <View style={styles.headRow}>
+          <LinearGradient colors={WENSI_GRAD} pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top + 150 }} />
+          <View style={[styles.headRow, { paddingTop: insets.top + 30 }]}>
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text className="font-serif" style={styles.headTitle}>闻思</Text>
               <RNText style={styles.headSub}>听闻正法 · 如理思维</RNText>
@@ -156,7 +160,7 @@ export default function Courses() {
         )}
 
       </ScrollView>
-      <ScrollTitleBar title="闻思" shown={bar.shown} />
+      <ScrollTitleBar title="闻思" shown={bar.shown} topInset={insets.top} />
     </SafeAreaView>
   );
 }
@@ -199,7 +203,7 @@ function SelfStudyCell() {
 }
 
 const styles = StyleSheet.create({
-  headRow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 22, paddingTop: 30, paddingBottom: 40 },
+  headRow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 22, paddingBottom: 40 },
   headTitle: { fontSize: 28, fontWeight: '700', color: WENSI_TITLE, lineHeight: 32 },
   headSub: { fontSize: 14.5, color: WENSI_SUB, fontWeight: '600', marginTop: 12 },
   conch: { width: 84, height: 84, flexShrink: 0 },

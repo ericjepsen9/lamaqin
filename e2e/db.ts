@@ -37,6 +37,40 @@ export async function deleteTestProfile(userId: string): Promise<void> {
   await adminClient.auth.admin.deleteUser(userId).catch(() => {});
 }
 
+// 批量建N个测试账号(2026-07-17·测试计划⑤数据量规模测试用)。GoTrue Admin API没有批量建号
+// 接口,仍是逐个createUser,用有限并发(不是200个一拥而上、也不是纯顺序200次)平衡速度与
+// 不压垮本地栈单机资源;full_name用一次性批量UPDATE(unnest),不像createTestProfile()那样
+// 逐个开一条独立连接。
+export async function createManyTestProfiles(prefix: string, count: number): Promise<string[]> {
+  const CONCURRENCY = 20;
+  const emails = Array.from({ length: count }, (_, i) => `${prefix}-${i}-${Date.now()}@local.test`);
+  const ids: string[] = [];
+  for (let i = 0; i < emails.length; i += CONCURRENCY) {
+    const batch = emails.slice(i, i + CONCURRENCY);
+    const batchIds = await Promise.all(batch.map(async (email) => {
+      const { data, error } = await adminClient.auth.admin.createUser({ email, password: 'E2E-Test-00000000', email_confirm: true });
+      if (error || !data.user) throw new Error(`createManyTestProfiles(${email}) 失败: ${error?.message}`);
+      return data.user.id;
+    }));
+    ids.push(...batchIds);
+  }
+  const names = ids.map((_, i) => `E2E规模测试-${i}`);
+  await withDb((c) => c.query(
+    `UPDATE profiles SET full_name = data.full_name FROM unnest($1::uuid[], $2::text[]) AS data(id, full_name) WHERE profiles.id = data.id`,
+    [ids, names],
+  ));
+  return ids;
+}
+
+// 批量删(同deleteTestProfile,限并发版)
+export async function deleteManyTestProfiles(userIds: string[]): Promise<void> {
+  const CONCURRENCY = 20;
+  for (let i = 0; i < userIds.length; i += CONCURRENCY) {
+    const batch = userIds.slice(i, i + CONCURRENCY);
+    await Promise.all(batch.map((id) => adminClient.auth.admin.deleteUser(id).catch(() => {})));
+  }
+}
+
 export async function getSeedIds() {
   return withDb(async (c) => {
     const { rows: [cohort] } = await c.query(`SELECT id FROM cohorts WHERE code='E2E_CO'`);

@@ -3,7 +3,8 @@ import type { AxeResults } from 'axe-core';
 import { expect, test } from '@playwright/test';
 import { getSeedIds } from './db';
 import { STUDENT_EMAIL, TEST_PASSWORD } from './global-setup';
-import { loginAs } from './helpers';
+import { loginAs, tabTo } from './helpers';
+import { testIds } from '../lib/testids';
 
 // A7无障碍(屏幕阅读器)覆盖率·2026-07-14 PM拍板范围="聚焦核心流程"(非全站扫)。
 // 只测盲人/聋人学员真的会自己摸黑操作的几条关键路径:登录/验证码、首页、快速计数打卡、
@@ -97,5 +98,41 @@ test.describe('A7无障碍扫描(聚焦核心流程·2026-07-14)', () => {
     await page.goto(`/lesson/${lesson1.id}?step=wensi&a11y=deaf`, { timeout: 45_000 });
     await expect(page.getByTestId('lesson-mark-complete-button')).toBeVisible();
     reportAndAssertNoCritical('课时详情·聋人模式', await new AxeBuilder({ page }).analyze());
+  });
+});
+
+// 键盘可达性(测试计划⑥·2026-07-17,与A7无障碍工作合并,同PM计划文档建议)。
+// axe-core扫的是"有没有可访问名称/ARIA标签",不管"这个东西能不能被键盘操作"——两件独立的
+// 事,之前完全没测过后者。RN-Web的Pressable底层渲染成普通div,键盘可达性(能被Tab聚焦到、
+// 聚焦后Enter/Space能触发onPress)不是白拿的,要实测才知道。
+//
+// 用tabTo()真按Tab键顺序移动焦点(不用locator.focus()抄近道——那样连"这个元素压根没被排进
+// Tab顺序"这类真实bug都会被掩盖),Enter激活,全程不调用一次.click()。
+test.describe('键盘可达性(核心路径·2026-07-17)', () => {
+  test('登录→首页→打卡:全程只用Tab+Enter,不用鼠标点击,能走完整条核心路径', async ({ page }) => {
+    await page.goto('/login');
+    await tabTo(page, testIds.login.emailInput);
+    await page.keyboard.type(STUDENT_EMAIL);
+    await tabTo(page, testIds.login.nextButton);
+    await page.keyboard.press('Enter');
+    await expect(page.getByTestId(testIds.verify.codeInput)).toBeVisible({ timeout: 10_000 });
+
+    await tabTo(page, testIds.verify.codeInput);
+    await page.keyboard.type(TEST_PASSWORD);
+    await tabTo(page, testIds.verify.submitButton);
+    await page.keyboard.press('Enter');
+    await page.waitForURL(/\/(home|dashboard)/, { timeout: 15_000 });
+
+    await expect(page.getByTestId(testIds.home.quickCountCard)).toBeVisible();
+    await tabTo(page, testIds.home.quickCountCard);
+    await page.keyboard.press('Enter');
+    await expect(page.getByTestId(testIds.quickCount.recordButton)).toBeVisible({ timeout: 10_000 });
+
+    // initialVow默认已选中第1个修法,不需要先键盘操作vowChip;直接按数字键"1"
+    await tabTo(page, testIds.quickCount.digitKey(1));
+    await page.keyboard.press('Enter');
+    await tabTo(page, testIds.quickCount.recordButton);
+    await page.keyboard.press('Enter');
+    await expect(page.getByTestId(testIds.quickCount.savedMark)).toBeVisible({ timeout: 10_000 });
   });
 });

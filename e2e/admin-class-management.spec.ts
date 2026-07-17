@@ -46,6 +46,59 @@ test.describe('调整共修日程(2026-07-15新增·本班辅导员也能改自�
   });
 });
 
+test.describe('学习提醒(决策188方案A·2026-07-17新增)', () => {
+  test('辅导员(zhumai)能看到"共修设定"里的学习提醒入口 → 开启+设星期时间文案 → cohorts对应4字段正确落库', async ({ page }) => {
+    const { cohortId } = await getSeedIds();
+    const customMessage = `E2E自定义提醒文案-${Date.now()}`;
+    await loginAs(page, COACH_EMAIL, TEST_PASSWORD);
+    await page.goto(`/classes/${cohortId}`, { timeout: 45_000 });
+
+    await expect(page.getByText('共修设定')).toBeVisible({ timeout: 10_000 });
+    await page.getByText('学习提醒', { exact: true }).click();
+    await expect(page.getByText('学习提醒', { exact: true }).last()).toBeVisible();
+
+    await page.getByText('开启', { exact: true }).click();
+    // 周三(DOW_OPTS: 日一二三四五六,index 3 = 周三)
+    await page.getByText('三', { exact: true }).click();
+    await page.getByTestId(testIds.classDetail.reminderTimeInput).fill('19:30');
+    await page.getByTestId(testIds.classDetail.reminderMessageInput).fill(customMessage);
+
+    let notifyMsg = '';
+    page.once('dialog', (d) => { notifyMsg = d.message(); void d.accept(); });
+    await page.getByTestId(testIds.classDetail.reminderSaveButton).click();
+    await expect.poll(() => notifyMsg, { timeout: 15_000 }).toContain('已更新');
+
+    const { rows } = await withDb((c) =>
+      c.query(`SELECT reminder_enabled, reminder_weekday, reminder_time, reminder_message FROM cohorts WHERE id=$1`, [cohortId]),
+    );
+    expect(rows[0].reminder_enabled).toBe(true);
+    expect(rows[0].reminder_weekday).toBe(3);
+    expect(String(rows[0].reminder_time)).toContain('19:30');
+    expect(rows[0].reminder_message).toBe(customMessage);
+
+    try {
+      // 关闭:星期/时间应该被清回null(关闭状态下这两项没有意义,不留脏数据)
+      await page.getByText('学习提醒', { exact: true }).click();
+      await expect(page.getByText('学习提醒', { exact: true }).last()).toBeVisible();
+      let closeMsg = '';
+      page.once('dialog', (d) => { closeMsg = d.message(); void d.accept(); });
+      await page.getByText('关闭', { exact: true }).click();
+      await page.getByTestId(testIds.classDetail.reminderSaveButton).click();
+      await expect.poll(() => closeMsg, { timeout: 15_000 }).toContain('已更新');
+
+      const { rows: afterClose } = await withDb((c) =>
+        c.query(`SELECT reminder_enabled, reminder_weekday, reminder_time FROM cohorts WHERE id=$1`, [cohortId]),
+      );
+      expect(afterClose[0].reminder_enabled).toBe(false);
+      expect(afterClose[0].reminder_weekday).toBeNull();
+      expect(afterClose[0].reminder_time).toBeNull();
+    } finally {
+      // 还原成种子默认状态(不影响其它复用同一个E2E班的spec文件)
+      await withDb((c) => c.query(`UPDATE cohorts SET reminder_enabled=false, reminder_weekday=NULL, reminder_time=NULL, reminder_message=NULL WHERE id=$1`, [cohortId]));
+    }
+  });
+});
+
 test.describe('添加学员', () => {
   test('搜索→勾选→选正式→提交 → class_members真的新增一行(正式)', async ({ page }) => {
     const { cohortId } = await getSeedIds();

@@ -45,11 +45,14 @@ export function AudioPlayer({ url, title, subtitle }: Props) {
   // 拖动态:scrubMs 非 null = 正在拖,显示拖到的位置(松手才真 seek,拖动中不抖)。
   const [scrubMs, setScrubMs] = useState<number | null>(null);
   const [trackW, setTrackW] = useState(0);
-  // PanResponder 闭包里读最新值用 ref(create 只跑一次)。
+  // PanResponder 闭包里读最新值用 ref(create 只跑一次)。写ref放进effect(react-hooks/refs·
+  // 2026-07-17 lint债清理):渲染期间同步写ref本身是新版规则不允许的impure操作,改成effect后
+  // 时机上仍然是"每次trackW/durMs变化后尽快同步",手势回调触发时(用户真实交互,必然晚于
+  // 任意一次effect)读到的都是最新值,行为不变。
   const trackWRef = useRef(0);
   const durRef = useRef(0);
-  trackWRef.current = trackW;
-  durRef.current = durMs;
+  useEffect(() => { trackWRef.current = trackW; }, [trackW]);
+  useEffect(() => { durRef.current = durMs; }, [durMs]);
 
   useEffect(() => {
     let mounted = true;
@@ -108,9 +111,14 @@ export function AudioPlayer({ url, title, subtitle }: Props) {
   };
 
   // 拖动:子元素 pointerEvents=none → locationX 始终相对轨道(web/原生一致)。
+  // react-hooks/refs 在这里是静态分析的假阳性(2026-07-17 lint债清理确认):PanResponder.create()
+  // 只是把下面这些函数打包成responder对象,不会在渲染期间同步调用它们——onPanResponderXxx只在
+  // 真实手势事件发生时才被调用,那时早已不在render阶段,读trackWRef.current/durRef.current
+  // 是安全的。lint规则看不到"这些函数只在事件回调里才执行"这层语义,所以保守报警。
   const panResponder = useMemo(
     () =>
       PanResponder.create({
+        // eslint-disable-next-line react-hooks/refs
         onStartShouldSetPanResponder: () => true,
         onMoveShouldSetPanResponder: () => true,
         onPanResponderGrant: (e) => setScrubMs(msFromX(e.nativeEvent.locationX)),
@@ -121,7 +129,7 @@ export function AudioPlayer({ url, title, subtitle }: Props) {
         },
         onPanResponderTerminate: () => setScrubMs(null),
       }),
-    [], // eslint-disable-line react-hooks/exhaustive-deps
+    [],
   );
 
   const onTrackLayout = (e: LayoutChangeEvent) => setTrackW(e.nativeEvent.layout.width);

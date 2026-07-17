@@ -1,6 +1,6 @@
-import { Plus, Repeat2 } from 'lucide-react-native';
+import { Plus, Repeat2, Sliders } from 'lucide-react-native';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AdminButton, AdminModal, Badge, EmptyState, ModalActions, ModalField, ModalFootnote, SCREEN_BG, ErrorState } from '@/components/ui/admin-kit';
@@ -12,6 +12,7 @@ import {
   usePracticesMaster,
   usePracticeTemplates,
   useTemplateBindCounts,
+  type PracticeMaster,
   type PracticeTemplate,
   type TargetPeriod,
 } from '@/lib/queries/practice-config';
@@ -24,7 +25,9 @@ import {
   useProvisionCohortVows,
   useToggleTemplateActive,
   useUnbindTemplate,
+  useUpdatePracticePaceLock,
   useUpdateTemplate,
+  type PracticePaceChannel,
   type TemplateInput,
 } from '@/lib/mutations/practice-config';
 import { useAddRequiredTransmission, useCreateTransmission, useRemoveRequiredTransmission } from '@/lib/mutations/proxy';
@@ -81,29 +84,38 @@ function TemplateFormModal({ initial, defaultProgramId, onClose, onSaved }: {
   const [err, setErr] = useState<string | null>(null);
   const [token, setToken] = useState(() => genClientToken());
 
-  useEffect(() => {
-    if (!visible) return;
-    setToken(genClientToken());
-    if (editingTpl) {
-      setPracticeId(editingTpl.practiceId);
-      setName(editingTpl.templateName);
-      setTargetCount(numStr(editingTpl.targetCount));
-      setPeriod(editingTpl.targetPeriod === 'event' ? 'until_complete' : editingTpl.targetPeriod);
-      setDailyTarget(numStr(editingTpl.dailyTarget));
-      setWeeklyTarget(numStr(editingTpl.weeklyTarget));
-      setOffsetDays(numStr(editingTpl.startsOffsetDays));
-      setDurationDays(numStr(editingTpl.durationDays));
-      setProgIds(editingTpl.appliesToPrograms ?? []);
-      setTimeLimited(editingTpl.isTimeLimited);
-      setMinSessionMinutes(numStr(editingTpl.defaultMinSessionMinutes));
-    } else {
-      setPracticeId(null); setName(''); setTargetCount(''); setPeriod('until_complete');
-      setDailyTarget(''); setWeeklyTarget(''); setOffsetDays(''); setDurationDays('');
-      setProgIds(defaultProgramId ? [defaultProgramId] : []); setTimeLimited(false);
-      setMinSessionMinutes('');
+  // 渲染期间比对上一次的visible/editingTpl/defaultProgramId(react-hooks/set-state-in-effect·
+  // 2026-07-17 lint债清理),逐项对应原依赖数组。
+  const [prevVisible, setPrevVisible] = useState(visible);
+  const [prevEditingTpl, setPrevEditingTpl] = useState(editingTpl);
+  const [prevDefaultProgramId, setPrevDefaultProgramId] = useState(defaultProgramId);
+  if (visible !== prevVisible || editingTpl !== prevEditingTpl || defaultProgramId !== prevDefaultProgramId) {
+    setPrevVisible(visible);
+    setPrevEditingTpl(editingTpl);
+    setPrevDefaultProgramId(defaultProgramId);
+    if (visible) {
+      setToken(genClientToken());
+      if (editingTpl) {
+        setPracticeId(editingTpl.practiceId);
+        setName(editingTpl.templateName);
+        setTargetCount(numStr(editingTpl.targetCount));
+        setPeriod(editingTpl.targetPeriod === 'event' ? 'until_complete' : editingTpl.targetPeriod);
+        setDailyTarget(numStr(editingTpl.dailyTarget));
+        setWeeklyTarget(numStr(editingTpl.weeklyTarget));
+        setOffsetDays(numStr(editingTpl.startsOffsetDays));
+        setDurationDays(numStr(editingTpl.durationDays));
+        setProgIds(editingTpl.appliesToPrograms ?? []);
+        setTimeLimited(editingTpl.isTimeLimited);
+        setMinSessionMinutes(numStr(editingTpl.defaultMinSessionMinutes));
+      } else {
+        setPracticeId(null); setName(''); setTargetCount(''); setPeriod('until_complete');
+        setDailyTarget(''); setWeeklyTarget(''); setOffsetDays(''); setDurationDays('');
+        setProgIds(defaultProgramId ? [defaultProgramId] : []); setTimeLimited(false);
+        setMinSessionMinutes('');
+      }
+      setErr(null);
     }
-    setErr(null);
-  }, [visible, editingTpl, defaultProgramId]);
+  }
 
   const pending = create.isPending || update.isPending;
   const minSessionRaw = toNum(minSessionMinutes);
@@ -306,10 +318,12 @@ function CohortBindingSection({ templates, programId }: { templates: PracticeTem
     [templates, programId],
   );
 
-  // 切换班级时清掉上一班的提示
-  useEffect(() => { setProvMsg(null); }, [cohortId]);
-  // 切专业时重置选中的班(避免选了别专业的班)
-  useEffect(() => { setCohortId(null); }, [programId]);
+  // 切换班级时清掉上一班的提示;切专业时重置选中的班(避免选了别专业的班)——渲染期间比对
+  // 上一次的cohortId/programId(react-hooks/set-state-in-effect·2026-07-17 lint债清理)。
+  const [prevCohortId, setPrevCohortId] = useState(cohortId);
+  if (cohortId !== prevCohortId) { setPrevCohortId(cohortId); setProvMsg(null); }
+  const [prevProgramId, setPrevProgramId] = useState(programId);
+  if (programId !== prevProgramId) { setPrevProgramId(programId); setCohortId(null); }
 
   const doProvision = async () => {
     if (!cohortId) return;
@@ -445,6 +459,102 @@ function OptionalPracticesSection({ programId, programName }: { programId: strin
   );
 }
 
+// ════════════════ 修法节奏权限(2026-07-17·PM决策方案3:双通道独立配置)════════════════
+// 班级(source='auto')/自学(source='custom')各自独立设置,同一条修法可以班级严格、自学自由
+// (或反过来)——判断逻辑在 app/vow/[id].tsx + DB 触发器 vows_check_daily_target。
+// 全局修法列表,不分专业。每条通道各自三态:自由 / 限定值可选 / 完全锁定。
+type PaceMode = 'free' | 'whitelist' | 'locked';
+const PACE_MODE_LABEL: Record<PaceMode, string> = { free: '自由', whitelist: '限定值', locked: '锁定' };
+function paceModeOf(locked: boolean, allowed: number[] | null): PaceMode {
+  if (locked) return 'locked';
+  if (allowed && allowed.length > 0) return 'whitelist';
+  return 'free';
+}
+
+// 单条通道(班级 或 自学)的三态chip+白名单输入——同一形状渲两遍,分别绑班级/自学两组字段。
+function PaceChannelChips({ practiceId, channel, label, locked, allowed }: {
+  practiceId: string; channel: PracticePaceChannel; label: string; locked: boolean; allowed: number[] | null;
+}) {
+  const update = useUpdatePracticePaceLock();
+  const mode = paceModeOf(locked, allowed);
+  const [whitelistDraft, setWhitelistDraft] = useState(() => (allowed ?? []).join(','));
+  // practices-master 刷新后(如别处也在改)重新对齐草稿——渲染期间比对上一次的 allowed
+  // (react-hooks/set-state-in-effect 同款写法,同文件其它弹层已用)。
+  const [prevAllowed, setPrevAllowed] = useState(allowed);
+  if (allowed !== prevAllowed) { setPrevAllowed(allowed); setWhitelistDraft((allowed ?? []).join(',')); }
+
+  const setMode = (m: PaceMode) => {
+    if (m === 'free') update.mutate({ practiceId, channel, dailyTargetLocked: false, allowedDailyTargets: null });
+    else if (m === 'locked') update.mutate({ practiceId, channel, dailyTargetLocked: true, allowedDailyTargets: allowed });
+    // 'whitelist':只切UI态,真正写库等填完数字点"应用"(见下方 applyWhitelist)——避免切过来
+    // 那一瞬间用空白名单直接落库,变相等同"锁定但没配值"的死状态。
+  };
+  const applyWhitelist = () => {
+    const nums = whitelistDraft.split(',').map((s) => Number(s.trim())).filter((n) => Number.isFinite(n) && n > 0);
+    if (nums.length === 0) return;
+    update.mutate({ practiceId, channel, dailyTargetLocked: false, allowedDailyTargets: nums });
+  };
+
+  return (
+    <View style={{ gap: 6 }}>
+      <Text style={s.paceChannelLabel}>{label}</Text>
+      <View style={s.chipWrap}>
+        {(['free', 'whitelist', 'locked'] as const).map((m) => (
+          <Pressable key={m} testID={testIds.practiceConfig.paceLockModeChip(practiceId, channel, m)} onPress={() => setMode(m)} style={[s.chip, mode === m && s.chipOn]}>
+            <Text style={[s.chipText, mode === m && s.chipTextOn]}>{PACE_MODE_LABEL[m]}</Text>
+          </Pressable>
+        ))}
+      </View>
+      {mode === 'whitelist' ? (
+        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+          <View style={{ flex: 1 }}>
+            <ModalField
+              testID={testIds.practiceConfig.paceLockWhitelistInput(practiceId, channel)}
+              label="允许的每日目标值(逗号分隔)"
+              value={whitelistDraft}
+              onChangeText={setWhitelistDraft}
+              placeholder="如: 1,2,3,5,9"
+            />
+          </View>
+          <AdminButton testID={testIds.practiceConfig.paceLockApplyButton(practiceId, channel)} variant="secondary" size="sm" disabled={update.isPending} onPress={applyWhitelist}>应用</AdminButton>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+function PracticePaceLockRow({ p }: { p: PracticeMaster }) {
+  return (
+    <View style={s.paceRow}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <Text style={s.paceName}>{p.name}</Text>
+        <Text style={s.paceUnit}>{p.unit}</Text>
+      </View>
+      <PaceChannelChips practiceId={p.id} channel="auto" label="班级来源" locked={p.dailyTargetLocked} allowed={p.allowedDailyTargets} />
+      <PaceChannelChips practiceId={p.id} channel="custom" label="自学来源" locked={p.selfStudyDailyTargetLocked} allowed={p.selfStudyAllowedDailyTargets} />
+    </View>
+  );
+}
+
+function PracticePaceLockModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+  const { data: practices = [], isLoading, error } = usePracticesMaster();
+  return (
+    <AdminModal visible={visible} onClose={onClose} title="修法节奏权限" maxWidth={520}>
+      <ModalFootnote>
+        班级(自动分配)/自学(自建)两个来源各自独立设置——同一条修法可以班级严格锁定、自学自由,或反过来。
+        班级新建默认「锁定」,自学新建默认「自由」,想改都在此逐条设。
+      </ModalFootnote>
+      {error ? <ErrorState /> : isLoading ? (
+        <View style={{ paddingVertical: 30, alignItems: 'center' }}><ActivityIndicator color={SAFFRON} /></View>
+      ) : (
+        <ScrollView style={{ maxHeight: 440, marginTop: 10 }} contentContainerStyle={{ gap: 12 }} showsVerticalScrollIndicator={false}>
+          {practices.map((p) => <PracticePaceLockRow key={p.id} p={p} />)}
+        </ScrollView>
+      )}
+    </AdminModal>
+  );
+}
+
 // ════════════════ 新增传承(记事本条目,决策124主清单;仅新增不改删,理由见 mutations 注释)════════════════
 function CreateTransmissionModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const [name, setName] = useState('');
@@ -453,9 +563,12 @@ function CreateTransmissionModal({ visible, onClose }: { visible: boolean; onClo
   const create = useCreateTransmission();
   const [err, setErr] = useState<string | null>(null);
 
-  useEffect(() => {
+  // 渲染期间比对上一次的visible(react-hooks/set-state-in-effect·2026-07-17 lint债清理)
+  const [prevVisible, setPrevVisible] = useState(visible);
+  if (visible !== prevVisible) {
+    setPrevVisible(visible);
     if (visible) { setName(''); setSourceKind('course'); setDescription(''); setErr(null); }
-  }, [visible]);
+  }
 
   const submit = async () => {
     if (!name.trim() || create.isPending) return;
@@ -518,7 +631,7 @@ function RequiredTransmissionsSection({ programId, programName }: { programId: s
         <AdminButton testID={testIds.practiceConfig.newTransmissionButton} variant="secondary" size="sm" onPress={() => setCreating(true)}>+ 新增传承</AdminButton>
       </View>
       <Text style={s.overHint}>
-        勾选 = 该传承列入「{programName}」的必需传承清单;升学评定页会显示学员"已获得/要求"对照,仅供人工参考,不自动卡升学。
+        勾选 = 该传承列入「{programName}」的必需传承清单;升学评定页会显示学员&ldquo;已获得/要求&rdquo;对照,仅供人工参考,不自动卡升学。
       </Text>
       {options.length === 0 ? (
         <EmptyState>还没有任何传承记录,先点上方「新增传承」建一条。</EmptyState>
@@ -559,9 +672,12 @@ export default function PracticeConfigScreen() {
   const toggle = useToggleTemplateActive();
   const [editing, setEditing] = useState<PracticeTemplate | 'new' | null>(null);
   const [progId, setProgId] = useState<string | null>(null);
+  const [paceLockOpen, setPaceLockOpen] = useState(false);
 
-  // 默认选第一个专业(program 为根·决策012)
-  useEffect(() => { if (!progId && programs.length > 0) setProgId(programs[0].id); }, [programs, progId]);
+  // 默认选第一个专业(program 为根·决策012)——渲染期间直接判定,不用effect
+  // (react-hooks/set-state-in-effect·2026-07-17 lint债清理):!progId这个guard本身在设值后
+  // 就不再成立,不会无限重入,不需要额外track"上一次的值"。
+  if (!progId && programs.length > 0) setProgId(programs[0].id);
 
   const progName = useMemo(() => {
     const m = new Map(programs.map((p) => [p.id, p.name]));
@@ -579,7 +695,10 @@ export default function PracticeConfigScreen() {
     <SafeAreaView style={s.root} edges={['bottom']}>
       <View style={s.actionBar}>
         <Text className="font-serif" style={s.pageTitle}>功课配置</Text>
-        <AdminButton testID={testIds.practiceConfig.newTemplateButton} variant="primary" size="sm" icon={<Plus size={15} color="#fff" />} onPress={() => setEditing('new')} disabled={!progId}>新建任务</AdminButton>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <AdminButton testID={testIds.practiceConfig.paceLockButton} variant="secondary" size="sm" icon={<Sliders size={15} color={SAFFRON_DARK} />} onPress={() => setPaceLockOpen(true)}>节奏权限</AdminButton>
+          <AdminButton testID={testIds.practiceConfig.newTemplateButton} variant="primary" size="sm" icon={<Plus size={15} color="#fff" />} onPress={() => setEditing('new')} disabled={!progId}>新建任务</AdminButton>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
@@ -648,6 +767,7 @@ export default function PracticeConfigScreen() {
       </ScrollView>
 
       <TemplateFormModal initial={editing} defaultProgramId={progId} onClose={() => setEditing(null)} onSaved={() => setEditing(null)} />
+      <PracticePaceLockModal visible={paceLockOpen} onClose={() => setPaceLockOpen(false)} />
     </SafeAreaView>
   );
 }
@@ -662,6 +782,11 @@ const s = StyleSheet.create({
   sectionHead: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: INK, letterSpacing: 1 },
   sectionNote: { fontSize: 11, color: INK4 },
+  // 修法节奏权限
+  paceRow: { backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(43,34,24,0.08)', padding: 12, gap: 10 },
+  paceName: { fontSize: 14, fontWeight: '700', color: INK },
+  paceUnit: { fontSize: 11, color: INK4 },
+  paceChannelLabel: { fontSize: 11, fontWeight: '700', color: INK3 },
   // 模板卡
   card: { backgroundColor: '#fff', borderRadius: 14, borderWidth: 1, borderColor: 'rgba(43,34,24,0.08)', padding: 14, gap: 10 },
   cardInactive: { opacity: 0.62 },

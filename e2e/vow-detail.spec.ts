@@ -8,15 +8,14 @@ import { testIds } from '../lib/testids';
 // 此前0个testID、调整节奏/补录/放弃这三条师兄自主操作的写路径零e2e覆盖(计数本身走的是
 // QuickCountSheet,与首页共用,已有别处覆盖,这里不重复测)。
 // ⚠️ 不用种子自带的那条班级功课(source='auto',target_period='lifetime'但来自班级、不可放弃):
-// 自建一条自定功课(source='custom')专测这页,practice选一条无daily_target_locked/无白名单的,
-// 避免撞上PD-6/PD-9那类锁定/白名单分支(不在本批范围)。用完直接删行,不触碰学员真实功课列表。
+// 自建一条自定功课(source='custom')专测这页。practice随便选一条count型即可——2026-07-17
+// PM定案:节奏锁定/白名单此后只管source='auto'的班级功课(vow/[id].tsx里
+// paceRestricted=vow.source==='auto'),自定功课永远不受锁,不用再避开锁定/白名单那些行
+// (此前的回填迁移20260717000500把存量practices基本全锁了,继续按锁定筛选会查不到行)。
 
 async function makeCustomVow(userId: string): Promise<string> {
   const { rows: [{ id: practiceId }] } = await withDb((c) =>
-    c.query(
-      `SELECT id FROM practices WHERE measurement='count' AND daily_target_locked IS NOT TRUE
-       AND (allowed_daily_targets IS NULL OR cardinality(allowed_daily_targets)=0) LIMIT 1`,
-    ),
+    c.query(`SELECT id FROM practices WHERE measurement='count' LIMIT 1`),
   );
   const { rows: [{ id: vowId }] } = await withDb((c) =>
     c.query(
@@ -26,6 +25,34 @@ async function makeCustomVow(userId: string): Promise<string> {
     ),
   );
   return vowId as string;
+}
+
+// 时长型(observation·座次)专用夹具:本地e2e栈的迁移种子从未插入过measurement='duration'的
+// practices行(2026-07-17 排查确认,全migrations唯一一处 insert into practices 是学经七经×三动作、
+// 全部count型)——生产/sss-dev上的"观修""入行论广释观修"是运营手工建的数据,不在这套栈里。
+// 若栈里已有duration行(未来若真补了迁移)则直接复用,没有就现建一条测试专用行,用完即删,
+// 不影响其它测试对practices表的假设。
+async function makeCustomDurationVow(userId: string): Promise<{ vowId: string; practiceId: string; ownPractice: boolean }> {
+  const { rows: existing } = await withDb((c) => c.query(`SELECT id FROM practices WHERE measurement='duration' LIMIT 1`));
+  let practiceId: string;
+  let ownPractice = false;
+  if (existing.length > 0) {
+    practiceId = existing[0].id as string;
+  } else {
+    const { rows: [{ id }] } = await withDb((c) =>
+      c.query(`INSERT INTO practices (name, measurement, category, unit) VALUES ('E2E测试观修','duration','meditation','座') RETURNING id`),
+    );
+    practiceId = id as string;
+    ownPractice = true;
+  }
+  const { rows: [{ id: vowId }] } = await withDb((c) =>
+    c.query(
+      `INSERT INTO user_practice_vows (user_id, source, practice_id, custom_name, target_period, start_date, status, is_required_for_promotion, share_to_collective)
+       VALUES ($1,'custom',$2,'E2E测试观修功课','lifetime','2026-01-01','active',false,false) RETURNING id`,
+      [userId, practiceId],
+    ),
+  );
+  return { vowId, practiceId, ownPractice };
 }
 
 test.describe('调整节奏 + 补录(app/vow/[id].tsx)', () => {
@@ -97,6 +124,47 @@ test.describe('放弃自定功课(app/vow/[id].tsx)', () => {
     } finally {
       await withDb((c) => c.query(`DELETE FROM practice_logs WHERE vow_id=$1`, [vowId]));
       await withDb((c) => c.query(`DELETE FROM user_practice_vows WHERE id=$1`, [vowId]));
+    }
+  });
+});
+
+// 时长型愿(观修·座次)记一笔(2026-07-17 修复回归锁定·PM 报"找不到观修计数入口"):
+//   此前详情页对时长型愿只有一段静态说明文字,指向结构性不含时长型愿的"快速计数"弹层——
+//   师兄根本点不出任何写库入口。修复后本页对isCount=false分支给一个"记一笔"主按钮,直开
+//   与"补录"共用的同一个弹层(默认今天/可选过去日期)。这条测试锁定:①按钮文案随类型切换、
+//   ②真的能写出 duration_minutes、③"计数"按钮(计数型专用)不该出现在时长型愿页面。
+test.describe('观修·座次(时长型愿)记一笔(app/vow/[id].tsx·2026-07-17修复回归)', () => {
+  test('时长型愿显示"记一笔"而非"计数" → 记今天的分钟数 → practice_logs.duration_minutes正确落库', async ({ page }) => {
+    const { studentId } = await getSeedIds();
+    const { vowId, practiceId, ownPractice } = await makeCustomDurationVow(studentId);
+    try {
+      await loginAs(page, STUDENT_EMAIL, TEST_PASSWORD);
+      await page.goto(`/vow/${vowId}`, { timeout: 45_000 });
+
+      // 时长型愿的主入口是"记一笔",不是计数型专用的"计数"(那边的QuickCountSheet结构性
+      // 不含时长型愿,指向它是死路——这正是2026-07-17要修的那个缺口)。
+      await expect(page.getByText('记一笔', { exact: true })).toBeVisible();
+      await expect(page.getByText('计数', { exact: true })).not.toBeVisible();
+
+      await page.getByText('记一笔', { exact: true }).click();
+      // 弹层文案已改中性(不是"补录"),且"今天"是默认选中的快选项——不是只能补过去的日子
+      await expect(page.getByText(/^记录 ·/)).toBeVisible();
+      await expect(page.getByText('今天', { exact: true })).toBeVisible();
+
+      await page.getByTestId(testIds.vowDetail.backfillAmountInput).fill('45');
+      await page.getByTestId(testIds.vowDetail.backfillSubmitButton).click();
+
+      const todayStr = new Date().toLocaleDateString('en-CA');
+      await expect.poll(async () => {
+        const { rows } = await withDb((c) =>
+          c.query(`SELECT duration_minutes FROM practice_logs WHERE vow_id=$1 AND log_date=$2`, [vowId, todayStr]),
+        );
+        return rows[0]?.duration_minutes ?? null;
+      }, { timeout: 10_000 }).toBe(45);
+    } finally {
+      await withDb((c) => c.query(`DELETE FROM practice_logs WHERE vow_id=$1`, [vowId]));
+      await withDb((c) => c.query(`DELETE FROM user_practice_vows WHERE id=$1`, [vowId]));
+      if (ownPractice) await withDb((c) => c.query(`DELETE FROM practices WHERE id=$1`, [practiceId]));
     }
   });
 });

@@ -11,6 +11,13 @@
 | 3 | 企业代理/CA | 不适用，划掉 |
 | 4 | E2E 起步 | **师兄端 iOS 先行**（Maestro + EAS preview build），管理端 Web Playwright 后移 |
 
+### 0.1 · 待 PM 重议:决策4 范围(2026-07-17 提出,尚未拍板)
+决策4写的是"iOS 先行",但 2026-07-17 两个真实 bug(键盘挡弹窗、安卓 flex-wrap 换行错位)都是安卓真机报的——这类问题 Web 端(Playwright/Chromium)结构性测不出(§4-15),要测出来只能靠真机/模拟器跑。两条落地路径,代价与效果不同,尚未选定:
+- **A(先试水,门槛低)**:Claude 写 Maestro 测试脚本(YAML,同代码一样进仓库),PM/Eric 在自己电脑装 Maestro CLI、手机插 USB 开调试,本地跑脚本对真手机操作,人工触发、非自动化。
+- **B(长期自动化,门槛高)**:GitHub Actions 里起安卓模拟器(官方支持,不需要任何人的手机/电脑),Maestro 对模拟器跑,每次推代码自动测,同现有 Web E2E 一样接入 CI。
+- 建议顺序:先做 A 验证"这条路真能测出问题",觉得有用再投入 B 搭自动化;若 PM 决定跳过 A 直接上 B 也可以,A 的脚本 B 能直接复用。
+- 影响范围:决策4字面只提"师兄端",这两个真实 bug 影响师兄端也影响管理端(弹窗键盘问题两边都有实例)——重议时应确认覆盖范围是否也要扩到管理端。
+
 ## 1 · 分层地图（谁守什么）
 | 层 | 工具 | 位置 | 守什么 |
 |---|---|---|---|
@@ -19,7 +26,8 @@
 | 单元/组件 | jest-expo + RNTL | 与源码同目录 `*.test.ts(x)` | 纯函数、Zod schema、store、hooks、组件 |
 | 计算层判例 | 判例清单 → jest/DB 断言 | `tests/casebook/`（清单）→ 各层落地 | 各专业计数、愿状态机、关怀 5 维等业务语义 |
 | Web E2E | Playwright（本地Docker栈） | `e2e/` | 决策4的Web层提前建了一层轻量确定性回归(2026-07-09):快乐路径5流程+报数复制+边界/连点/胡乱点击,零LLM成本复跑;`local-stack-tests.yml` CI 自动跑(2026-07-10 接入)。`e2e/resilience.spec.ts`(2026-07-13新增)覆盖测试计划A线三条:弱网断网提交(setOffline+window.alert捕获+恢复重试,验证基础设施本来就是对的)、辅导员URL直达admin-only页、学员深链后台的角色兜底闪现(后两条最初写来复现问题,PM当天拍板"全部修复"后已在`app/(admin)/_layout.tsx`落地页面级角色门+加载中角色清空,断言同步改成"验证修复生效"的回归锁定)——22/22绿(3次稳定性验证,指最初复现版本;修复后新断言待下一次真机跑确认)。⚠️ **2026-07-16 系统性补测**(PM"继续完成"剩余测试缺口全清单,共9批):新增10个spec文件(`registration`/`admin-student-management`/`admin-class-management`扩量/`admin-attendance`/`admin-advancement`/`vow-detail`/`admin-scheduling`/`admin-practice-config`/`course-self-study`/`admin-quiz`),测试总数54→74(共15个文件)——补齐此前0个testID/0覆盖的:注册验证码流程、学员审批可逆(拒绝不再是终态)、后台建号、班级详情全部管理操作(添加学员/设辅导员爱心/设休息周/标记结班/成员管理)、出勤/讲考逐人记录(点名/批量/三态/等级评价/挂靠共修)、学期末升学批处理(毕业/留级两形态「留原班重修」「转下一届」/继续旁听)、功课详情管理(调整节奏/补录/放弃自定功课)、排课管理(一句话排课/放假周/移除课节/清空学期/自学读物——`get_week_lessons`数据源本身)、功课模板配置(编辑/停用启用/传承要求清单)、课程详情"加入自学"(决策119)、思考题管理(新建/编辑/删除)。追加批(PM"把剩余的测试内容也加进去")补齐了上述全部4处已知缺口:按班覆盖(bind/unbind,无confirm)+同步发放(provision_cohort_vows RPC,幂等重跑验证)、自选经候选清单(program_optional_practices增删)、从讲记提取思考题(只读消费`lesson_blocks`既有列,不改其schema)、客观题(单选/判断/填空/记忆卡/颂词组句/颂词续接)payload编辑器6种题型payload形状核对——测试总数74→83(仍15个文件,均追加在既有spec内,无新文件)。**这一整批在AI施工的sandbox环境里从未真正执行过**(该环境无Docker、无浏览器内核,只做到`tsc`/`lint`/`jest`/`playwright --list`四道静态门禁,即"能编译、能被发现"≠"跑过验证通过")——按本文件 §4 需在有真实环境的分支连跑 3 次绿才算稳定,这一步还没做,是下一步要靠人工在真实环境完成的事。 |
-| iOS E2E | Maestro（后续阶段·仍按决策4排期） | 未建 | 师兄端核心流程 5-10 条,上架冲刺前做 |
+| iOS E2E | Maestro（后续阶段·仍按决策4排期） | 未建 | 师兄端核心流程 5-10 条,上架冲刺前做。⚠️ 2026-07-17:PM 安卓真机已实测复现2处 Web 层结构性测不出的问题(见 §4-15)——决策4写的是"iOS 先行",但两处真实 bug 都是安卓真机报的;哪个平台先做 Maestro/是否需要安卓也起一套,待 PM 重议决策4范围 |
+| 静态反模式扫描 | 自建 script | `scripts/check-rn-ui-pitfalls.mjs`(`npm run check:ui-pitfalls`,已接入 `app-checks.yml`) | 不跑 app、纯扫源码文本:①`Modal`+`TextInput`缺`KeyboardAvoidingView` ②`${100/N}%`算宽度。防§4-15 这两类"Web 端必然测不出"的问题在别的文件重犯;不是"测试"本身,是比 e2e 更早一层的护栏 |
 
 ## 2 · 测试命令
 ```bash
@@ -59,6 +67,11 @@ npm run e2e:ui                 # 同上,交互式UI模式(调试单条用例用)
 12. **`page.route()` 延迟响应可复现"加载中角色兜底"类闪现问题**：某些页面在关键查询（如当前用户角色）解析完成前会渲染一个默认态（如"未知角色先当admin处理，避免闪烁"），这种过渡态闪现在真实网速下窗口极短、肉眼难截；用 `page.route('**/rest/v1/<table>*', async r => { await sleep(N); await r.continue(); })` 人为拉长这个窗口，就能稳定断言到过渡态的内容，而不必赌真实网络时序。
 13. **`window.alert`/`window.confirm` 断言用 `page.once('dialog', d => { msg = d.message(); void d.accept(); })`**：`lib/dialog.ts` 在 web 端用原生 `window.alert`/`window.confirm`（非自定义 Modal），Playwright 默认会自动关闭这类原生弹窗——不注册监听就断言不到内容，也会因为没调用 `accept()`/`dismiss()` 而卡住等待；提前注册好再触发动作。
 14. **`context.setOffline()` 测不出依赖 `navigator.connection` 的 UI 反应**：`@react-native-community/netinfo` 的 web 实现里，只要 `navigator.connection`（Network Information API）存在就*只*监听它的 `change` 事件、完全不走 `window.addEventListener('online'/'offline')` 兜底分支；桌面 Chromium 有这个 API，而 Playwright/CDP 的 `context.setOffline()` 只切 `navigator.onLine` + 触发 `online`/`offline` DOM 事件，不触发 `connection.change`——所以像 `components/offline-banner.tsx` 这类依赖 `useIsOnline()` 的 UI，在这套模拟手法下测不出反应，这是模拟工具够不到信号源的方法论局限，不是代码 bug（iOS Safari 没有 `navigator.connection`，走的是 online/offline 分支，不受此限）。但 `context.setOffline()` 对真实网络请求失败（mutation/fetch 报错）的模拟是可靠的，见 `e2e/resilience.spec.ts` 断网提交那条用例。
+15. **Web E2E(Playwright/Chromium)结构性测不出"原生渲染引擎"和"系统软键盘"类问题**（2026-07-17 PM 安卓真机连续踩到2处后定案记录，供以后不必重新论证）：
+    - **软键盘遮挡**:`KeyboardAvoidingView` 响应的是真机 OS 弹出的软键盘；桌面 Chromium 用物理键盘输入,从来不会有"键盘从底部滑上来盖住内容"这件事,所以哪怕补一万条 e2e,`<Modal>` 里忘包 `KeyboardAvoidingView` 这类问题永远是绿的。
+    - **flex 布局浮点误差**:`width: \`${100/7}%\`` 在安卓 Yoga(RN 原生布局引擎)上会因浮点累计误差导致 `flexWrap` 提前换行、丢一整列;Chromium 自己的 CSS 排版引擎舍入方式不同,同样的代码在浏览器里天然复现不出来。
+    - **不是"漏测"，是这类 bug 本来就在这套工具的可见范围之外**：不能靠"多写 e2e / 测得更仔细"解决，只能靠 (a) 源码层静态护栏挡已知反模式(`scripts/check-rn-ui-pitfalls.mjs`，见 §1)、(b) 真正在真机/模拟器上跑(决策4的 Maestro，目前"未建"，且决策写的是 iOS 而两处真实 bug 都在安卓报的，范围待重议，见 §0.1)、(c) 发布前人工真机过一遍已知高风险类别(新增的带输入框弹窗/新增的等分网格/新增手势区)。三者互补，缺任何一样都会有这类盲区。
+16. **一个字段/参数有几种取值(变体)，每种都要各写一条测试，不能只测最常见的那种**（2026-07-17 教训:观修·座次记录入口那次缺口）：`vow/[id].tsx` 与 `practice.tsx` 共用同一批组件同时服务 `practices.measurement`='count'(计数型)和'duration'(时长型)两种愿,2026-07-16 那批"系统性覆盖"的夹具函数只造了 count 型(硬编码 `WHERE measurement='count'`),从未构造过一条 duration 型去点一遍同一页的按钮——两种类型分支逻辑不同(按钮文案、能不能用某个入口),但测试代码从头到尾没让"另一种取值"露过面。**这不是 Web 端测不出的那类问题**(纯逻辑判断,浏览器和真机执行一模一样,Playwright 本来就测得出来)，是单纯的用例设计疏漏。新写涉及"按字段分支渲染/分支交互"的测试时，先列出该字段的全部取值，每种至少造一条最小夹具走一遍主路径，不能只覆盖写测试时手边最方便造的那一种。
 
 ## 5 · 判例先行流程（计算层专用 · 决策 2）
 1. Claude 通读规格（`docs/requirements_master_2026-05-31.md`、`schema_phase1` §12.6.5 等），产出**中文判例清单** `tests/casebook/<模块>.md`——每条一句可判对错的业务话，标注规格出处（决策号）。

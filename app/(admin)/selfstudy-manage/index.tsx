@@ -7,7 +7,7 @@ import { Badge, EmptyState, SectionCard, ErrorState } from '@/components/ui/admi
 import { Text } from '@/components/ui/text';
 import { notify } from '@/lib/dialog';
 import { useAdminSelfStudyStudents, useProgramPaces, useSetProgramDefaultPace } from '@/lib/queries/admin/selfstudy';
-import { INK, INK2, INK3, SAFFRON, SAFFRON_DARK } from '@/lib/theme';
+import { INK, INK2, INK3, SAFFRON } from '@/lib/theme';
 import { useAdminLayout } from '../_layout';
 
 // 自学管理(M10 屏·PRD §4.4;补审计 P0「自学生后台 0 可见」+ P1「默认节奏无配置 UI」·2026-07-02)。

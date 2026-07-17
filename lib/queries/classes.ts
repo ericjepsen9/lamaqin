@@ -251,6 +251,11 @@ export type CohortDetail = {
   weeklyTime: string | null;   // 'HH:MM:SS'
   practiceDow: number | null;
   practiceTime: string | null;
+  // 学习提醒(决策188方案A)原始字段——管理端「学习提醒」表单回填用
+  reminderEnabled: boolean;
+  reminderWeekday: number | null;
+  reminderTime: string | null; // 'HH:MM:SS'
+  reminderMessage: string | null;
   coaches: string[]; // zhumai 辅导员
   coachIds: string[]; // 辅导员 user_id(判断当前登录者是否为本班主麦,放宽"转正"权限用·决策040/134)
   aixin: string[]; // 爱心
@@ -266,7 +271,7 @@ export function useCohortDetail(cohortId: string | undefined) {
       if (!cohortId) return null;
       const { data: cohort, error } = await supabase
         .from('cohorts')
-        .select('id, name, code, program_id, timezone, start_date, is_active, weekly_cosession_dow, weekly_cosession_time, cosession_zoom_url, practice_cosession_dow, practice_cosession_time, practice_cosession_zoom_url, programs(name)')
+        .select('id, name, code, program_id, timezone, start_date, is_active, weekly_cosession_dow, weekly_cosession_time, cosession_zoom_url, practice_cosession_dow, practice_cosession_time, practice_cosession_zoom_url, reminder_enabled, reminder_weekday, reminder_time, reminder_message, programs(name)')
         .eq('id', cohortId)
         .single();
       if (error) throw error;
@@ -275,6 +280,7 @@ export function useCohortDetail(cohortId: string | undefined) {
         id: string; name: string; code: string; program_id: string; timezone: string | null; start_date: string | null; is_active: boolean | null;
         weekly_cosession_dow: number | null; weekly_cosession_time: string | null; cosession_zoom_url: string | null;
         practice_cosession_dow: number | null; practice_cosession_time: string | null; practice_cosession_zoom_url: string | null;
+        reminder_enabled: boolean | null; reminder_weekday: number | null; reminder_time: string | null; reminder_message: string | null;
         programs: { name?: string } | null;
       };
 
@@ -300,6 +306,10 @@ export function useCohortDetail(cohortId: string | undefined) {
         weeklyTime: c.weekly_cosession_time,
         practiceDow: c.practice_cosession_dow,
         practiceTime: c.practice_cosession_time,
+        reminderEnabled: c.reminder_enabled ?? false,
+        reminderWeekday: c.reminder_weekday,
+        reminderTime: c.reminder_time,
+        reminderMessage: c.reminder_message,
         coaches,
         coachIds,
         aixin,

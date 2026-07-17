@@ -7,8 +7,10 @@ import { CoreviewList } from '@/components/coreview-timeline';
 import { Text } from '@/components/ui/text';
 import { useCoreviewTimeline } from '@/lib/queries/coreview';
 
-// 共修 / 法会(决策140/162/164 + 法会场次决策②)。一条时间轴混排:法会(每场一节点)+ 本班共修。
-//   进行中/即将在上,最近往期在下;「历史」看全部往期。状态按日期算;回向只出总和(#193);无状态色。
+// 共修 / 法会(决策140/162/164 + 法会场次决策②)。一条时间轴:进行中/即将。
+//   往期不在本页(2026-07-17 PM 定案):往期一律进「历史」独立页(/past-events),
+//   本页只看向前看的安排,没有就是纯空态,不用"往期"兜底撑着页面有内容。
+//   状态按日期算;回向只出总和(#193);无状态色。
 const INK = '#2b2218';
 const INK2 = '#55463a';
 const INK3 = '#7e6d5b';
@@ -17,9 +19,6 @@ export default function Activities() {
   const router = useRouter();
   const { data, isLoading, isError } = useCoreviewTimeline();
   const upcoming = data?.upcoming ?? [];
-  const pastAll = data?.past ?? [];
-  const past = pastAll.slice(0, 4);
-  const hasMorePast = pastAll.length > past.length;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FBF4E9' }} edges={['top']}>
@@ -38,30 +37,15 @@ export default function Activities() {
           <View style={{ paddingVertical: 50, alignItems: 'center' }}>
             <RNText style={{ fontSize: 13, color: INK3, textAlign: 'center', lineHeight: 20 }}>加载失败,请检查网络后重试</RNText>
           </View>
-        ) : upcoming.length === 0 && past.length === 0 ? (
+        ) : upcoming.length === 0 ? (
           <View style={{ paddingVertical: 50, alignItems: 'center' }}>
             <RNText style={{ fontSize: 13, color: INK3, textAlign: 'center', lineHeight: 20 }}>暂无共修 / 法会安排。{'\n'}法会由管理员发布,本班共修按排课生成。</RNText>
+            <Link href="/past-events" asChild>
+              <Pressable style={[styles.moreBtn, { marginTop: 14 }]}><RNText style={{ fontSize: 13, color: INK2, fontWeight: '600' }}>看往期历史 →</RNText></Pressable>
+            </Link>
           </View>
         ) : (
-          <>
-            {upcoming.length > 0 ? (
-              <>
-                <RNText style={styles.secLabel}>进行中 / 即将</RNText>
-                <CoreviewList nodes={upcoming} />
-              </>
-            ) : null}
-            {past.length > 0 ? (
-              <>
-                <RNText style={styles.secLabel}>往期</RNText>
-                <CoreviewList nodes={past} />
-                {hasMorePast ? (
-                  <Link href="/past-events" asChild>
-                    <Pressable style={styles.moreBtn}><RNText style={{ fontSize: 13, color: INK2, fontWeight: '600' }}>查看全部历史 →</RNText></Pressable>
-                  </Link>
-                ) : null}
-              </>
-            ) : null}
-          </>
+          <CoreviewList nodes={upcoming} />
         )}
       </ScrollView>
     </SafeAreaView>
@@ -71,6 +55,5 @@ export default function Activities() {
 const styles = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 8 },
   histBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 9999, backgroundColor: 'rgba(43,34,24,0.05)' },
-  secLabel: { fontSize: 13, color: INK3, fontWeight: '700', paddingTop: 14, paddingBottom: 2 },
   moreBtn: { alignSelf: 'center', marginTop: 8, paddingHorizontal: 16, paddingVertical: 9, borderRadius: 9999, backgroundColor: 'rgba(43,34,24,0.05)' },
 });

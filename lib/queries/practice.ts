@@ -28,8 +28,11 @@ export type MyVow = {
   endDate: string | null;
   todayCount: number;
   weekCount: number;       // 本周(周日起)累计计数/时长
-  allowedDailyTargets: number[] | null; // 每日目标白名单(PD-9/PD-19);非空=daily_target 只能选其中之一
-  dailyTargetLocked: boolean;           // true=daily_target 锁定,本人不可自改(PD-6三选一锁定,如净土)
+  // 节奏锁定/白名单(PD-6/9/19,2026-07-17方案3双通道):班级(source='auto')/自学(source='custom')
+  // 各读各自独立配置的那组字段(practices.allowed_daily_targets/daily_target_locked 或
+  // self_study_*),这里已按 source 选好、暴露成统一的这一对——消费方(PaceSheet)不用关心通道。
+  allowedDailyTargets: number[] | null; // 非空=daily_target 只能选其中之一
+  dailyTargetLocked: boolean;           // true=daily_target 锁定,本人不可自改(admin 纠错后门)
   status: 'on_track' | 'falling_behind' | 'at_risk' | 'na'; // get_vow_status() 读时算(SD-1单一真源),非存储列
 };
 
@@ -109,7 +112,7 @@ export function useMyVows() {
       if (!uid) return [];
       const { data: vrows, error } = await supabase
         .from('user_practice_vows')
-        .select('id, source, cohort_id, custom_name, target_count, target_period, daily_target, weekly_target, start_date, current_count, current_session_count, is_required_for_promotion, current_end_date, practices(name, unit, measurement, category, allowed_daily_targets, daily_target_locked), cohorts(name, timezone)')
+        .select('id, source, cohort_id, custom_name, target_count, target_period, daily_target, weekly_target, start_date, current_count, current_session_count, is_required_for_promotion, current_end_date, practices(name, unit, measurement, category, allowed_daily_targets, daily_target_locked, self_study_allowed_daily_targets, self_study_daily_target_locked), cohorts(name, timezone)')
         .eq('user_id', uid)
         .eq('status', 'active');
       if (error) throw error;
@@ -118,7 +121,11 @@ export function useMyVows() {
         target_count: number | null; target_period: string; daily_target: number | null; weekly_target: number | null; start_date: string | null;
         current_count: number | null; current_session_count: number | null;
         is_required_for_promotion: boolean | null; current_end_date: string | null;
-        practices: { name?: string; unit?: string; measurement?: string; category?: string | null; allowed_daily_targets?: number[] | null; daily_target_locked?: boolean | null } | null;
+        practices: {
+          name?: string; unit?: string; measurement?: string; category?: string | null;
+          allowed_daily_targets?: number[] | null; daily_target_locked?: boolean | null;
+          self_study_allowed_daily_targets?: number[] | null; self_study_daily_target_locked?: boolean | null;
+        } | null;
         cohorts: { name?: string | null; timezone?: string | null } | null;
       }[];
       if (rows.length === 0) return [];
@@ -178,8 +185,8 @@ export function useMyVows() {
           endDate: r.current_end_date,
           todayCount: todayMap.get(r.id) ?? 0,
           weekCount: weekMap.get(r.id) ?? 0,
-          allowedDailyTargets: r.practices?.allowed_daily_targets ?? null,
-          dailyTargetLocked: !!r.practices?.daily_target_locked,
+          allowedDailyTargets: r.source === 'auto' ? (r.practices?.allowed_daily_targets ?? null) : (r.practices?.self_study_allowed_daily_targets ?? null),
+          dailyTargetLocked: r.source === 'auto' ? !!r.practices?.daily_target_locked : !!r.practices?.self_study_daily_target_locked,
           status: statusMap.get(r.id) ?? 'na',
         }))
         // 计数型在前、时长型(观修)在后;升学硬依据优先

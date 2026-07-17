@@ -146,6 +146,26 @@ CHECKS = [
     # provision_selfstudy_vows 改成3参(p_today);2参签名已被新迁移DROP,fn_exists探不出"参数
     # 变没变"(只要函数名存在的某个重载就算在场),这条只确认新3参签名真的能被探到。
     ("provision_selfstudy_vows() 函数(新3参签名)", "20260716000000_provision_current_date_fallback", lambda: fn_exists("provision_selfstudy_vows", {"p_user_id": "00000000-0000-0000-0000-000000000000", "p_program_id": "00000000-0000-0000-0000-000000000000", "p_today": "2026-01-01"})),
+    # ── 2026-07-17 批次(本清单同步跟到这里;此前落过一周的漂移,这次当场补,别再欠账)──
+    # exam_grades_score_integer_check(20260717000000)、questions/question_references 两条
+    # 长度CHECK(20260717000100)都是纯约束改动,列本就存在,REST探不到"约束是否真的加上"——
+    # 同0713-300那批的已知限制,验证走直接试插入(考试分数填85.5 / 思考题填超5000字,应报错)。
+    ("cohorts.reminder_enabled 列", "20260717000200_cohort_reminders", lambda: col_exists("cohorts", "reminder_enabled")),
+    ("cohorts.reminder_weekday 列", "20260717000200_cohort_reminders", lambda: col_exists("cohorts", "reminder_weekday")),
+    ("update_reminder_settings() 函数", "20260717000200_cohort_reminders", lambda: fn_exists("update_reminder_settings", {"p_cohort_id": "00000000-0000-0000-0000-000000000000", "p_enabled": False, "p_weekday": None, "p_time": None, "p_message": None})),
+    # 20260717000300_cohort_reminders_cron 整条都是注释/占位(同account_deletion/
+    # search_log_retention_cron先例):真正的pg_cron.schedule(...)要Eric在部署Edge Function后
+    # 手动执行(含项目专属URL/密钥,写死进自动迁移在别的环境会报错/误导)——这条文件本身
+    # 对库无任何可探测的产物,不进本清单;"有没有真的定时发提醒"要看cron.job表或等到点实测。
+    ("practices.self_study_daily_target_locked 列", "20260717000600_practice_pace_lock_self_study_channel", lambda: col_exists("practices", "self_study_daily_target_locked")),
+    ("practices.self_study_allowed_daily_targets 列", "20260717000600_practice_pace_lock_self_study_channel", lambda: col_exists("practices", "self_study_allowed_daily_targets")),
+    # 20260717000400(daily_target_locked默认值改true)+20260717000500(存量回填UPDATE)都不新增
+    # 列/表/函数(只改DEFAULT、跑UPDATE),REST探不出"默认值改了没""回填过没"——同上述CHECK约束
+    # 那类限制,验证方式:建一条新modelpractices行看daily_target_locked是不是默认true(400)/
+    # 抽查几条存量修法的daily_target_locked是不是已经是true(500)。
+    # vows_check_daily_target()函数体改了(按source分通道读锁定字段,20260717000600尾段)但签名
+    # 没变,fn_exists探不出"改没改"(同0714-000 attendance_dim_lag那类false negative)——验证靠
+    # e2e/vow-detail.spec.ts那条"调整节奏"测试真跑一遍(自定功课能不能真的存进新daily_target)。
 ]
 
 print(f"库:{URL}\n")

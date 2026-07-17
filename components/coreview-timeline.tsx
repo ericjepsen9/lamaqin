@@ -18,13 +18,13 @@ const fmtWan = (n: number) => (n >= 10000 ? `${(n / 10000).toFixed(n >= 1000000 
 
 export function CoreviewList({ nodes, showMonths }: { nodes: CoreviewNode[]; showMonths?: boolean }) {
   const router = useRouter();
-  let lastMonth = '';
   return (
     <View>
       {nodes.map((n, i) => {
+        // 跟前一条比较月份(react-hooks/immutability·2026-07-17 lint债清理):不再用渲染期间
+        // 会被reassign的外部变量累积"上一次显示的月份",nodes按日期升序,跟"上一条"比较等价。
         const ym = n.date.slice(0, 7);
-        const monthHeader = showMonths && ym !== lastMonth;
-        if (monthHeader) lastMonth = ym;
+        const monthHeader = showMonths && (i === 0 || nodes[i - 1].date.slice(0, 7) !== ym);
         return (
           <View key={n.key}>
             {monthHeader ? <RNText style={styles.monthHead}>{`${Number(n.date.slice(0, 4))} 年 ${Number(n.date.slice(5, 7))} 月`}</RNText> : null}

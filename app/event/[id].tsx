@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { CalendarClock, ChevronLeft, HandHeart, Video } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -37,14 +37,14 @@ export default function EventDetail() {
   const [target, setTarget] = useState<number | null>(null);
   const [customStr, setCustomStr] = useState('');
   const [targetInited, setTargetInited] = useState(false);
-  useEffect(() => {
-    if (!targetInited && ev) {
-      const sug = ev.suggestedTarget ?? null;
-      if (sug != null && !TARGETS.some((t) => t.value === sug)) setCustomStr(String(sug)); // 建议值不在快捷挡 → 进自定框
-      setTarget(sug);
-      setTargetInited(true);
-    }
-  }, [ev, targetInited]);
+  // 渲染期间直接判定,不用effect(react-hooks/set-state-in-effect·2026-07-17 lint债清理):
+  // targetInited这个guard本身在设true后就不再成立,不会无限重入,不需要额外track"上一次的值"。
+  if (!targetInited && ev) {
+    const sug = ev.suggestedTarget ?? null;
+    if (sug != null && !TARGETS.some((t) => t.value === sug)) setCustomStr(String(sug)); // 建议值不在快捷挡 → 进自定框
+    setTarget(sug);
+    setTargetInited(true);
+  }
   const customNum = customStr.trim() ? Math.max(1, parseInt(customStr, 10) || 0) || null : null;
   const effectiveTarget = customNum ?? target; // 自定填了数 → 覆盖挡位
 

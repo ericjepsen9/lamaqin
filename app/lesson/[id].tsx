@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Calendar, ChevronLeft, Headphones, ListChecks, Presentation, Video } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Modal, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { ActivityIndicator, Animated, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -246,7 +246,8 @@ export default function LessonFlow() {
 
   // ── 顶/底栏滚动隐藏(PM 2026-06-29):下滑沉浸阅读时收起顶部(标题+进度轴)与底部导航,上滑/回顶恢复 ──
   const scrollY = useRef(0);
-  const barAnim = useRef(new Animated.Value(0)).current; // 0=显示 1=隐藏
+  // useState 惰性初始化取代 useRef(...).current(react-hooks/refs·2026-07-17 lint债清理)。
+  const [barAnim] = useState(() => new Animated.Value(0)); // 0=显示 1=隐藏
   const barShown = useRef(true);
   const [topH, setTopH] = useState(96);
   const [navH, setNavH] = useState(76);
@@ -280,7 +281,8 @@ export default function LessonFlow() {
   const restoredProgressRef = useRef(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const meIdRef = useRef<string | undefined>(undefined);
-  meIdRef.current = me.data?.id;
+  // 写ref放进effect,不在渲染期间同步写(react-hooks/refs·2026-07-17 lint债清理)。
+  useEffect(() => { meIdRef.current = me.data?.id; }, [me.data?.id]);
   useEffect(() => {
     if (restoredProgressRef.current || cur !== 'wensi') return;
     if (!savedProgress || savedProgress.lastMedia !== 'text') return;
@@ -479,7 +481,7 @@ export default function LessonFlow() {
                   <Pressable disabled={boundIdx === 0} onPress={() => setQIdx((i) => Math.max(0, i - 1))} style={[styles.qNav, boundIdx === 0 && { opacity: 0.4 }]}><RNText style={styles.qNavTxt}>‹ 上一题</RNText></Pressable>
                   <Pressable disabled={boundIdx === questions.length - 1} onPress={() => setQIdx((i) => Math.min(questions.length - 1, i + 1))} style={[styles.qNav, boundIdx === questions.length - 1 && { opacity: 0.4 }]}><RNText style={styles.qNavTxt}>下一题 ›</RNText></Pressable>
                 </View>
-                <RNText style={{ fontSize: 11, color: INK3 }}>圆满只看"问答题(法本思考题)"全部提交;其余题型为练习、不计圆满。</RNText>
+                <RNText style={{ fontSize: 11, color: INK3 }}>圆满只看&ldquo;问答题(法本思考题)&rdquo;全部提交;其余题型为练习、不计圆满。</RNText>
               </View>
             );
           })()
@@ -563,9 +565,12 @@ export default function LessonFlow() {
       </Modal>
 
       {/* 完成确认(听闻/阅读 + 补录日期) */}
-      {/* animationType="none"(A7无障碍扫描2026-07-14发现,同quick-count-sheet.tsx注释):
-          react-native-web的Modal动画期间aria-modal先于role="dialog"~250ms挂上,axe-core判定critical */}
-      <Modal aria-label="标记完成确认" visible={markOpen} transparent animationType="none" onRequestClose={() => setMarkOpen(false)}>
+      {/* animationType 分平台(2026-07-17 PM"没有展开动画"折中方案,同quick-count-sheet.tsx):
+          问题只在web——react-native-web的Modal动画期间aria-modal先于role="dialog"~250ms挂上,
+          axe-core判定critical(A7无障碍扫描2026-07-14发现);原生端不走这套web ARIA机制,恢复动画。 */}
+      <Modal aria-label="标记完成确认" visible={markOpen} transparent animationType={Platform.OS === 'web' ? 'none' : 'slide'} onRequestClose={() => setMarkOpen(false)}>
+        {/* KeyboardAvoidingView(2026-07-17·PM真机反馈键盘挡住弹层输入框,全app排查后补齐) */}
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <Pressable style={styles.backdrop} onPress={() => setMarkOpen(false)}>
           <Pressable style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]} onPress={() => {}}>
             <View style={styles.handle} />
@@ -602,10 +607,12 @@ export default function LessonFlow() {
             </Pressable>
           </Pressable>
         </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* 法本纠错(写 feedback 表·预填课程节次上下文) */}
       <Modal visible={correctionOpen} transparent animationType="slide" onRequestClose={() => setCorrectionOpen(false)}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <Pressable style={styles.backdrop} onPress={() => setCorrectionOpen(false)}>
           <Pressable style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]} onPress={() => {}}>
             <View style={styles.handle} />
@@ -636,6 +643,7 @@ export default function LessonFlow() {
             {submitCorrection.isError ? <RNText style={{ fontSize: 11, color: SAFFRON_DARK, marginTop: 8, textAlign: 'center' }}>提交失败,请重试。</RNText> : null}
           </Pressable>
         </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* 前进未完成软提示 */}

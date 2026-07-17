@@ -85,13 +85,16 @@ function CreateCohortModal({ visible, onClose, onCreated }: {
   const [useCustomTz, setUseCustomTz] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  // 每次打开重置
-  useEffect(() => {
+  // 每次打开重置——渲染期间比对上一次的visible(react-hooks/set-state-in-effect·
+  // 2026-07-17 lint债清理)
+  const [prevVisible, setPrevVisible] = useState(visible);
+  if (visible !== prevVisible) {
+    setPrevVisible(visible);
     if (visible) {
       setProgramId(null); setName(''); setCode(''); setStartDate('');
       setTz('Asia/Shanghai'); setCustomTz(''); setUseCustomTz(false); setErr(null);
     }
-  }, [visible]);
+  }
 
   const effectiveTz = useCustomTz ? customTz.trim() : tz;
   const sd = startDate.trim();

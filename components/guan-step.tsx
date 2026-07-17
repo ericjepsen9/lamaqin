@@ -1,6 +1,6 @@
 import { Check, Pencil, Play, Presentation } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
-import { Linking, Modal, Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Linking, Modal, Platform, Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
 import { SlideViewer } from '@/components/slide-viewer';
@@ -120,7 +120,8 @@ export function GuanStep({ lessonId, media, videoId, downloadUrl, slideImageUrls
 
       {/* 填写时间 */}
       <Modal visible={manualOpen} transparent animationType="fade" onRequestClose={() => setManualOpen(false)}>
-        <View style={styles.modalRoot}>
+        {/* KeyboardAvoidingView(2026-07-17·PM真机反馈键盘挡住弹层输入框,全app排查后补齐) */}
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalRoot}>
           <View style={styles.dialog}>
             <Text className="font-serif" style={{ fontSize: 16, fontWeight: '700', color: INK }}>填写打坐时间</Text>
             <RNText style={{ fontSize: 12, color: INK3, marginTop: 4 }}>忘了计时 / 线下已打坐,直接填本座分钟数</RNText>
@@ -133,7 +134,7 @@ export function GuanStep({ lessonId, media, videoId, downloadUrl, slideImageUrls
               <Pressable testID={testIds.guan.manualConfirmButton} style={[styles.dlgBtn, { backgroundColor: SAFFRON }]} onPress={onManual}><RNText style={{ color: '#fff', fontWeight: '700' }}>确认</RNText></Pressable>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );

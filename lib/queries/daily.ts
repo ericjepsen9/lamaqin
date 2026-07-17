@@ -68,6 +68,31 @@ export function useMyDailyLessons() {
   });
 }
 
+// 本周暂无排课时(休息周/未排)的兜底目标(PM 2026-07-17):此前兜底按钮跳全部课程目录,
+//   师兄反馈"这个页面让人不明白"——改跳「当前学习课程」的详情页(该页本身对"本周没排上"
+//   已有优雅兜底:course/[id].tsx 的 ThisWeek 组件在 weekLessons 为空时会退到"第一节未圆满课",
+//   不需要重复实现)。只需解出"当前学习课程是哪一门"——同专业若挂了多门课,取 sort_order 最前的
+//   那门(专业下的"主课"惯例,同排课/自选经候选清单等处的排序口径一致)。
+export function useProgramPrimaryCourseId(programId: string | null | undefined) {
+  return useQuery({
+    queryKey: ['program-primary-course', programId ?? 'none'],
+    enabled: !!programId,
+    staleTime: 10 * 60 * 1000,
+    queryFn: async (): Promise<string | null> => {
+      if (!programId) return null;
+      const { data, error } = await supabase
+        .from('program_courses')
+        .select('course_id')
+        .eq('program_id', programId)
+        .order('sort_order')
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data?.course_id ?? null;
+    },
+  });
+}
+
 // 每日功课 · 闻思「内容清单」(PM 2026-06-30):把每节当天要学的内容件(听讲记/读法本/答思考题/观修)逐项列出,
 //   并标已完成态——让"今天这节要学什么"一目了然,不再藏在单个"去学习"按钮后;按学修顺序排列(对齐 lesson 流程)。
 // 铁律1(不臆造):组件存在性据真实数据判定——

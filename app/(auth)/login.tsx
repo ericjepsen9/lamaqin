@@ -21,7 +21,7 @@ export default function Login() {
     <SafeAreaView role="main" style={{ flex: 1, backgroundColor: '#FBF4E9' }}>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, gap: 8 }}>
         <View style={styles.mark}><Flower2 size={34} color={SAFFRON_DARK} /></View>
-        <Text className="font-serif" style={{ fontSize: 26, fontWeight: '700', color: INK, letterSpacing: 2, marginTop: 8 }}>纽约佛学会 · 闻思修</Text>
+        <Text className="font-serif" style={{ fontSize: 26, fontWeight: '700', color: INK, letterSpacing: 2, marginTop: 8 }}>纽约佛学会</Text>
         <RNText style={{ fontSize: 13, color: INK3, letterSpacing: 1 }}>前行发心 · 正行无缘 · 结行回向</RNText>
 
         <View style={{ width: '100%', maxWidth: 320, gap: 12, marginTop: 28 }}>

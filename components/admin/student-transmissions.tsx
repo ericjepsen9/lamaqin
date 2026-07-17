@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
 
 import { AdminButton, Badge } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
@@ -66,6 +66,8 @@ export function StudentTransmissions({ userId, name, canWrite }: { userId: strin
       ) : null}
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+        {/* KeyboardAvoidingView(2026-07-17·PM真机反馈键盘挡住弹层输入框,全app排查后补齐) */}
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <Pressable style={styles.backdrop} onPress={() => setOpen(false)}>
           <Pressable style={styles.card} onPress={() => {}}>
             <Text className="font-serif" style={styles.cardTitle}>录入传承</Text>
@@ -95,6 +97,7 @@ export function StudentTransmissions({ userId, name, canWrite }: { userId: strin
             ) : null}
           </Pressable>
         </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );

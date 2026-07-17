@@ -2,7 +2,7 @@ import { format, isSameDay, subDays } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Calendar, ChevronLeft, Plus, Sliders, XCircle } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DatePickerModal } from '@/components/month-calendar';
@@ -125,15 +125,17 @@ export default function VowDetail() {
           {pct != null ? (<><View style={styles.statDiv} /><Stat k="进度" v={`${pct}%`} /></>) : null}
         </View>
 
-        {/* 计数(计数型) */}
+        {/* 计数(计数型)/ 记一笔(时长型;2026-07-17 修:此前文案指向"快速计数",但该弹层结构性
+            只收计数型愿、从不含时长型,师兄找不到打卡入口——改为本页直接开「记录」弹层,默认今天,
+            也可选过去日期,不再依赖措辞正确的说明文字) */}
         {isCount ? (
           <Pressable style={styles.countBtn} onPress={() => setQcOpen(true)}>
             <Plus size={18} color="#fff" /><RNText style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>计数</RNText>
           </Pressable>
         ) : (
-          <View style={styles.noteCard}>
-            <RNText style={{ fontSize: 13, color: INK2, lineHeight: 20 }}>观修 · 座次为时长型功课,请在打座结束后于「快速计数」记录本次座数 / 分钟。</RNText>
-          </View>
+          <Pressable style={styles.countBtn} onPress={() => setBackfillOpen(true)}>
+            <Plus size={18} color="#fff" /><RNText style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>记一笔</RNText>
+          </Pressable>
         )}
 
         {/* 节奏 + 周期(决策085 节奏自主) */}
@@ -154,20 +156,23 @@ export default function VowDetail() {
             ) : null}
           </View>
           {vow.source === 'auto' ? <RNText style={{ fontSize: 11, color: INK3, marginTop: 6 }}>班级功课:项目 / 总数 / 周期锁定,仅节奏可调。</RNText>
-            : isDerivedLimited ? <RNText style={{ fontSize: 11, color: INK3, marginTop: 6 }}>限期功课:每日 / 每周量按"剩余 ÷ 剩余天 · 周"自动算,落下会自动调高。</RNText> : null}
+            : isDerivedLimited ? <RNText style={{ fontSize: 11, color: INK3, marginTop: 6 }}>限期功课:每日 / 每周量按&ldquo;剩余 ÷ 剩余天 · 周&rdquo;自动算,落下会自动调高。</RNText> : null}
         </Section>
 
-        {/* 补录(信任师兄·原则6) */}
-        <Section title="补录">
-          <Pressable testID={testIds.vowDetail.backfillButton} style={styles.infoRow} onPress={() => setBackfillOpen(true)}>
-            <Calendar size={18} color={INK2} />
-            <View style={{ flex: 1 }}>
-              <RNText style={{ fontSize: 14, fontWeight: '600', color: INK }}>补录过去的{isCount ? '遍数' : '座次 / 时长'}</RNText>
-              <RNText style={{ fontSize: 12, color: INK3, marginTop: 1 }}>选过去日期补记,即时生效</RNText>
-            </View>
-            <RNText style={{ fontSize: 13, fontWeight: '700', color: SAFFRON_DARK }}>补录 ›</RNText>
-          </Pressable>
-        </Section>
+        {/* 补录(信任师兄·原则6)。时长型愿已改用上方「记一笔」统一入口(同一个 BackfillSheet,
+            自带"今天/昨天/前天/选日期",不必再重复一个入口),此处只留给计数型愿单独补过去的遍数。 */}
+        {isCount ? (
+          <Section title="补录">
+            <Pressable testID={testIds.vowDetail.backfillButton} style={styles.infoRow} onPress={() => setBackfillOpen(true)}>
+              <Calendar size={18} color={INK2} />
+              <View style={{ flex: 1 }}>
+                <RNText style={{ fontSize: 14, fontWeight: '600', color: INK }}>补录过去的遍数</RNText>
+                <RNText style={{ fontSize: 12, color: INK3, marginTop: 1 }}>选过去日期补记,即时生效</RNText>
+              </View>
+              <RNText style={{ fontSize: 13, fontWeight: '700', color: SAFFRON_DARK }}>补录 ›</RNText>
+            </Pressable>
+          </Section>
+        ) : null}
 
         {/* 计数历史 */}
         <VowHistory vowId={vow.vowId} isCount={isCount} unit={unit} />
@@ -229,6 +234,9 @@ function PaceSheet({ open, onClose, vow }: { open: boolean; onClose: () => void;
   const update = useUpdateVowPace();
   const isWeekly = vow.targetPeriod === 'weekly';
   const initial = isWeekly ? vow.weeklyTarget : vow.dailyTarget;
+  // 节奏锁定/白名单(PD-6/9/19,2026-07-17方案3双通道):班级(auto)/自学(custom)各自独立配置,
+  // useMyVows 已按 vow.source 选好对应那组字段暴露成 vow.dailyTargetLocked/allowedDailyTargets,
+  // 这里不用再关心是哪个通道——同一条修法完全可能班级锁定、自学自由(或反过来)。
   const locked = !isWeekly && vow.dailyTargetLocked;
   const whitelist = !isWeekly && !locked && vow.allowedDailyTargets && vow.allowedDailyTargets.length > 0 ? vow.allowedDailyTargets : null;
   // 当前值若不在白名单里(老数据·约束是后补的,历史行没被回填过),不要预选一个"看似选中"却非法的值——
@@ -253,41 +261,45 @@ function PaceSheet({ open, onClose, vow }: { open: boolean; onClose: () => void;
 
   return (
     <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={styles.sheet} onPress={() => {}}>
-          <View style={styles.handle} />
-          <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>调整节奏</Text>
-          {locked ? (
-            <RNText style={{ fontSize: 13, color: INK2, marginTop: 8, lineHeight: 20 }}>
-              该功课的每日目标已锁定,不可自行更改(避免变相换号)。选错了请联系管理员纠正。
-            </RNText>
-          ) : (
-            <>
-              <RNText style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>改节奏无需审批,随时按自己的状态调整。</RNText>
-              <Text style={{ fontSize: 12, fontWeight: '600', color: INK3, marginBottom: 6 }}>{label}{required ? '(必填)' : '(可选)'}</Text>
-              {whitelist ? (
-                <>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                    {whitelist.map((t) => (
-                      <Pressable key={t} style={[styles.pchip, picked === t && styles.pchipOn]} onPress={() => setPicked(t)}>
-                        <RNText style={{ fontSize: 14, fontWeight: '700', color: picked === t ? '#fff' : INK2 }}>{t}</RNText>
-                      </Pressable>
-                    ))}
-                  </View>
-                  <RNText style={{ fontSize: 11, color: INK3, marginTop: 8 }}>该修法每日目标只能选以上数值之一。</RNText>
-                </>
-              ) : (
-                <TextInput testID={testIds.vowDetail.paceInput} value={val} onChangeText={setVal} keyboardType="number-pad" placeholder={`${isWeekly ? '每周' : '每日'} ${vow.unit}数${required ? '' : ';留空=不设'}`} placeholderTextColor={INK3} maxLength={9} style={styles.fieldInput} />
-              )}
-            </>
-          )}
-          {!locked ? (
-            <Pressable testID={testIds.vowDetail.paceSaveButton} style={[styles.saveBtn, !canSave && { opacity: 0.4 }]} disabled={!canSave} onPress={submit}>
-              <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>保存</RNText>
-            </Pressable>
-          ) : null}
+      {/* KeyboardAvoidingView(2026-07-17·PM真机实测反馈:键盘弹出挡住输入框+保存按钮,不会自动
+          让位)——Modal 是独立原生层,系统不会帮它避让键盘,必须显式包一层。 */}
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <Pressable style={styles.backdrop} onPress={onClose}>
+          <Pressable style={styles.sheet} onPress={() => {}}>
+            <View style={styles.handle} />
+            <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>调整节奏</Text>
+            {locked ? (
+              <RNText style={{ fontSize: 13, color: INK2, marginTop: 8, lineHeight: 20 }}>
+                该功课的每日目标已锁定,不可自行更改(避免变相换号)。选错了请联系管理员纠正。
+              </RNText>
+            ) : (
+              <>
+                <RNText style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>改节奏无需审批,随时按自己的状态调整。</RNText>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: INK3, marginBottom: 6 }}>{label}{required ? '(必填)' : '(可选)'}</Text>
+                {whitelist ? (
+                  <>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                      {whitelist.map((t) => (
+                        <Pressable key={t} style={[styles.pchip, picked === t && styles.pchipOn]} onPress={() => setPicked(t)}>
+                          <RNText style={{ fontSize: 14, fontWeight: '700', color: picked === t ? '#fff' : INK2 }}>{t}</RNText>
+                        </Pressable>
+                      ))}
+                    </View>
+                    <RNText style={{ fontSize: 11, color: INK3, marginTop: 8 }}>该修法每日目标只能选以上数值之一。</RNText>
+                  </>
+                ) : (
+                  <TextInput testID={testIds.vowDetail.paceInput} value={val} onChangeText={setVal} keyboardType="number-pad" placeholder={`${isWeekly ? '每周' : '每日'} ${vow.unit}数${required ? '' : ';留空=不设'}`} placeholderTextColor={INK3} maxLength={9} style={styles.fieldInput} />
+                )}
+              </>
+            )}
+            {!locked ? (
+              <Pressable testID={testIds.vowDetail.paceSaveButton} style={[styles.saveBtn, !canSave && { opacity: 0.4 }]} disabled={!canSave} onPress={submit}>
+                <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>保存</RNText>
+              </Pressable>
+            ) : null}
+          </Pressable>
         </Pressable>
-      </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -316,34 +328,36 @@ function BackfillSheet({ open, onClose, vow, isCount }: { open: boolean; onClose
   return (
     <>
       <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
-        <Pressable style={styles.backdrop} onPress={onClose}>
-          <Pressable style={styles.sheet} onPress={() => {}}>
-            <View style={styles.handle} />
-            <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>补录 · {vow.name}</Text>
-            <RNText style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>补记过去某天的{isCount ? `${vow.unit}数` : '时长(分钟)'},即时累计(不能补未来)。</RNText>
-            <Text style={{ fontSize: 12, fontWeight: '600', color: INK3, marginBottom: 6 }}>哪天</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              {QUICK_DAYS.map((q) => {
-                const qd = subDays(new Date(), q.back);
-                const on = isSameDay(date, qd);
-                return (
-                  <Pressable key={q.label} style={[styles.pchip, on && styles.pchipOn]} onPress={() => setDate(qd)}>
-                    <RNText style={{ fontSize: 13, fontWeight: '600', color: on ? '#fff' : INK2 }}>{q.label}</RNText>
-                  </Pressable>
-                );
-              })}
-              <Pressable style={styles.pchip} onPress={() => setCalOpen(true)}>
-                <RNText style={{ fontSize: 13, fontWeight: '600', color: SAFFRON_DARK }}>选日期</RNText>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+          <Pressable style={styles.backdrop} onPress={onClose}>
+            <Pressable style={styles.sheet} onPress={() => {}}>
+              <View style={styles.handle} />
+              <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>记录 · {vow.name}</Text>
+              <RNText style={{ fontSize: 12, color: INK3, marginTop: 2, marginBottom: 12 }}>选日期(默认今天,也可选过去日期补记)+ 填{isCount ? `${vow.unit}数` : '时长(分钟)'},即时累计(不能选未来)。</RNText>
+              <Text style={{ fontSize: 12, fontWeight: '600', color: INK3, marginBottom: 6 }}>哪天</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                {QUICK_DAYS.map((q) => {
+                  const qd = subDays(new Date(), q.back);
+                  const on = isSameDay(date, qd);
+                  return (
+                    <Pressable key={q.label} style={[styles.pchip, on && styles.pchipOn]} onPress={() => setDate(qd)}>
+                      <RNText style={{ fontSize: 13, fontWeight: '600', color: on ? '#fff' : INK2 }}>{q.label}</RNText>
+                    </Pressable>
+                  );
+                })}
+                <Pressable style={styles.pchip} onPress={() => setCalOpen(true)}>
+                  <RNText style={{ fontSize: 13, fontWeight: '600', color: SAFFRON_DARK }}>选日期</RNText>
+                </Pressable>
+              </View>
+              <RNText style={{ fontSize: 11, color: SAGE, marginTop: 6 }}>补录日期:{logDate}</RNText>
+              <Text style={{ fontSize: 12, fontWeight: '600', color: INK3, marginTop: 14, marginBottom: 6 }}>{isCount ? `${vow.unit}数` : '时长(分钟)'}</Text>
+              <TextInput testID={testIds.vowDetail.backfillAmountInput} value={amount} onChangeText={setAmount} keyboardType="number-pad" placeholder={isCount ? `补录的${vow.unit}数` : '分钟数(≥30 计 1 座)'} placeholderTextColor={INK3} maxLength={9} style={styles.fieldInput} />
+              <Pressable testID={testIds.vowDetail.backfillSubmitButton} style={[styles.saveBtn, !canSave && { opacity: 0.4 }]} disabled={!canSave} onPress={submit}>
+                <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>记录</RNText>
               </Pressable>
-            </View>
-            <RNText style={{ fontSize: 11, color: SAGE, marginTop: 6 }}>补录日期:{logDate}</RNText>
-            <Text style={{ fontSize: 12, fontWeight: '600', color: INK3, marginTop: 14, marginBottom: 6 }}>{isCount ? `${vow.unit}数` : '时长(分钟)'}</Text>
-            <TextInput testID={testIds.vowDetail.backfillAmountInput} value={amount} onChangeText={setAmount} keyboardType="number-pad" placeholder={isCount ? `补录的${vow.unit}数` : '分钟数(≥30 计 1 座)'} placeholderTextColor={INK3} maxLength={9} style={styles.fieldInput} />
-            <Pressable testID={testIds.vowDetail.backfillSubmitButton} style={[styles.saveBtn, !canSave && { opacity: 0.4 }]} disabled={!canSave} onPress={submit}>
-              <RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>补录</RNText>
             </Pressable>
           </Pressable>
-        </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
       <DatePickerModal visible={calOpen} value={date} maxDate={new Date()} onPick={setDate} onClose={() => setCalOpen(false)} title="选择补录日期" />
     </>
@@ -358,7 +372,7 @@ function VowHistory({ vowId, isCount, unit }: { vowId: string; isCount: boolean;
       {isLoading ? (
         <View style={{ paddingVertical: 16, alignItems: 'center' }}><ActivityIndicator color={SAFFRON_DARK} /></View>
       ) : logs.length === 0 ? (
-        <RNText style={{ fontSize: 13, color: INK3 }}>还没有记录。点上面「计数」或「补录」记一笔。</RNText>
+        <RNText style={{ fontSize: 13, color: INK3 }}>{isCount ? '还没有记录。点上面「计数」或「补录」记一笔。' : '还没有记录。点上面「记一笔」试试。'}</RNText>
       ) : (
         <View style={styles.histCard}>
           {logs.map((l, i) => {
@@ -413,7 +427,6 @@ const styles = StyleSheet.create({
   statsCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 16, paddingVertical: 16, borderWidth: 1, borderColor: 'rgba(43,34,24,0.06)' },
   statDiv: { width: 1, alignSelf: 'stretch', backgroundColor: 'rgba(43,34,24,0.08)', marginVertical: 4 },
   countBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 14, borderRadius: 14, backgroundColor: SAFFRON },
-  noteCard: { backgroundColor: '#fff', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: 'rgba(43,34,24,0.06)' },
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#fff', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: 'rgba(43,34,24,0.06)' },
   smallBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: 'rgba(224,120,86,0.5)', borderRadius: 9999, paddingHorizontal: 12, paddingVertical: 6 },
   histCard: { backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(43,34,24,0.06)' },

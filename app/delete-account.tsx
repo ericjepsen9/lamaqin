@@ -15,7 +15,6 @@ import { supabase } from '@/lib/supabase';
 // 找回仅限后台管理操作,本页/重新登录都不提供自助撤回。
 const INK = '#2b2218';
 const INK2 = '#55463a';
-const INK3 = '#7e6d5b';
 const SAFFRON_DARK = '#b35535';
 const CRIM = '#a13c2e';
 

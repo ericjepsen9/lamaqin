@@ -1,18 +1,25 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
-import { Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import { useEffect, useState } from 'react';
+import { Platform, Pressable, ScrollView, StyleSheet, Text as RNText, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
+import { useAuth } from '@/lib/auth';
 import { FONT_LEVELS, useFontScale } from '@/lib/font-scale';
 import { DOWNLOADS_SUPPORTED } from '@/lib/downloads';
+import { requestPushPermissionAndRegisterToken } from '@/lib/push-notifications';
 import { supabase } from '@/lib/supabase';
+import { testIds } from '@/lib/testids';
 
 // 设置(决策160·从「我的」进)。整合通知/偏好/账号隐私/关于。
-// 通知:系统推送 A/B/C 类(决策068)+ 自设提醒(决策102 恢复 v1.0)+ 殊胜日提醒(决策075 UTC+8)。
-//   ⚠️ 关怀通知不在此(care_followups 对本人不可见/不推送·隐私红线·决策035)。
+// 通知:学习提醒(决策188方案A,2026-07-17接线)——这里只显示"本设备通知权限"这个真实状态+
+//   给拒绝过系统权限弹窗的人一个手动重开的后路;是否真的发提醒由所在班级的辅导员配置
+//   (cohort.reminder_*,管理端「学习提醒」),决策188明确不做个人user_settings开关这层,
+//   这里不是、也不该是一个可以自己关掉提醒的开关。
 // 偏好:简繁体 v1.5+(决策089→暂禁用占位);字号本地。账号:注销走 Apple/Edge Function(决策078)。
-// 守:无状态色、无排名;退出 = 回登录。TODO:user_settings(推送开关/偏好·C3·v1.5排期)。
+// 守:无状态色、无排名;退出 = 回登录。
 //   （注销 Edge Function 已建·2026-07-10,此行此前过期未同步——待Eric部署,非前端待办）
 const INK = '#2b2218';
 const INK3 = '#7e6d5b';
@@ -20,9 +27,26 @@ const SAFFRON = '#e07856';
 const CRIM = '#a13c2e';
 export default function Settings() {
   const router = useRouter();
+  const { session } = useAuth();
   // 字号:全局持久化 store(改即全 app 联动·决策见 lib/font-scale.ts)
   const font = useFontScale((s) => s.level);
   const setFont = useFontScale((s) => s.setLevel);
+
+  // 本设备通知权限真实状态(决策188方案A·2026-07-17接线)。web不支持Expo Push这套token
+  // 机制(同lib/push-notifications.ts的Platform门控),直接标"仅移动端支持",不调用API。
+  const [notifStatus, setNotifStatus] = useState<'checking' | 'granted' | 'denied' | 'unsupported'>(
+    Platform.OS === 'web' ? 'unsupported' : 'checking',
+  );
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    Notifications.getPermissionsAsync().then((r) => setNotifStatus(r.granted ? 'granted' : 'denied'));
+  }, []);
+  const enableNotifications = async () => {
+    if (!session?.user.id) return;
+    await requestPushPermissionAndRegisterToken(session.user.id);
+    const r = await Notifications.getPermissionsAsync();
+    setNotifStatus(r.granted ? 'granted' : 'denied');
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FBF4E9' }} edges={['top']}>
@@ -31,12 +55,21 @@ export default function Settings() {
         <Text className="font-serif" style={{ fontSize: 17, fontWeight: '700', color: INK }}>设置</Text>
       </View>
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 16 }}>
-        {/* 通知(审计 P0 清空承诺·2026-07-02):v1 无推送系统,开关是纯本地假承诺 → 整区改「即将推出」;
-            提醒系统 v1.5(决策 D-7)上线时恢复 Toggle 并接 user_settings。 */}
         <Group title="通知">
           <View style={styles.row}>
-            <View style={{ flex: 1 }}><RNText style={styles.title}>学修 / 殊胜日 / 自设提醒</RNText><RNText style={styles.sub}>推送提醒功能完善中,上线后在这里开关</RNText></View>
-            <View style={styles.soonTag}><RNText style={{ fontSize: 11, color: INK3, fontWeight: '600' }}>即将推出</RNText></View>
+            <View style={{ flex: 1 }}>
+              <RNText style={styles.title}>学习提醒</RNText>
+              <RNText style={styles.sub}>是否提醒由所在班级的辅导员统一设置;这里是本设备的通知权限状态</RNText>
+            </View>
+            {notifStatus === 'granted' ? (
+              <View style={styles.soonTag}><RNText style={{ fontSize: 11, color: INK3, fontWeight: '600' }}>已开启</RNText></View>
+            ) : notifStatus === 'unsupported' ? (
+              <View style={styles.soonTag}><RNText style={{ fontSize: 11, color: INK3, fontWeight: '600' }}>仅移动端支持</RNText></View>
+            ) : notifStatus === 'checking' ? null : (
+              <Pressable testID={testIds.settings.enableNotificationsButton} style={styles.enableBtn} onPress={() => void enableNotifications()}>
+                <RNText style={{ fontSize: 12, color: '#fff', fontWeight: '700' }}>开启通知</RNText>
+              </Pressable>
+            )}
           </View>
         </Group>
 
@@ -72,7 +105,7 @@ export default function Settings() {
         {/* 关于 */}
         <Group title="关于">
           <View style={[styles.row, styles.rowBorder]}><View style={{ flex: 1 }}><RNText style={styles.title}>版本</RNText></View><RNText style={styles.sub}>纽约佛学会 v1.0.0</RNText></View>
-          <NavRow title="关于三殊胜" sub="闻思修 · 学修端" last onPress={() => router.push('/about')} />
+          <NavRow title="关于纽约佛学会" sub="闻思修 · 学修端" last onPress={() => router.push('/about')} />
         </Group>
 
         <Pressable style={styles.logout} onPress={async () => { await supabase.auth.signOut(); router.replace('/login'); }}>
@@ -89,27 +122,6 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
       <Text className="font-serif" style={{ fontSize: 14, fontWeight: '700', color: INK3, marginLeft: 4 }}>{title}</Text>
       <View style={styles.group}>{children}</View>
     </View>
-  );
-}
-function Toggle({ title, sub, value, onChange, last }: { title: string; sub: string; value: boolean; onChange: (v: boolean) => void; last?: boolean }) {
-  return (
-    <View style={[styles.row, !last && styles.rowBorder]}>
-      <View style={{ flex: 1 }}><RNText style={styles.title}>{title}</RNText><RNText style={styles.sub}>{sub}</RNText></View>
-      <IosSwitch value={value} onChange={onChange} />
-    </View>
-  );
-}
-// iOS 风格开关(自绘):web 上 RN Switch 不认 thumbColor 会出现绿色滑块,故自绘保证白滑块 + 藏红轨道。
-function IosSwitch({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <Pressable
-      onPress={() => onChange(!value)}
-      accessibilityRole="switch"
-      accessibilityState={{ checked: value }}
-      style={[styles.iosTrack, { backgroundColor: value ? SAFFRON : 'rgba(43,34,24,0.18)' }]}
-    >
-      <View style={[styles.iosThumb, value ? styles.iosThumbOn : null]} />
-    </Pressable>
   );
 }
 function NavRow({ title, sub, titleColor, last, onPress }: { title: string; sub?: string; titleColor?: string; last?: boolean; onPress?: () => void }) {
@@ -132,9 +144,6 @@ const styles = StyleSheet.create({
   segBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 9999 },
   segOn: { backgroundColor: SAFFRON },
   soonTag: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, backgroundColor: 'rgba(43,34,24,0.05)' },
+  enableBtn: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 9999, backgroundColor: SAFFRON },
   logout: { alignItems: 'center', paddingVertical: 15, borderRadius: 14, backgroundColor: '#fff', borderWidth: 1, borderColor: 'rgba(161,60,46,0.25)' },
-  // iOS 风格开关
-  iosTrack: { width: 50, height: 30, borderRadius: 15, padding: 2, justifyContent: 'center' },
-  iosThumb: { width: 26, height: 26, borderRadius: 13, backgroundColor: '#fff', alignSelf: 'flex-start', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 2, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
-  iosThumbOn: { alignSelf: 'flex-end' },
 });

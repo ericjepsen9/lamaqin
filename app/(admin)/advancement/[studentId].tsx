@@ -75,7 +75,15 @@ function ActionModal({ action, s, onConfirm, onCancel, pending }: {
 }) {
   const [basis, setBasis] = useState('');
   const [token, setToken] = useState('');
-  useEffect(() => { setBasis(''); setToken(genClientToken()); }, [action]);
+  // 换成"渲染期间比对上一次的action、变了就重置"(react-hooks/set-state-in-effect·2026-07-17
+  // lint债清理),按React官方"你可能不需要effect"指南里"prop变化时调整state"这个写法——
+  // 不用等commit后再触发一轮effect,同一次渲染内就把新弹窗该有的初始值定下来。
+  const [prevAction, setPrevAction] = useState(action);
+  if (action !== prevAction) {
+    setPrevAction(action);
+    setBasis('');
+    setToken(genClientToken());
+  }
   if (!action) return null;
   const CONFIG: Record<Exclude<ConfirmAction, null>, { title: string; desc: string; label: string; variant: AdminButtonVariant }> = {
     graduate: { title: '确认毕业', desc: '标记为「已毕业」并留痕(advancement_records),不可撤销。请确认五维并填判定依据。', label: '确认毕业', variant: 'confirm' },
@@ -121,7 +129,12 @@ function ExamModal({ visible, onClose, onSubmit, pending }: {
   const [score, setScore] = useState('');
   const [examFormat, setExamFormat] = useState<ExamFormat>('closed');
   const [token, setToken] = useState('');
-  useEffect(() => { if (visible) { setName(''); setScore(''); setExamFormat('closed'); setToken(genClientToken()); } }, [visible]);
+  // 渲染期间比对上一次的visible(同上ActionModal先例)
+  const [prevVisible, setPrevVisible] = useState(visible);
+  if (visible !== prevVisible) {
+    setPrevVisible(visible);
+    if (visible) { setName(''); setScore(''); setExamFormat('closed'); setToken(genClientToken()); }
+  }
   const n = Number(score.trim());
   // 2026-07-17·PM决定:考试分数不允许小数(此前85.5这类小数能存进去,PM明确要求改掉)
   const scoreValid = score.trim() !== '' && Number.isFinite(n) && Number.isInteger(n) && n >= 0 && n <= 100;
@@ -148,7 +161,12 @@ function ExemptModal({ visible, onClose, onSubmit, pending }: {
 }) {
   const [reason, setReason] = useState('');
   const [token, setToken] = useState('');
-  useEffect(() => { if (visible) { setReason(''); setToken(genClientToken()); } }, [visible]);
+  // 渲染期间比对上一次的visible(同上ActionModal先例)
+  const [prevVisible, setPrevVisible] = useState(visible);
+  if (visible !== prevVisible) {
+    setPrevVisible(visible);
+    if (visible) { setReason(''); setToken(genClientToken()); }
+  }
   const valid = reason.trim().length > 0;
   return (
     <AdminModal visible={visible} onClose={onClose} title="标记考试豁免" dismissOnOverlay={false}>

@@ -663,6 +663,11 @@ export type Database = {
           neijiaxing_lock_years: number;
           neijiaxing_ext_years: number;
           created_at: string | null;
+          reminder_enabled: boolean | null;
+          reminder_weekday: number | null;
+          reminder_time: string | null;
+          reminder_message: string | null;
+          reminder_last_sent_date: string | null;
         };
         Insert: {
           id?: string;
@@ -683,6 +688,11 @@ export type Database = {
           neijiaxing_lock_years?: number;
           neijiaxing_ext_years?: number;
           created_at?: string | null;
+          reminder_enabled?: boolean | null;
+          reminder_weekday?: number | null;
+          reminder_time?: string | null;
+          reminder_message?: string | null;
+          reminder_last_sent_date?: string | null;
         };
         Update: {
           id?: string;
@@ -703,6 +713,11 @@ export type Database = {
           neijiaxing_lock_years?: number;
           neijiaxing_ext_years?: number;
           created_at?: string | null;
+          reminder_enabled?: boolean | null;
+          reminder_weekday?: number | null;
+          reminder_time?: string | null;
+          reminder_message?: string | null;
+          reminder_last_sent_date?: string | null;
         };
         Relationships: [];
       };
@@ -1770,6 +1785,8 @@ export type Database = {
           session_mode: string | null;
           allowed_daily_targets: (number)[] | null;
           daily_target_locked: boolean | null;
+          self_study_daily_target_locked: boolean | null;
+          self_study_allowed_daily_targets: (number)[] | null;
         };
         Insert: {
           id?: string;
@@ -1784,6 +1801,8 @@ export type Database = {
           session_mode?: string | null;
           allowed_daily_targets?: (number)[] | null;
           daily_target_locked?: boolean | null;
+          self_study_daily_target_locked?: boolean | null;
+          self_study_allowed_daily_targets?: (number)[] | null;
         };
         Update: {
           id?: string;
@@ -1798,6 +1817,8 @@ export type Database = {
           session_mode?: string | null;
           allowed_daily_targets?: (number)[] | null;
           daily_target_locked?: boolean | null;
+          self_study_daily_target_locked?: boolean | null;
+          self_study_allowed_daily_targets?: (number)[] | null;
         };
         Relationships: [];
       };
@@ -3746,6 +3767,16 @@ export type Database = {
           p_practice_dow: number | null;
           p_practice_time: string | null;
           p_practice_zoom_url: string | null;
+        };
+        Returns: Json;
+      };
+      update_reminder_settings: {
+        Args: {
+          p_cohort_id: string | null;
+          p_enabled: boolean | null;
+          p_weekday?: number | null;
+          p_time?: string | null;
+          p_message?: string | null;
         };
         Returns: Json;
       };

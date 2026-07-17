@@ -170,23 +170,21 @@ export function useSpeechLibrary() {
     queryKey: ['speech-library', uid ?? 'anon'],
     staleTime: 60 * 1000,
     queryFn: async (): Promise<SpeechLibrary> => {
-      const [{ data: books, error: bErr }, { data: articles, error: aErr }, { data: res }] = await Promise.all([
+      // 5 条查询合并进一个 Promise.all(2026-07-17 修"每次进入都转圈,感觉慢"):此前"本人进度"
+      // 那 2 条故意等前 3 条(books/articles/resources)先跑完才发,但它们互不依赖对方结果
+      // (uid 在 queryFn 一开始就已知,不是从前 3 条查询里派生的),纯属多余的串行等待,
+      // 白白多等一轮网络往返。未登录时用本地空结果占位,不发多余请求。
+      const [{ data: books, error: bErr }, { data: articles, error: aErr }, { data: res }, clsRes, perRes] = await Promise.all([
         supabase.from('self_study_books').select('id, book_number, title, author, display_order').order('display_order'),
         supabase.from('self_study_articles').select('id, title, article_number, book_id, display_order').order('display_order'),
         supabase.from('self_study_resources').select('article_id'),
+        uid ? supabase.from('self_study_records').select('*').eq('user_id', uid) : Promise.resolve({ data: [] as MyRecordRow[] }),
+        uid ? supabase.from('personal_self_study_records').select('*').eq('user_id', uid) : Promise.resolve({ data: [] as MyRecordRow[] }),
       ]);
       if (bErr) throw bErr;
       if (aErr) throw aErr;
 
-      // 本人进度(未登录跳过;两表本人行数极小)
-      let mine: MyRecordRow[] = [];
-      if (uid) {
-        const [cls, per] = await Promise.all([
-          supabase.from('self_study_records').select('*').eq('user_id', uid),
-          supabase.from('personal_self_study_records').select('*').eq('user_id', uid),
-        ]);
-        mine = ([...(cls.data ?? []), ...(per.data ?? [])] as MyRecordRow[]);
-      }
+      const mine: MyRecordRow[] = [...(clsRes.data ?? []), ...(perRes.data ?? [])] as MyRecordRow[];
       const prog = new Map<string, { completed: boolean; watched: boolean; read: boolean; reading: boolean }>();
       for (const r of mine) {
         if (!r.article_id) continue;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
 
 import { AdminButton } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
@@ -66,7 +66,6 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
   // "拒绝"改判为"批准";拒绝按钮本身仍只在 pending 出现(不做"已批准/在读→打回拒绝"这条反向路,
   // 那是没被问到的另一件事,不在这次要求范围内)。
   const canApprove = status === 'pending' || status === 'rejected';
-  const primary = memberships.find((m) => m.isPrimary) ?? memberships[0] ?? null;
   const auditorMembership = memberships.find((m) => m.memberRole === 'auditor') ?? null;
 
   const graceDateValid = /^\d{4}-\d{2}-\d{2}$/.test(graceDate) && !Number.isNaN(new Date(graceDate + 'T00:00:00').getTime());
@@ -214,6 +213,8 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
 
       {/* 设宽限(auto 愿延期·#186)+ 暂停/恢复(决策071·auto必修愿须代停) */}
       <Modal visible={graceOpen} transparent animationType="fade" onRequestClose={() => setGraceOpen(false)}>
+        {/* KeyboardAvoidingView(2026-07-17·PM真机反馈键盘挡住弹层输入框,全app排查后补齐) */}
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <Pressable style={styles.backdrop} onPress={() => setGraceOpen(false)}>
           <Pressable style={styles.card} onPress={() => {}}>
             <Text className="font-serif" style={styles.cardTitle}>设宽限 / 暂停 / 纠正目标</Text>
@@ -304,10 +305,12 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
             )}
           </Pressable>
         </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* 代行(设计①·2026-07-08):替代/追溯认可/豁免。传承走独立"传承记录"入口(060/112 不含灌顶)。 */}
       <Modal visible={proxyOpen} transparent animationType="fade" onRequestClose={() => setProxyOpen(false)}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <Pressable style={styles.backdrop} onPress={() => setProxyOpen(false)}>
           <Pressable style={[styles.card, { maxHeight: '86%' }]} onPress={() => {}}>
             <Text className="font-serif" style={styles.cardTitle}>代行操作</Text>
@@ -402,6 +405,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
             </ScrollView>
           </Pressable>
         </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );

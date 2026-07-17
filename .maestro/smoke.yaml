@@ -1,0 +1,7 @@
+# 最小烟雾测试(方案B第一步·2026-07-17):只验证"装得上、启动得起来",
+# 不登录、不碰数据——先证明 CI 里"安卓模拟器 + Maestro"这条管线本身通不通。
+# 真正对着键盘遮挡/flex-wrap换行/观修入口这3个bug写的flow,等这条管线跑绿了再补。
+appId: com.bicwny.sssapp
+---
+- launchApp
+- takeScreenshot: smoke-launch

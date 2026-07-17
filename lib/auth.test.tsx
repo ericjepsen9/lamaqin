@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, waitFor } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
+import { AuthProvider } from '@/lib/auth';
 import { useDownloadStore } from '@/lib/download-store';
 
 type AuthEventHandler = (event: string, session: null) => void;
@@ -21,8 +22,6 @@ jest.mock('@/lib/supabase', () => ({
     },
   },
 }));
-
-import { AuthProvider } from '@/lib/auth';
 
 function Probe() {
   return <Text>ok</Text>;

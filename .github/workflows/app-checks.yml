@@ -15,6 +15,7 @@ on:
       - 'jest.config.js'
       - 'supabase/migrations/**'
       - 'scripts/check-orphan-rpcs.mjs'
+      - 'scripts/check-rn-ui-pitfalls.mjs'
       - '.github/workflows/app-checks.yml'
   pull_request:
     paths:
@@ -26,6 +27,7 @@ on:
       - 'jest.config.js'
       - 'supabase/migrations/**'
       - 'scripts/check-orphan-rpcs.mjs'
+      - 'scripts/check-rn-ui-pitfalls.mjs'
       - '.github/workflows/app-checks.yml'
   workflow_dispatch: {}
 
@@ -48,6 +50,10 @@ jobs:
       # （防 care.ts / get_cohort_today_active 这类"写了没接"复发；有意暂不接的登记进脚本 WHITELIST）。
       - name: Orphan RPC check
         run: npm run check:orphans
+      # 2026-07-17·PM 真机复现两处 Web 端(Playwright/Chromium)结构性测不出的坑
+      # (键盘挡弹窗输入框 / 安卓 flex-wrap 浮点误差):静态扫描挡复发,别指望多写 e2e 能测出来。
+      - name: RN UI pitfalls check (keyboard/flex-wrap)
+        run: npm run check:ui-pitfalls
       # lint 暂为告警（不阻断）：现有 app 代码有 18 处既有 lint error（转义字符 / effect 内 setState 等），
       # 与测试搭建无关、修复涉及产品逻辑需 PM 定夺。清理后把 continue-on-error 去掉即转硬门禁。
       - name: Lint (expo lint · advisory)

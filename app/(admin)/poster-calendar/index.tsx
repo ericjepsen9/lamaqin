@@ -258,9 +258,12 @@ function PosterEditModal({ poster, year, onClose, onSave }: { poster: Poster | n
   const [caption, setCaption] = useState('');
   const [isActive, setIsActive] = useState(true);
   const uploadImg = useUploadPosterImage();
-  useEffect(() => {
+  // 渲染期间比对上一次的poster(react-hooks/set-state-in-effect·2026-07-17 lint债清理)
+  const [prevPoster, setPrevPoster] = useState(poster);
+  if (poster !== prevPoster) {
+    setPrevPoster(poster);
     if (poster) { setImageUrl(poster.imageUrl ?? ''); setCaption(poster.caption ?? ''); setIsActive(poster.isActive); }
-  }, [poster]);
+  }
   if (!poster) return null;
 
   const pickAndUpload = async () => {
@@ -305,7 +308,7 @@ function PosterEditModal({ poster, year, onClose, onSave }: { poster: Poster | n
           onClose();
         }} style={{ flex: 1 }}>保存</AdminButton>
       </ModalActions>
-      <ModalFootnote>填链接即存入当月画报、立即生效;清空链接则移除当月画报。也可以用上方"从设备选图上传"直接传图,两种方式二选一。</ModalFootnote>
+      <ModalFootnote>填链接即存入当月画报、立即生效;清空链接则移除当月画报。也可以用上方&ldquo;从设备选图上传&rdquo;直接传图,两种方式二选一。</ModalFootnote>
     </AdminModal>
   );
 }
@@ -560,7 +563,9 @@ const styles = StyleSheet.create({
   weekHeader: { flexDirection: 'row', width: '100%', maxWidth: 600, alignSelf: 'center', marginTop: 2 },
   weekHeaderText: { flex: 1, textAlign: 'center', fontSize: 13, color: INK3, fontWeight: '600' },
   calendarGrid: { flexDirection: 'row', flexWrap: 'wrap', width: '100%', maxWidth: 600, alignSelf: 'center', backgroundColor: '#fff', borderRadius: 16, padding: 8, borderWidth: 1, borderColor: 'rgba(43,34,24,0.08)' },
-  dayCell: { width: `${100 / 7}%`, aspectRatio: 1.02, alignItems: 'center', justifyContent: 'center', borderRadius: 12, position: 'relative' },
+  // width用14.28%而非100/7(同app/calendar.tsx"藏历页周六不显示"根因·2026-07-17):100/7是
+  // 无限小数,安卓上7格累加浮点误差会让flex-wrap提前换行,丢一整列。
+  dayCell: { width: '14.28%', aspectRatio: 1.02, alignItems: 'center', justifyContent: 'center', borderRadius: 12, position: 'relative' },
   dayCellSelected: { backgroundColor: SAFFRON_LIGHT, borderWidth: 1.5, borderColor: SAFFRON },
   dayCellAuspicious: { backgroundColor: GOLD_PALE },
   dayCellCeremony: { backgroundColor: 'rgba(161,60,46,0.08)' },

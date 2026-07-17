@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { Platform } from 'react-native';
 
 import { useDownloadStore } from '@/lib/download-store';
+import { requestPushPermissionAndRegisterToken } from '@/lib/push-notifications';
 import { supabase } from '@/lib/supabase';
 
 // 会话上下文。持久化 + 自动刷新 token 见 lib/supabase.ts(web=localStorage 默认,原生=AsyncStorage,
@@ -31,6 +32,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // 登入/token 刷新 → 让所有查询用新 token 重取。
         //   修「会话过期后,课程/班级等需登录才读的数据被旧 token 读成空、又被缓存 → 看着像数据没了」。
         qc.invalidateQueries();
+        // 学习提醒(决策188方案A):只在真正"登入"这一刻请求权限+注册token,不跟TOKEN_REFRESHED
+        // 共用这个分支——token刷新是自动、频繁发生的,不是"登录后"这个语义,不该借机重复弹权限请求。
+        if (event === 'SIGNED_IN' && next?.user.id) {
+          void requestPushPermissionAndRegisterToken(next.user.id);
+        }
       } else if (event === 'SIGNED_OUT') {
         // A2审计发现(2026-07-13):invalidateQueries 只标脏待刷新,刷新完成前旧数据仍渲染在屏幕上——
         //   同设备换号登录时会闪现上一账号缓存(大量query key不带uid)。clear() 直接清空、组件退回

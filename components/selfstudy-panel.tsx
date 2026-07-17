@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { Calendar, ChevronRight, Minus, Plus, X } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
 import { notify } from '@/lib/dialog';
@@ -196,6 +196,8 @@ function RestModal({ open, onClose, programId }: { open: boolean; onClose: () =>
 
   return (
     <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
+      {/* KeyboardAvoidingView(2026-07-17·PM真机反馈键盘挡住弹层输入框,全app排查后补齐) */}
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
       <Pressable style={styles.backdrop} onPress={onClose}>
         <Pressable style={styles.sheet} onPress={() => {}}>
           <View style={styles.handle} />
@@ -241,6 +243,7 @@ function RestModal({ open, onClose, programId }: { open: boolean; onClose: () =>
           <Pressable style={styles.doneBtn} onPress={onClose}><RNText style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>完成</RNText></Pressable>
         </Pressable>
       </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

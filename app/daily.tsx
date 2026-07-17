@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { ChevronLeft, Plus } from 'lucide-react-native';
+import { ChevronLeft } from 'lucide-react-native';
 import { useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text as RNText, View, type TextStyle, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,7 +9,7 @@ import { QuickCountSheet } from '@/components/quick-count-sheet';
 import { Text } from '@/components/ui/text';
 import { useMarkRitual } from '@/lib/mutations/daily';
 import { useRecordPracticeLog } from '@/lib/mutations/practice';
-import { useMyDailyLessons, useDailyLessonComponents, useTodayRitual, type LessonComponents } from '@/lib/queries/daily';
+import { useMyDailyLessons, useDailyLessonComponents, useProgramPrimaryCourseId, useTodayRitual, type LessonComponents } from '@/lib/queries/daily';
 import { useMyVows } from '@/lib/queries/practice';
 import { usePrimaryContext, useSelfStudyPlan } from '@/lib/queries/self-study-progress';
 import { bookTitle } from '@/lib/utils';
@@ -123,6 +123,10 @@ export default function Daily() {
   const primaryWeek = !selfStudy ? classWeeks[0] : null;
   const otherWeeks = !selfStudy ? classWeeks.slice(1) : [];
   const [othersOpen, setOthersOpen] = useState(false);
+  // 本周暂无排课(休息周/未排)兜底目标(PM 2026-07-17:原兜底跳全部课程目录让人看不懂,
+  // 改跳"当前学习课程"的详情页——只在真的用得到时才查,避免多一次无谓请求)。
+  const needFallbackCourse = !selfStudy && !!primaryWeek && primaryWeek.lessons.length === 0;
+  const { data: fallbackCourseId } = useProgramPrimaryCourseId(needFallbackCourse ? primaryWeek?.programId : undefined);
 
   // 本周要展开「内容清单」的节(主班 or 自学本周)→ 批量取各节真实内容件 + 完成态
   const lessonIds = (selfStudy ? (ssPlan?.lessons ?? []) : (primaryWeek?.lessons ?? [])).map((l) => l.lessonId);
@@ -192,6 +196,9 @@ export default function Daily() {
                     title={`${bookTitle(l.courseName)}${l.lessonTitle}`}
                     comp={lessonComps[l.lessonId]} onStep={(step) => router.push(`/lesson/${l.lessonId}?step=${step}` as never)} />
                 ))
+              ) : fallbackCourseId ? (
+                <Node num={nextStep()} state="todo" tag="正行 · 闻思" title="本周课" sub="本周暂无排课(休息周或未排),去看当前课程学到哪了"
+                  actionLabel="去当前课程" onPress={() => router.push(`/course/${fallbackCourseId}` as never)} />
               ) : (
                 <Node num={nextStep()} state="todo" tag="正行 · 闻思" title="本周课" sub="本周暂无排课,去课程目录自选"
                   actionLabel="去课程" onPress={() => router.push('/catalog' as never)} />

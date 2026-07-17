@@ -23,7 +23,7 @@ import { useCancelAccountDeletion } from '@/lib/mutations/account';
 import { useUpdateAccessibilityNeeds } from '@/lib/mutations/proxy';
 import { useGrantSelfStudy, useRevokeSelfStudy } from '@/lib/mutations/self-study';
 import { useStudentProxyActions, type ProxyActionType, type ProxyTargetKind } from '@/lib/queries/admin/proxy';
-import { useAdminStudentDetail, useApproveStudent, useRejectStudent } from '@/lib/queries/admin/students';
+import { useAdminStudentDetail } from '@/lib/queries/admin/students';
 import { useCurrentUser } from '@/lib/queries/profile';
 import { useStudentSelfStudyGrant } from '@/lib/queries/self-study-progress';
 import { INK, INK2, INK3, SAFFRON } from '@/lib/theme';
@@ -72,8 +72,6 @@ export default function StudentDetailScreen() {
   const { data: grant, isError: grantError } = useStudentSelfStudyGrant(isAdmin ? id : undefined);
   const grantSS = useGrantSelfStudy();
   const revokeSS = useRevokeSelfStudy();
-  const approve = useApproveStudent();
-  const reject = useRejectStudent();
   const updateA11y = useUpdateAccessibilityNeeds();
   const { data: proxyActions = [], isError: proxyError } = useStudentProxyActions(id);
 
@@ -84,18 +82,16 @@ export default function StudentDetailScreen() {
   const status = (detail?.status ?? 'active') as StudentStatus;
   const studentNo = detail?.student_id ?? null;
 
-  const memberships = (detail?.classMemberships ?? []) as unknown as Array<{
+  const memberships = (detail?.classMemberships ?? []) as unknown as {
     cohort_id: string;
     member_role: string;
     is_primary: boolean | null;
     cohorts: { name: string } | null;
-  }>;
+  }[];
   const primary = memberships.find((m) => m.is_primary) ?? memberships[0] ?? null;
   const cohortName = primary?.cohorts?.name ?? '未入班';
   const memberRole = (primary?.member_role ?? null) as MemberRole | null;
 
-  const isPending = status === 'pending';
-  const isAuditor = memberRole === 'auditor';
   const accessibilityNeeds = (detail?.accessibility_needs ?? []) as ('blind' | 'deaf')[];
   const learningMode = detail?.learning_mode as string | null;
   const intendedProgramName = (detail?.intended_program as unknown as { name?: string } | null)?.name ?? null;

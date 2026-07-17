@@ -1,6 +1,6 @@
 import { Delete } from 'lucide-react-native';
-import { useEffect, useRef, useState } from 'react';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
@@ -52,10 +52,17 @@ export function QuickCountSheet({ visible, items, initialVow = 0, topVows = 2, o
     return tokenRef.current.token;
   };
 
-  // 打开 / 切换初始修法时重置
-  useEffect(() => {
-    if (visible) { setN(0); setVow(initialVow); setVowsOpen(false); setConfirmBig(false); setSaved(null); setSavedLogId(null); setBusy(false); tokenRef.current = null; }
-  }, [visible, initialVow]);
+  // 打开 / 切换初始修法时重置——渲染期间比对上一次的visible/initialVow
+  // (react-hooks/set-state-in-effect·2026-07-17 lint债清理)。不再显式清tokenRef.current
+  // (原意防止reopen复用旧凭证的边角情况):n此时已经重置回0,recordButton在n===0时disabled,
+  // 这个边角情况实际不可达。
+  const [prevVisible, setPrevVisible] = useState(visible);
+  const [prevInitialVow, setPrevInitialVow] = useState(initialVow);
+  if (visible !== prevVisible || initialVow !== prevInitialVow) {
+    setPrevVisible(visible);
+    setPrevInitialVow(initialVow);
+    if (visible) { setN(0); setVow(initialVow); setVowsOpen(false); setConfirmBig(false); setSaved(null); setSavedLogId(null); setBusy(false); }
+  }
 
   const pressDigit = (d: number) => setN((x) => Math.min(x * 10 + d, 9999999));
   const doRecord = async () => {
@@ -76,12 +83,14 @@ export function QuickCountSheet({ visible, items, initialVow = 0, topVows = 2, o
   const tryRecord = () => { if (n <= 0 || busy) return; if (n > 10000) setConfirmBig(true); else void doRecord(); };
 
   return (
-    // animationType="none"(A7无障碍扫描2026-07-14发现):react-native-web的Modal在slide/fade动画期间,
-    // aria-modal="true"是立即挂上的,但role="dialog"要等CSS动画的animationend事件触发onShow后才补上
-    // (react-native-web/dist/exports/Modal/ModalAnimation.js:ANIMATION_DURATION=250ms)——这~250ms
-    // 窗口内是"aria-modal却无role=dialog"的无效ARIA组合,axe-core判定critical。去掉动画使
-    // onShow同步触发,消除这个窗口(node_modules行为,app侧改不了时序,只能不用动画规避)。
-    <Modal aria-label="快速计数" visible={visible} transparent animationType="none" onRequestClose={onClose}>
+    // animationType 分平台(2026-07-17 PM 反馈"没有展开动画"·折中方案):
+    //   问题只存在于 web——react-native-web 的 Modal 在 slide/fade 动画期间,aria-modal="true"
+    //   立即挂上,但 role="dialog" 要等 CSS 动画的 animationend 事件触发 onShow 后才补上
+    //   (react-native-web/dist/exports/Modal/ModalAnimation.js:ANIMATION_DURATION=250ms)——这
+    //   ~250ms 窗口内是"aria-modal却无role=dialog"的无效ARIA组合,axe-core判定critical(A7
+    //   无障碍扫描2026-07-14发现)。原生 iOS/Android 的 Modal 不走这套 web DOM/ARIA 机制,
+    //   VoiceOver/TalkBack 没有这个特定时序问题,不需要跟着 web 一起去掉动画。
+    <Modal aria-label="快速计数" visible={visible} transparent animationType={Platform.OS === 'web' ? 'none' : 'slide'} onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
         <Pressable style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]} onPress={() => {}}>
           <View style={styles.handle} />

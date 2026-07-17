@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { Camera, ChevronLeft } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -15,7 +15,6 @@ import { supabase } from '@/lib/supabase';
 // 学号 = 转正后发放·只读(决策134);无障碍登记(盲聋豁免·听看两遍即圆满)。
 // 守:无状态色。保存已接真(D-9·2026-07-02:full_name/dharma_name/phone/accessibility_needs);头像上传仍待 storage。
 const INK = '#2b2218';
-const INK2 = '#55463a';
 const INK3 = '#7e6d5b';
 const SAFFRON = '#e07856';
 const SAFFRON_DARK = '#b35535';
@@ -31,15 +30,21 @@ export default function EditProfile() {
   const [blind, setBlind] = useState(false);
   const [deaf, setDeaf] = useState(false);
   const [busy, setBusy] = useState(false);
-  // 档案到位后灌初值(只灌一次:以 me.id 变化为准)
-  useEffect(() => {
-    if (!me) return;
-    setDharma(me.dharmaName ?? '');
-    setName(me.fullName ?? '');
-    setContact(me.phone ?? '');
-    setBlind(me.accessibilityNeeds.includes('blind'));
-    setDeaf(me.accessibilityNeeds.includes('deaf'));
-  }, [me?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  // 档案到位后灌初值(只灌一次:以 me.id 变化为准)——渲染期间比对上一次的me?.id
+  // (react-hooks/set-state-in-effect·2026-07-17 lint债清理)。刻意只跟me?.id比,不跟me本身比
+  // (原exhaustive-deps disable注释的既有用意):同一个人的资料后台刷新拿到新对象引用时不应该
+  // 覆盖用户正在编辑的内容,只有真的换了人(id变了)才重灌。
+  const [prevMeId, setPrevMeId] = useState(me?.id);
+  if (me?.id !== prevMeId) {
+    setPrevMeId(me?.id);
+    if (me) {
+      setDharma(me.dharmaName ?? '');
+      setName(me.fullName ?? '');
+      setContact(me.phone ?? '');
+      setBlind(me.accessibilityNeeds.includes('blind'));
+      setDeaf(me.accessibilityNeeds.includes('deaf'));
+    }
+  }
   const initial = (dharma || name || '师').slice(0, 1);
 
   async function save() {

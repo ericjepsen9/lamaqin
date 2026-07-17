@@ -130,6 +130,34 @@ export function useUnbindTemplate() {
   });
 }
 
+// ── 修法节奏权限(2026-07-17·PM决策,方案3双通道):班级(source='auto')/自学(source='custom')
+//   两条通道各自独立的锁定+白名单——判断在 app/vow/[id].tsx 与 DB 触发器 vows_check_daily_target
+//   (按 vow.source 分别读对应那组字段),这里只管 practices 表两组字段各自的读写,互不覆盖。
+export type PracticePaceChannel = 'auto' | 'custom';
+export type PracticePaceLockInput = {
+  practiceId: string;
+  channel: PracticePaceChannel;
+  dailyTargetLocked: boolean;
+  allowedDailyTargets: number[] | null; // null/空=不限制具体值(仍可能被 dailyTargetLocked 整体锁住)
+};
+export function useUpdatePracticePaceLock() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (p: PracticePaceLockInput) => {
+      const allowed = p.allowedDailyTargets && p.allowedDailyTargets.length > 0 ? p.allowedDailyTargets : null;
+      const patch = p.channel === 'auto'
+        ? { daily_target_locked: p.dailyTargetLocked, allowed_daily_targets: allowed }
+        : { self_study_daily_target_locked: p.dailyTargetLocked, self_study_allowed_daily_targets: allowed };
+      const { error } = await supabase.from('practices').update(patch).eq('id', p.practiceId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['practices-master'] });
+      qc.invalidateQueries({ queryKey: ['my-vows'] }); // 已发的愿(班级+自学)跟着重新读锁定状态
+    },
+  });
+}
+
 // ── 发放班级愿(把绑定的 auto 模板实例化成全班 active 学员的愿)──────────
 // 走 SECURITY DEFINER 函数 provision_cohort_vows(迁移 20260628000020);返回新建愿条数。
 // 幂等:已有的不重建,可随时重跑补差额。RPC 未进生成类型 → 缝里收窄。

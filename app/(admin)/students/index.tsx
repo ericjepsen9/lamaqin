@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -18,8 +18,6 @@ import {
   SCREEN_BG,
   SearchBar,
   SectionCard,
-  Table,
-  TableRow,
   type BadgeTone,
 } from '@/components/ui/admin-kit';
 import { StudentAdminActions } from '@/components/admin/student-actions';
@@ -27,7 +25,7 @@ import { StudentCareDims, StudentCareFollowups } from '@/components/admin/studen
 import { Text } from '@/components/ui/text';
 import { confirmAsync, notify } from '@/lib/dialog';
 import { useGrantSelfStudy, useRevokeSelfStudy } from '@/lib/mutations/self-study';
-import { useAdminCreateStudent, useAdminStudentDetail, useAdminStudents, useApproveStudent, useRejectStudent } from '@/lib/queries/admin/students';
+import { useAdminCreateStudent, useAdminStudentDetail, useAdminStudents } from '@/lib/queries/admin/students';
 import { useCurrentUser } from '@/lib/queries/profile';
 import { useStudentSelfStudyGrant } from '@/lib/queries/self-study-progress';
 import { testIds } from '@/lib/testids';
@@ -114,8 +112,6 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 
 function StudentDetailPanel({ id, listStudent }: { id: string; listStudent: Student | undefined }) {
   const { data: detail, isLoading, isError: detailError } = useAdminStudentDetail(id);
-  const approve = useApproveStudent();
-  const reject = useRejectStudent();
   // 自学资格(决策119·D-2 审批赋权):此前授予/撤销只在手机版详情页有,宽屏(≥900)走本面板点不到 → 补齐(P0)
   const me = useCurrentUser();
   const isAdmin = me.data?.role === 'admin';
@@ -141,18 +137,15 @@ function StudentDetailPanel({ id, listStudent }: { id: string; listStudent: Stud
   const status = ((detail?.status ?? listStudent?.status) ?? 'active') as StudentStatus;
   const studentNo = detail?.student_id ?? null;
 
-  const memberships = (detail?.classMemberships ?? []) as unknown as Array<{
+  const memberships = (detail?.classMemberships ?? []) as unknown as {
     cohort_id: string;
     member_role: string;
     is_primary: boolean | null;
     cohorts: { name: string } | null;
-  }>;
+  }[];
   const primary = memberships.find((m) => m.is_primary) ?? memberships[0] ?? null;
   const cohortName = primary?.cohorts?.name ?? listStudent?.cohort ?? '未入班';
   const memberRole = (primary?.member_role ?? listStudent?.memberRole) as MemberRole | null;
-
-  const isPending = status === 'pending';
-  const isAuditor = memberRole === 'auditor';
 
   return (
     <ScrollView contentContainerStyle={styles.detailScroll} showsVerticalScrollIndicator={false}>

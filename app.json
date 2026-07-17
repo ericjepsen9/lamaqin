@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "三殊胜",
+    "name": "纽约佛学会",
     "slug": "sss-app",
     "owner": "lamaqin",
     "version": "1.0.0",
@@ -16,7 +16,6 @@
     },
     "ios": {
       "bundleIdentifier": "com.bicwny.sssapp",
-      "icon": "./assets/expo.icon",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -24,9 +23,8 @@
     "android": {
       "package": "com.bicwny.sssapp",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#E8151D",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false
@@ -47,6 +45,7 @@
           }
         }
       ],
+      "expo-notifications",
       "expo-audio"
     ],
     "experiments": {

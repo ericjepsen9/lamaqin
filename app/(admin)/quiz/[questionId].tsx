@@ -18,7 +18,7 @@ import { confirmAsync, notify } from '@/lib/dialog';
 import { useAdminQuestion,
   useQuestionResponses, useDeleteQuestion, useUpdateQuestion, useUpsertQuestionReference, type QuestionPayload, type QuestionType } from '@/lib/queries/admin/quiz';
 import { testIds } from '@/lib/testids';
-import { GOLD_DARK as GOLD, GOLD_PALE, INK, INK2, INK3, INK4, SAFFRON_DARK } from '@/lib/theme';
+import { GOLD_DARK as GOLD, GOLD_PALE, INK, INK2, INK3, INK4 } from '@/lib/theme';
 import { useAdminLayout } from '../_layout';
 
 const TYPE_LABEL: Record<QuestionType, string> = {
@@ -48,7 +48,12 @@ export default function QuestionDetail() {
   const { data: responses = [] } = useQuestionResponses(questionId);
   const [respExpanded, setRespExpanded] = useState(false);
 
-  useEffect(() => { if (q) { setRefText(q.referenceText ?? ''); setPromptText(q.prompt); setPayloadDraft(q.payload ?? {}); } }, [q]);
+  // 渲染期间比对上一次的q(react-hooks/set-state-in-effect·2026-07-17 lint债清理)
+  const [prevQ, setPrevQ] = useState(q);
+  if (q !== prevQ) {
+    setPrevQ(q);
+    if (q) { setRefText(q.referenceText ?? ''); setPromptText(q.prompt); setPayloadDraft(q.payload ?? {}); }
+  }
   useEffect(() => { if (q) setTitle(`Q${q.questionNumber} · ${q.lessonTitle}`); }, [setTitle, q]);
 
   if (isLoading) {

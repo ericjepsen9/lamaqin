@@ -13,7 +13,6 @@ const INK = '#2b2218';
 const INK2 = '#55463a';
 const INK3 = '#7e6d5b';
 const SAFFRON = '#e07856';
-const SAFFRON_DARK = '#b35535';
 
 export default function SpeakingDetail() {
   const router = useRouter();

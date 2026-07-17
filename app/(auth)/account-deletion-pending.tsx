@@ -1,4 +1,5 @@
 import { Hourglass } from 'lucide-react-native';
+import { useState } from 'react';
 import { Pressable, Text as RNText, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -14,10 +15,14 @@ const INK3 = '#7e6d5b';
 
 export default function AccountDeletionPending() {
   const { data: me } = useCurrentUser();
+  // Date.now()不能直接在渲染期间调用(react-hooks/purity·2026-07-17 lint债清理):同一次渲染
+  // 反复调用可能拿到不同值,不纯。用useState惰性初始化拿一个"这个页面第一次挂载时"的稳定快照,
+  // 倒计时本来就是"约N天"的展示,不需要逐秒刷新,行为不变。
+  const [nowMs] = useState(() => Date.now());
 
   const daysLeft = (() => {
     if (!me?.deletionRequestedAt) return null;
-    const elapsed = (Date.now() - new Date(me.deletionRequestedAt).getTime()) / (24 * 60 * 60 * 1000);
+    const elapsed = (nowMs - new Date(me.deletionRequestedAt).getTime()) / (24 * 60 * 60 * 1000);
     return Math.max(0, Math.ceil(ACCOUNT_DELETION_RETENTION_DAYS - elapsed));
   })();
 

@@ -1,9 +1,9 @@
 import { addDays, addMonths, differenceInCalendarDays, format } from 'date-fns';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { ChevronRight, Plus } from 'lucide-react-native';
+import { Plus } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DatePickerModal } from '@/components/month-calendar';
@@ -108,8 +108,12 @@ export default function Practice() {
           </View>
         ) : (
           <>
-            {/* 我的功课:计数型愿两列卡片。卡身点按 → 详情页;「添加」药丸 → 直接计数(写 practice_logs) */}
-            {countVows.length > 0 ? (
+            {/* 我的功课:计数型 + 观修·座次(时长型)统一一个列表、卡片同尺寸,靠副标题区分
+                (PM 2026-07-17 定·此前"我的功课"两列卡与"观修·座次"整行列表两种视觉,不必要的不一致)。
+                卡身点按 → 详情页;计数型「添加」药丸直接计数(写 practice_logs);时长型愿本页无就地
+                记录弹层(BackfillSheet 仍是 vow/[id].tsx 内部组件、未抽公共),药丸同样→详情页,
+                该页已有「记一笔」入口(2026-07-17 一并修复,默认今天/可选过去日期)。 */}
+            {(countVows.length > 0 || durationVows.length > 0) ? (
               <View style={{ paddingHorizontal: 16, marginTop: 30 }}>
                 <View style={styles.sechRow}>
                   <Text className="font-serif" style={styles.sech}>我的功课</Text>
@@ -138,6 +142,20 @@ export default function Practice() {
                       </View>
                     );
                   })}
+                  {durationVows.map((v) => (
+                    <View key={v.vowId} style={styles.gcard}>
+                      <Pressable style={styles.tx} onPress={() => router.push(`/vow/${v.vowId}`)}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                          {v.status === 'at_risk' ? <View style={[styles.statusDot, { backgroundColor: CRIM }]} /> : v.status === 'falling_behind' ? <View style={[styles.statusDot, { backgroundColor: WARN }]} /> : null}
+                          <Text className="font-serif" numberOfLines={1} style={[styles.gName, { flex: 1 }]}>{v.name}</Text>
+                        </View>
+                        <RNText numberOfLines={1} style={{ fontSize: 12, marginTop: 3, color: INK3 }}>
+                          观修 · 累计 {v.currentSessions} 座{v.targetCount ? ` / ${v.targetCount}` : ''}
+                        </RNText>
+                      </Pressable>
+                      <Pressable hitSlop={6} style={styles.daka} onPress={() => router.push(`/vow/${v.vowId}`)}><RNText style={styles.dakaTxt}>记录</RNText></Pressable>
+                    </View>
+                  ))}
                 </View>
               </View>
             ) : null}
@@ -163,24 +181,6 @@ export default function Practice() {
                     );
                   })}
                 </View>
-              </Section>
-            ) : null}
-
-            {/* 观修 · 座次(时长型愿) */}
-            {durationVows.length > 0 ? (
-              <Section title="观修 · 座次">
-                {durationVows.map((v) => (
-                  <Pressable key={v.vowId} style={styles.todayRow} onPress={() => router.push(`/vow/${v.vowId}`)}>
-                    <View style={{ flex: 1 }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                        {v.status === 'at_risk' ? <View style={[styles.statusDot, { backgroundColor: CRIM }]} /> : v.status === 'falling_behind' ? <View style={[styles.statusDot, { backgroundColor: WARN }]} /> : null}
-                        <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: INK }}>{v.name}</Text>
-                      </View>
-                      <RNText style={{ fontSize: 12, color: INK3, marginTop: 1 }}>累计 {v.currentSessions} 座{v.targetCount ? ` / ${v.targetCount}` : ''}</RNText>
-                    </View>
-                    <ChevronRight size={18} color={INK3} />
-                  </Pressable>
-                ))}
               </Section>
             ) : null}
           </>
@@ -300,6 +300,9 @@ function AddVowModal({ open, onClose }: { open: boolean; onClose: () => void }) 
   return (
     <>
       <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
+        {/* KeyboardAvoidingView(2026-07-17·PM真机反馈键盘挡住弹层输入框):这个弹层字段最多,
+            最容易被键盘挡到保存按钮。 */}
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <Pressable style={styles.backdrop} onPress={onClose}>
           <Pressable style={[styles.sheet, { maxHeight: '92%' }]} onPress={() => {}}>
             <View style={styles.handle} />
@@ -377,6 +380,7 @@ function AddVowModal({ open, onClose }: { open: boolean; onClose: () => void }) 
             </Pressable>
           </Pressable>
         </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
       <DatePickerModal visible={calOpen} value={endDate} minDate={addDays(new Date(), 1)} onPick={setEndDate} onClose={() => setCalOpen(false)} title="选择截止日" />
     </>
@@ -460,7 +464,6 @@ const styles = StyleSheet.create({
   daka: { flexShrink: 0, borderWidth: 1, borderColor: SAFFRON, borderRadius: 9999, paddingHorizontal: 9, paddingVertical: 3 },
   dakaTxt: { color: SAFFRON_DARK, fontSize: 11, fontWeight: '700' },
 
-  todayRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: 'rgba(43,34,24,0.06)' },
   njGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   jcell: { width: '31%', backgroundColor: '#fff', borderRadius: 12, padding: 10, borderWidth: 1, borderColor: 'rgba(43,34,24,0.06)', marginBottom: 8 },
   barSm: { height: 4, borderRadius: 2, backgroundColor: 'rgba(43,34,24,0.10)', marginTop: 6, overflow: 'hidden' },
