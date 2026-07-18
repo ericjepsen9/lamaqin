@@ -26,6 +26,7 @@ import { useStudentProxyActions, type ProxyActionType, type ProxyTargetKind } fr
 import { useAdminStudentDetail } from '@/lib/queries/admin/students';
 import { useCurrentUser } from '@/lib/queries/profile';
 import { useStudentSelfStudyGrant } from '@/lib/queries/self-study-progress';
+import { testIds } from '@/lib/testids';
 import { INK, INK2, INK3, SAFFRON } from '@/lib/theme';
 import { useAdminLayout } from '../_layout';
 
@@ -49,9 +50,9 @@ function ProfileRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function A11yChip({ label, active, disabled, onPress }: { label: string; active: boolean; disabled: boolean; onPress: () => void }) {
+function A11yChip({ label, active, disabled, onPress, testID }: { label: string; active: boolean; disabled: boolean; onPress: () => void; testID?: string }) {
   return (
-    <Pressable style={[styles.a11yChip, active && styles.a11yChipOn]} disabled={disabled} onPress={onPress}>
+    <Pressable testID={testID} style={[styles.a11yChip, active && styles.a11yChipOn]} disabled={disabled} onPress={onPress}>
       <Text style={[styles.a11yChipTxt, active && styles.a11yChipTxtOn]}>{active ? '✓ ' : ''}{label}</Text>
     </Pressable>
   );
@@ -122,6 +123,7 @@ export default function StudentDetailScreen() {
                   <Text style={{ fontSize: 12, color: INK3, marginTop: 2 }}>申请于 {detail.deletion_requested_at.slice(0, 10)};保留期满将永久删除全部数据。</Text>
                 </View>
                 <AdminButton
+                  testID={testIds.students.cancelDeletionButton}
                   variant="secondary"
                   disabled={cancelDeletion.isPending}
                   onPress={() => cancelDeletion.mutate(id, {
@@ -224,8 +226,8 @@ export default function StudentDetailScreen() {
           {/* 无障碍(决策078登记;设计小活:管理端展示+代登记) */}
           <SectionCard title="无障碍学修">
             <View style={styles.row}>
-              <A11yChip label="视力障碍" active={accessibilityNeeds.includes('blind')} disabled={!isAdmin || updateA11y.isPending} onPress={() => toggleA11y('blind')} />
-              <A11yChip label="听力障碍" active={accessibilityNeeds.includes('deaf')} disabled={!isAdmin || updateA11y.isPending} onPress={() => toggleA11y('deaf')} />
+              <A11yChip testID={testIds.students.a11yBlindChip} label="视力障碍" active={accessibilityNeeds.includes('blind')} disabled={!isAdmin || updateA11y.isPending} onPress={() => toggleA11y('blind')} />
+              <A11yChip testID={testIds.students.a11yDeafChip} label="听力障碍" active={accessibilityNeeds.includes('deaf')} disabled={!isAdmin || updateA11y.isPending} onPress={() => toggleA11y('deaf')} />
             </View>
             {accessibilityNeeds.length === 0 ? <Text style={styles.placeholder}>未登记(闻思圆满按常规判定)</Text> : null}
             {!isAdmin ? <Text style={styles.hint}>仅系统管理员可代登记;学员本人可在个人设置自助登记。</Text> : null}

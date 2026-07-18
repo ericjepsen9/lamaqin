@@ -7,7 +7,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   AdminButton,
+  AdminDateField,
   AdminModal,
+  AdminTimeField,
   Avatar,
   Badge,
   DetailHeader,
@@ -254,7 +256,7 @@ function ScheduleModal({ cohort, onClose }: { cohort: CohortDetail; onClose: () 
         <Text style={styles.modalGroupLabel}>常规共修</Text>
         <Text style={styles.fieldHint}>星期</Text>
         <DowPicker value={wDow} onChange={setWDow} />
-        <ModalField label="时间(24 小时制,如 19:30)" value={wTime} onChangeText={setWTime} placeholder="留空表示未定" />
+        <AdminTimeField label="时间" value={wTime} onChange={setWTime} placeholder="留空表示未定" />
         <ModalField label="Zoom 链接" value={wZoom} onChangeText={setWZoom} placeholder="https://…" />
         {!timeOk(wTime) ? <Text style={styles.errText}>时间格式应为 HH:MM</Text> : null}
 
@@ -262,7 +264,7 @@ function ScheduleModal({ cohort, onClose }: { cohort: CohortDetail; onClose: () 
         <Text style={styles.modalGroupLabel}>实修共修</Text>
         <Text style={styles.fieldHint}>星期</Text>
         <DowPicker value={pDow} onChange={setPDow} />
-        <ModalField label="时间(如 20:00)" value={pTime} onChangeText={setPTime} placeholder="留空表示未定" />
+        <AdminTimeField label="时间" value={pTime} onChange={setPTime} placeholder="留空表示未定" />
         <ModalField label="Zoom 链接" value={pZoom} onChangeText={setPZoom} placeholder="https://…" />
         {!timeOk(pTime) ? <Text style={styles.errText}>时间格式应为 HH:MM</Text> : null}
       </ScrollView>
@@ -321,7 +323,7 @@ function ReminderModal({ cohort, onClose }: { cohort: CohortDetail; onClose: () 
           <>
             <Text style={styles.fieldHint}>星期</Text>
             <DowPicker value={weekday} onChange={setWeekday} />
-            <ModalField testID={testIds.classDetail.reminderTimeInput} label="时间(24 小时制,如 19:30)" value={time} onChangeText={setTime} placeholder="必填,如 19:30" />
+            <AdminTimeField testID={testIds.classDetail.reminderTimeInput} label="时间" value={time} onChange={setTime} placeholder="必填" allowClear={false} />
             {!timeOk ? <Text style={styles.errText}>时间格式应为 HH:MM</Text> : null}
             <ModalField
               testID={testIds.classDetail.reminderMessageInput}
@@ -369,7 +371,7 @@ function RestWeeksModal({ cohortId, onClose }: { cohortId: string; onClose: () =
   return (
     <AdminModal visible onClose={onClose} title="休息周" dismissOnOverlay={false}>
       <Text style={styles.note}>计划外休息(如临时停课)。起始日不晚于今天的,会让本班进度往后顺延一周——「本周该学」随之延后。</Text>
-      <ModalField testID={testIds.classDetail.restDateInput} label="休息周起始日(YYYY-MM-DD)" value={date} onChangeText={setDate} placeholder="YYYY-MM-DD" />
+      <AdminDateField testID={testIds.classDetail.restDateInput} label="休息周起始日" value={date} onChange={setDate} />
       {!dateValid ? <Text style={styles.errText}>日期格式应为 YYYY-MM-DD</Text> : null}
       <ModalField label="原因(选填)" value={reason} onChangeText={setReason} placeholder="如:春节假期" />
       <AdminButton testID={testIds.classDetail.restAddButton} variant="primary" disabled={!dateValid || addRest.isPending} onPress={add}>{addRest.isPending ? '添加中…' : '＋ 添加休息周'}</AdminButton>

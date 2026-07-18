@@ -18,3 +18,22 @@ export function bookTitle(name: string | null | undefined): string {
 export function genClientToken(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 }
+
+/** 给一个背景色(#rrggbb),判断该配浅色字还是深色字(YIQ 感知亮度公式,阈值128·业界常见做法)。
+ *  画报强调色场景专用:管理员选的是一个明确的颜色值,不是要分析一整张图片的深浅,亮度可以
+ *  直接算、不需要猜(2026-07-18·画报强调色/透明度)。传入格式不对时兜底按"配深色字"处理。 */
+export function readableTextTone(hex: string | null | undefined): 'light' | 'dark' {
+  if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) return 'dark';
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 128 ? 'dark' : 'light';
+}
+
+/** #rrggbb + 0~1 透明度 → rgba() 字符串(画报强调色叠色用)。 */
+export function hexToRgba(hex: string, alpha: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return `rgba(${r},${g},${b},${alpha})`;
+}

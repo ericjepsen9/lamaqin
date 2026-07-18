@@ -4,7 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   AdminButton,
+  AdminDateField,
   AdminModal,
+  AdminTimeField,
   Badge,
   EmptyState,
   FilterChips,
@@ -74,8 +76,8 @@ function NewEventModal({ visible, onClose }: { visible: boolean; onClose: () => 
     <AdminModal visible={visible} onClose={onClose} title="新建法会" dismissOnOverlay={false}>
       <ModalField testID={testIds.events.newEventNameInput} label="名称 *" value={name} onChangeText={setName} placeholder="如:神变月共修" />
       <ModalField label="类型" value={type} onChangeText={setType} placeholder="法会 / 共修营…" />
-      <ModalField testID={testIds.events.newEventStartInput} label="开始日期 *" value={start} onChangeText={setStart} placeholder="YYYY-MM-DD" />
-      <ModalField testID={testIds.events.newEventEndInput} label="结束日期 *" value={end} onChangeText={setEnd} placeholder="YYYY-MM-DD(不早于开始)" />
+      <AdminDateField testID={testIds.events.newEventStartInput} label="开始日期 *" value={start} onChange={setStart} />
+      <AdminDateField testID={testIds.events.newEventEndInput} label="结束日期 *" value={end} onChange={setEnd} minDate={dateValid(start) ? new Date(start + 'T00:00:00') : undefined} />
       <ModalField label="说明" value={desc} onChangeText={setDesc} placeholder="活动说明(可选);具体场次建好后在「管理场次」逐场添加" multiline />
       {/* 共修功课(§3.12 法会愿模板·一法会一修法):不选=纯讲座,学员端无发愿区 */}
       <Text style={styles.pickTitle}>共修功课(可选·全体同修此一门)</Text>
@@ -163,8 +165,15 @@ function SessionsModal({ visible, event, onClose }: { visible: boolean; event: A
       )}
 
       <Text style={styles.sessAddLabel}>添加场次</Text>
-      <ModalField testID={testIds.events.sessionDateInput} label="日期 *" value={date} onChangeText={setDate} placeholder={`${event.startDate} ~ ${event.endDate}`} />
-      <ModalField label="时间(可空=全天)" value={time} onChangeText={setTime} placeholder="HH:mm,如 09:00" />
+      <AdminDateField
+        testID={testIds.events.sessionDateInput}
+        label="日期 *"
+        value={date}
+        onChange={setDate}
+        minDate={new Date(event.startDate + 'T00:00:00')}
+        maxDate={new Date(event.endDate + 'T00:00:00')}
+      />
+      <AdminTimeField label="时间(可空=全天)" value={time} onChange={setTime} />
       <ModalField label="场次名" value={title} onChangeText={setTitle} placeholder="如 早课 / 午课 / 晚课" />
       <Text style={styles.fLabel}>形式</Text>
       <View style={styles.seg}>

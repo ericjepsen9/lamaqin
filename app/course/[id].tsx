@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ChevronLeft, Share2 } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Image, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LessonStatusBadge } from '@/components/lesson-status-badge';
 import { ScrollTitleBar, useScrollTitleBar } from '@/components/scroll-title-bar';
@@ -55,6 +55,7 @@ export default function CourseDetail() {
   const [enrollOpen, setEnrollOpen] = useState(false); // 「加入自学」本课属多专业时选一个
   const [shareText, setShareText] = useState<string | null>(null); // web 端两条能力都没有时,弹自定义卡片兜底显示分享文案(非 null=打开)
   const bar = useScrollTitleBar(); // 头图滚出后顶部淡入细标题栏(带返回·PM 2026-07-02:解决滚下去返回键没了)
+  const insets = useSafeAreaInsets();
 
   const { data: course, isLoading, isError } = useCourseDetail(id);
   const { data: schedule } = useCourseSchedule(id);
@@ -267,7 +268,10 @@ export default function CourseDetail() {
           </View>
         ) : null}
       </ScrollView>
-      <ScrollTitleBar title={course ? bookTitle(course.name) : ''} shown={bar.shown && !!course} onBack={() => router.back()} />
+      {/* topInset(2026-07-17 PM 真机反馈:课程概览页顶部标题栏叠在系统状态栏位置)——
+          ScrollTitleBar 内部是 position:absolute,不吃 SafeAreaView 的顶部安全区 padding,
+          必须显式传 topInset 才会在自己身上补,漏传就默认 0、贴着物理屏幕顶端画。 */}
+      <ScrollTitleBar title={course ? bookTitle(course.name) : ''} shown={bar.shown && !!course} onBack={() => router.back()} topInset={insets.top} />
 
       {/* 加入自学:本课归属多专业时选一个(单专业直接报名,不弹) */}
       <Modal visible={enrollOpen} transparent animationType="fade" onRequestClose={() => setEnrollOpen(false)}>

@@ -4,7 +4,8 @@ import { supabase } from '@/lib/supabase';
 
 // 月度画报(home_posters)管理端读:某年 12 个月,无行的月份补空位(便于网格逐月编辑)。
 // 师兄端首页只读当月 active 一张(lib/queries/home.ts useCurrentPoster)。
-export type AdminPoster = { month: number; imageUrl: string | null; caption: string | null; isActive: boolean };
+// accentColor/overlayOpacity(2026-07-18):管理员手动定的强调色/透明度,null=未设置、维持默认样式。
+export type AdminPoster = { month: number; imageUrl: string | null; caption: string | null; isActive: boolean; accentColor: string | null; overlayOpacity: number | null };
 
 export function useAdminPosters(year: number) {
   return useQuery({
@@ -13,7 +14,7 @@ export function useAdminPosters(year: number) {
     queryFn: async (): Promise<AdminPoster[]> => {
       const { data, error } = await supabase
         .from('home_posters')
-        .select('month, image_url, caption, is_active')
+        .select('month, image_url, caption, is_active, accent_color, overlay_opacity')
         .eq('poster_type', 'monthly')
         .eq('year', year);
       if (error) throw error;
@@ -25,6 +26,8 @@ export function useAdminPosters(year: number) {
           imageUrl: row?.image_url ?? null,
           caption: row?.caption ?? null,
           isActive: row?.is_active ?? false,
+          accentColor: row?.accent_color ?? null,
+          overlayOpacity: row?.overlay_opacity ?? null,
         };
       });
     },
@@ -41,6 +44,8 @@ export type AdminEventPoster = {
   imageUrl: string | null;
   caption: string | null;
   isActive: boolean;
+  accentColor: string | null;
+  overlayOpacity: number | null;
 };
 
 export function useAdminEventPosters(posterType: 'event' | 'special') {
@@ -50,7 +55,7 @@ export function useAdminEventPosters(posterType: 'event' | 'special') {
     queryFn: async (): Promise<AdminEventPoster[]> => {
       const { data, error } = await supabase
         .from('home_posters')
-        .select('id, start_date, end_date, image_url, caption, is_active')
+        .select('id, start_date, end_date, image_url, caption, is_active, accent_color, overlay_opacity')
         .eq('poster_type', posterType)
         .order('start_date', { ascending: false });
       if (error) throw error;
@@ -62,6 +67,8 @@ export function useAdminEventPosters(posterType: 'event' | 'special') {
         imageUrl: r.image_url,
         caption: r.caption,
         isActive: r.is_active ?? false,
+        accentColor: r.accent_color ?? null,
+        overlayOpacity: r.overlay_opacity ?? null,
       }));
     },
   });

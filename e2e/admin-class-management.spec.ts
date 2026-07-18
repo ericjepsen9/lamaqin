@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createTestProfile, deleteTestProfile, getSeedIds, withDb } from './db';
 import { ADMIN_EMAIL, COACH_EMAIL, TEST_PASSWORD } from './global-setup';
-import { loginAs } from './helpers';
+import { loginAs, pickDate, pickTime } from './helpers';
 import { testIds } from '../lib/testids';
 
 // 班级详情管理操作 系统性覆盖(2026-07-16·PM"系统性测试包括点击,剩余内容继续补")。
@@ -60,7 +60,7 @@ test.describe('学习提醒(决策188方案A·2026-07-17新增)', () => {
     await page.getByText('开启', { exact: true }).click();
     // 周三(DOW_OPTS: 日一二三四五六,index 3 = 周三)
     await page.getByText('三', { exact: true }).click();
-    await page.getByTestId(testIds.classDetail.reminderTimeInput).fill('19:30');
+    await pickTime(page, testIds.classDetail.reminderTimeInput, '19:30');
     await page.getByTestId(testIds.classDetail.reminderMessageInput).fill(customMessage);
 
     let notifyMsg = '';
@@ -205,7 +205,7 @@ test.describe('设休息周', () => {
       await loginAs(page, ADMIN_EMAIL, TEST_PASSWORD);
       await page.goto(`/classes/${cohortId}`, { timeout: 45_000 });
       await page.getByTestId(testIds.classDetail.restButton).click();
-      await page.getByTestId(testIds.classDetail.restDateInput).fill(restDate);
+      await pickDate(page, testIds.classDetail.restDateInput, restDate); // 2026-07-18改用日历选择器,不再是手打文本框
       await page.getByPlaceholder('如:春节假期').fill(reason); // 原因字段(选填),按placeholder定位——ModalField的label是纯文本,不是input,不能.fill()
       // notify()走window.alert,不是DOM文本——添加本身没有前置confirm(删除才有),单次alert。
       // 2026-07-16曾怀疑这里跟"调整共修日程"一样有click()/dialog时序竞争,当时诊断两轮都很快、

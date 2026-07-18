@@ -35,15 +35,16 @@ test.describe('字号联动(2026-07-17诊断:web端是否生效)', () => {
       return Number.parseFloat(px);
     };
 
-    // 默认"标准"=1.15倍;NavRow标题样式写死fontSize:15,即15*1.15=17.25px。
-    await expect.poll(readFontSize, { timeout: 5000 }).toBeCloseTo(17.25, 0);
+    // 默认档"小"(PM 2026-07-17 改默认,推翻此前"标准"=1.15 默认放大的决定)=1.0倍;
+    // NavRow标题样式写死fontSize:15,即15*1.0=15px。
+    await expect.poll(readFontSize, { timeout: 5000 }).toBeCloseTo(15, 0);
 
     await page.getByText('大', { exact: true }).click();
-    // 15*1.32=19.8px——若这里读到的还是17.25(或原样15),说明补丁在web端也没生效。
+    // 15*1.32=19.8px——若这里读到的还是15,说明改档在web端没生效。
     await expect.poll(readFontSize, { timeout: 5000 }).toBeCloseTo(19.8, 0);
 
-    await page.getByText('小', { exact: true }).click();
-    // 15*1.0=15px(小=旧标准,补丁应退回无副作用)。
-    await expect.poll(readFontSize, { timeout: 5000 }).toBeCloseTo(15, 0);
+    await page.getByText('标准', { exact: true }).click();
+    // 15*1.15=17.25px。
+    await expect.poll(readFontSize, { timeout: 5000 }).toBeCloseTo(17.25, 0);
   });
 });

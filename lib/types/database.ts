@@ -1218,6 +1218,8 @@ export type Database = {
           poster_type: string | null;
           start_date: string | null;
           end_date: string | null;
+          accent_color: string | null;
+          overlay_opacity: number | null;
         };
         Insert: {
           id?: string;
@@ -1232,6 +1234,8 @@ export type Database = {
           poster_type?: string | null;
           start_date?: string | null;
           end_date?: string | null;
+          accent_color?: string | null;
+          overlay_opacity?: number | null;
         };
         Update: {
           id?: string;
@@ -1246,6 +1250,8 @@ export type Database = {
           poster_type?: string | null;
           start_date?: string | null;
           end_date?: string | null;
+          accent_color?: string | null;
+          overlay_opacity?: number | null;
         };
         Relationships: [];
       };

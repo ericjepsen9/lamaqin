@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ScrollTitleBar, useScrollTitleBar } from '@/components/scroll-title-bar';
 import { Text } from '@/components/ui/text';
@@ -24,6 +24,7 @@ const SAGE_BG = '#eef3e9';
 export default function SpeechList() {
   const router = useRouter();
   const bar = useScrollTitleBar();
+  const insets = useSafeAreaInsets();
   const { data: lib, isLoading, error } = useSpeechLibrary();
 
   const cont = lib?.continueTarget ?? null;
@@ -102,7 +103,9 @@ export default function SpeechList() {
           </View>
         ) : null}
       </ScrollView>
-      <ScrollTitleBar title="《大学演讲系列》" shown={bar.shown && !!lib} onBack={() => router.back()} />
+      {/* topInset(同 course/[id].tsx 2026-07-17 修复):漏传会让 ScrollTitleBar 默认 topInset=0,
+          贴着状态栏画。 */}
+      <ScrollTitleBar title="《大学演讲系列》" shown={bar.shown && !!lib} onBack={() => router.back()} topInset={insets.top} />
     </SafeAreaView>
   );
 }

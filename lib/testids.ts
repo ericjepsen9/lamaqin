@@ -270,5 +270,63 @@ export const testIds = {
     approveButton: 'students-approve-button',
     rejectButton: 'students-reject-button',
     promoteButton: 'students-promote-button',
+    // 学员详情页「管理操作」剩余交互(2026-07-18补·后台全面测试方案批①):
+    // 切主班 / 设宽限-暂停-纠错 / 代行,此前这几处 0 个 testID。
+    switchCohortButton: 'students-switch-cohort-button',
+    switchCohortOption: (cohortId: string) => `students-switch-cohort-option-${cohortId}`,
+    graceButton: 'students-grace-button',
+    graceVowRow: (vowId: string) => `students-grace-vow-row-${vowId}`,
+    gracePauseToggle: (vowId: string) => `students-grace-pause-toggle-${vowId}`,
+    graceDateInput: 'students-grace-date-input',
+    graceExtendButton: 'students-grace-extend-button',
+    graceMinSessionInput: 'students-grace-min-session-input',
+    graceMinSessionButton: 'students-grace-min-session-button',
+    graceDailyTargetChip: (value: number) => `students-grace-daily-target-chip-${value}`,
+    graceDailyTargetButton: 'students-grace-daily-target-button',
+    proxyButton: 'students-proxy-button',
+    proxyTypeChip: (type: string) => `students-proxy-type-chip-${type}`,
+    proxyKindChip: (kind: string) => `students-proxy-kind-chip-${kind}`,
+    proxyVowRow: (vowId: string) => `students-proxy-vow-row-${vowId}`,
+    proxyNoteInput: 'students-proxy-note-input',
+    proxyPracticeChip: (practiceId: string) => `students-proxy-practice-chip-${practiceId}`,
+    proxyCountInput: 'students-proxy-count-input',
+    proxyReasonInput: 'students-proxy-reason-input',
+    proxyBasisInput: 'students-proxy-basis-input',
+    proxySubmitButton: 'students-proxy-submit-button',
+    // 独立路由 /students/[id] 专属区块(宽屏 master-detail 面板不渲染这几块):
+    // 无障碍学修 chip、传承记录录入、撤回注销。
+    a11yBlindChip: 'students-a11y-blind-chip',
+    a11yDeafChip: 'students-a11y-deaf-chip',
+    cancelDeletionButton: 'students-cancel-deletion-button',
+    transmissionRecordButton: 'students-transmission-record-button',
+    transmissionPickChip: (transmissionId: string) => `students-transmission-pick-chip-${transmissionId}`,
+    transmissionDateInput: 'students-transmission-date-input',
+    transmissionReasonInput: 'students-transmission-reason-input',
+    transmissionConfirmButton: 'students-transmission-confirm-button',
+  },
+  calendarPicker: {
+    // 共享日期选择弹层(components/month-calendar.tsx DatePickerModal·2026-07-18 后台日期录入
+    // 体验审计改造后新用)。dIso 用 yyyy-MM-dd(同组件内部 iso() 那份格式,e2e 按目标日期直接算 testID)。
+    // scope 用调用方(AdminDateField 自己的 testID)做后缀区分——CI 真机跑到:同屏两个日期字段
+    // (如"新建法会"的起止日期)各自的 DatePickerModal 在 RN Modal(web 端不摘除底层 DOM)下
+    // 会同时挂载,不加区分会撞 Playwright 严格模式(getByTestId 解析到 2 个元素)。不传 scope 时
+    // 退回不带后缀的原始 ID(没 testID 的字段没有 e2e 覆盖,不需要区分)。
+    nextMonthButton: (scope?: string) => (scope ? `calendar-next-month-button-${scope}` : 'calendar-next-month-button'),
+    prevMonthButton: (scope?: string) => (scope ? `calendar-prev-month-button-${scope}` : 'calendar-prev-month-button'),
+    dayCell: (dIso: string, scope?: string) => (scope ? `calendar-day-${dIso}-${scope}` : `calendar-day-${dIso}`),
+  },
+  timePicker: {
+    // 共享时间选择弹层(components/time-picker.tsx TimePickerModal·同上审计改造新用)。
+    // h/m 为数字(非补零字符串),e2e 按目标 HH:mm 拆出数字直接算 testID。scope 同 calendarPicker
+    // 那份道理(同屏两个时间字段,如共修起止时间,需要区分)。
+    hourCell: (h: number, scope?: string) => (scope ? `time-picker-hour-${h}-${scope}` : `time-picker-hour-${h}`),
+    minuteCell: (m: number, scope?: string) => (scope ? `time-picker-minute-${m}-${scope}` : `time-picker-minute-${m}`),
+    confirmButton: (scope?: string) => (scope ? `time-picker-confirm-button-${scope}` : 'time-picker-confirm-button'),
+  },
+  posterTheme: {
+    // 画报强调色/透明度 实时预览窗(2026-07-18·PM"先做预览窗"新增)。previewTabBarBg 是预览里
+    // tab栏那层背景色 View,e2e 靠读它的computed backgroundColor验证预览真的跟着表单联动。
+    hexInput: 'poster-theme-hex-input',
+    previewTabBarBg: 'poster-theme-preview-tabbar-bg',
   },
 } as const;

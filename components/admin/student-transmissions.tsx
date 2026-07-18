@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { AdminButton, Badge } from '@/components/ui/admin-kit';
+import { AdminButton, AdminDateField, Badge } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
 import { notify } from '@/lib/dialog';
 import { useRecordTransmission } from '@/lib/mutations/proxy';
 import { useStudentTransmissions, useTransmissions } from '@/lib/queries/admin/proxy';
+import { testIds } from '@/lib/testids';
 import { INK, INK2, INK3, SAFFRON_DARK } from '@/lib/theme';
 
 import { TextInput } from '@/components/ui/text-input';
@@ -59,7 +60,7 @@ export function StudentTransmissions({ userId, name, canWrite }: { userId: strin
       )}
       {canWrite ? (
         <View style={{ marginTop: 12 }}>
-          <AdminButton variant="secondary" size="sm" onPress={() => { setPickId(null); setReason(''); setDate(new Date().toLocaleDateString('en-CA')); setOpen(true); }}>
+          <AdminButton testID={testIds.students.transmissionRecordButton} variant="secondary" size="sm" onPress={() => { setPickId(null); setReason(''); setDate(new Date().toLocaleDateString('en-CA')); setOpen(true); }}>
             录入传承
           </AdminButton>
         </View>
@@ -78,7 +79,7 @@ export function StudentTransmissions({ userId, name, canWrite }: { userId: strin
               <ScrollView style={{ maxHeight: 260, marginTop: 12 }}>
                 <View style={{ gap: 6 }}>
                   {pending.map((o) => (
-                    <Pressable key={o.id} style={[styles.opt, pickId === o.id && styles.optPick]} onPress={() => setPickId(o.id)}>
+                    <Pressable key={o.id} testID={testIds.students.transmissionPickChip(o.id)} style={[styles.opt, pickId === o.id && styles.optPick]} onPress={() => setPickId(o.id)}>
                       <Text style={{ fontSize: 13, fontWeight: '600', color: INK }}>{o.name}</Text>
                       <Text style={{ fontSize: 10, color: INK3 }}>{SOURCE_LABEL[o.sourceKind] ?? o.sourceKind}</Text>
                     </Pressable>
@@ -88,9 +89,9 @@ export function StudentTransmissions({ userId, name, canWrite }: { userId: strin
             )}
             {pickId ? (
               <View style={{ gap: 6, marginTop: 12 }}>
-                <TextInput value={date} onChangeText={setDate} placeholder="所得日 YYYY-MM-DD" placeholderTextColor={INK3} autoCapitalize="none" maxLength={10} style={styles.textInput} />
-                <TextInput value={reason} onChangeText={setReason} placeholder="录入依据(如:法会签到记录)" placeholderTextColor={INK3} style={styles.textInput} />
-                <AdminButton variant="primary" size="sm" disabled={!valid || record.isPending} onPress={onSubmit}>
+                <AdminDateField testID={testIds.students.transmissionDateInput} value={date} onChange={setDate} placeholder="选择所得日" maxDate={new Date()} />
+                <TextInput testID={testIds.students.transmissionReasonInput} value={reason} onChangeText={setReason} placeholder="录入依据(如:法会签到记录)" placeholderTextColor={INK3} style={styles.textInput} />
+                <AdminButton testID={testIds.students.transmissionConfirmButton} variant="primary" size="sm" disabled={!valid || record.isPending} onPress={onSubmit}>
                   {record.isPending ? '保存中…' : '确认录入'}
                 </AdminButton>
               </View>

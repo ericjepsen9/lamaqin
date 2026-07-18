@@ -10,7 +10,7 @@ export function useUpsertPoster() {
   const { session } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (p: { year: number; month: number; imageUrl: string | null; caption: string | null; isActive: boolean }) => {
+    mutationFn: async (p: { year: number; month: number; imageUrl: string | null; caption: string | null; isActive: boolean; accentColor: string | null; overlayOpacity: number | null }) => {
       const url = (p.imageUrl ?? '').trim();
       if (!url) {
         const { error } = await supabase.from('home_posters').delete().eq('year', p.year).eq('month', p.month);
@@ -24,6 +24,8 @@ export function useUpsertPoster() {
           image_url: url,
           caption: p.caption?.trim() || null,
           is_active: p.isActive,
+          accent_color: p.accentColor,
+          overlay_opacity: p.overlayOpacity,
           created_by: session?.user.id ?? null,
         },
         { onConflict: 'year,month' },
@@ -83,6 +85,8 @@ export function useUpsertEventPoster() {
       imageUrl: string;
       caption: string | null;
       isActive: boolean;
+      accentColor: string | null;
+      overlayOpacity: number | null;
     }) => {
       const row = {
         poster_type: p.posterType,
@@ -91,6 +95,8 @@ export function useUpsertEventPoster() {
         image_url: p.imageUrl.trim(),
         caption: p.caption?.trim() || null,
         is_active: p.isActive,
+        accent_color: p.accentColor,
+        overlay_opacity: p.overlayOpacity,
         created_by: session?.user.id ?? null,
       };
       if (p.id) {

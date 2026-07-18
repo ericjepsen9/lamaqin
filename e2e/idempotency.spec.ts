@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { getSeedIds, withDb } from './db';
 import { ADMIN_EMAIL, COACH_EMAIL, STUDENT_EMAIL, TEST_PASSWORD } from './global-setup';
-import { loginAs } from './helpers';
+import { loginAs, pickDate } from './helpers';
 import { testIds } from '../lib/testids';
 
 const uniqueContent = (label: string) => `e2e测试${label}-${Date.now()}`;
@@ -39,8 +39,8 @@ test.describe('法会管理:新建法会(events.ts::useCreateEvent)', () => {
 
     await page.getByTestId(testIds.events.newEventButton).click();
     await page.getByTestId(testIds.events.newEventNameInput).fill(evName);
-    await page.getByTestId(testIds.events.newEventStartInput).fill('2026-08-01');
-    await page.getByTestId(testIds.events.newEventEndInput).fill('2026-08-03');
+    await pickDate(page, testIds.events.newEventStartInput, '2026-08-01'); // 2026-07-18改用日历选择器
+    await pickDate(page, testIds.events.newEventEndInput, '2026-08-03');
     const submitBtn = page.getByTestId(testIds.events.newEventSubmitButton);
     await submitBtn.click();
     try { await submitBtn.click({ timeout: 1000 }); } catch { /* 创建成功后弹层已关,第二下点不中属预期 */ }
@@ -62,7 +62,7 @@ test.describe('法会管理:加场次(events.ts::useAddEventSession)', () => {
     await page.goto('/events', { timeout: 45_000 });
 
     await page.getByTestId(testIds.events.manageSessionsButton(ev.id)).click();
-    await page.getByTestId(testIds.events.sessionDateInput).fill('2026-08-02');
+    await pickDate(page, testIds.events.sessionDateInput, '2026-08-02'); // 2026-07-18改用日历选择器
     const addBtn = page.getByTestId(testIds.events.sessionAddButton);
     await addBtn.click();
     try { await addBtn.click({ timeout: 1000 }); } catch { /* 弹层不会自动关(可连加几场),但同一天同一凭证第二下应被幂等挡住,不一定点不中——不依赖这个catch判断结果 */ }
@@ -231,7 +231,7 @@ test.describe('新建讲考场次(speaking.ts::useCreateSpeakingSession)', () =>
 
     await page.getByTestId(testIds.speaking.newButton).click();
     await page.getByTestId(testIds.speaking.lessonRow(lesson1.id)).click();
-    await page.getByTestId(testIds.speaking.dateInput).fill('2027-01-01');
+    await pickDate(page, testIds.speaking.dateInput, '2027-01-01');
     const submitBtn = page.getByTestId(testIds.speaking.submitButton);
     await submitBtn.click();
     try { await submitBtn.click({ timeout: 1000 }); } catch { /* 创建成功后弹层关闭,第二下点不中属预期 */ }

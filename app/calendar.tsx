@@ -110,7 +110,9 @@ export default function Calendar() {
             </View>
           </View>
         )}
-        {mode === 'week' ? <ScrollTitleBar title={heroMonth} shown={bar.shown} onBack={() => router.back()} /> : null}
+        {/* topInset(同 course/[id].tsx 2026-07-17 修复):这里漏传,ScrollTitleBar 默认 topInset=0,
+            周视图顶部标题栏会贴着状态栏画。这个文件本来就有 insets,漏的只是没传这一个参数。 */}
+        {mode === 'week' ? <ScrollTitleBar title={heroMonth} shown={bar.shown} onBack={() => router.back()} topInset={insets.top} /> : null}
       </SafeAreaView>
       <LegendModal open={legend} onClose={() => setLegend(false)} />
     </View>

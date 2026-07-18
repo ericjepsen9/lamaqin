@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
+import { testIds } from '@/lib/testids';
 
 // 轻量月历(纯 RN + date-fns,无新依赖;web/iOS 一致)。日期选择:截止日(未来)/ 补录日(过去)复用。
 //   minDate/maxDate 之外置灰不可选;选中=橙底白字;今天=橙色描边。按本地日期字符串比较,避免时分误差。
@@ -13,11 +14,16 @@ const SAFFRON_DARK = '#b35535';
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
 const iso = (d: Date) => format(d, 'yyyy-MM-dd');
 
-export function MonthCalendar({ value, onChange, minDate, maxDate }: {
+// scopeId(2026-07-18·CI真机发现修复):RN Modal 在 web 端不摘除底层 DOM,同屏两个日期字段
+// (如法会起止日期)各自的 DatePickerModal 会同时挂载;不传 scopeId 时月切换按钮/日期格 testID
+// 全局唯一,会撞 Playwright 严格模式。scopeId 传调用方自己的 testID(如 AdminDateField 的
+// testID prop)即可保证同屏多实例互不冲突。
+export function MonthCalendar({ value, onChange, minDate, maxDate, scopeId }: {
   value: Date | null;
   onChange: (d: Date) => void;
   minDate?: Date;
   maxDate?: Date;
+  scopeId?: string;
 }) {
   const [visible, setVisible] = useState<Date>(startOfMonth(value ?? new Date()));
   const minIso = minDate ? iso(minDate) : null;
@@ -28,9 +34,9 @@ export function MonthCalendar({ value, onChange, minDate, maxDate }: {
   return (
     <View style={styles.card}>
       <View style={styles.head}>
-        <Pressable hitSlop={8} onPress={() => setVisible((m) => addMonths(m, -1))}><ChevronLeft size={20} color={INK} /></Pressable>
+        <Pressable testID={testIds.calendarPicker.prevMonthButton(scopeId)} hitSlop={8} onPress={() => setVisible((m) => addMonths(m, -1))}><ChevronLeft size={20} color={INK} /></Pressable>
         <Text className="font-serif" style={{ fontSize: 15, fontWeight: '700', color: INK }}>{format(visible, 'yyyy 年 M 月')}</Text>
-        <Pressable hitSlop={8} onPress={() => setVisible((m) => addMonths(m, 1))}><ChevronRight size={20} color={INK} /></Pressable>
+        <Pressable testID={testIds.calendarPicker.nextMonthButton(scopeId)} hitSlop={8} onPress={() => setVisible((m) => addMonths(m, 1))}><ChevronRight size={20} color={INK} /></Pressable>
       </View>
       <View style={styles.wkRow}>
         {WEEKDAYS.map((w) => <Text key={w} style={styles.wk}>{w}</Text>)}
@@ -45,6 +51,7 @@ export function MonthCalendar({ value, onChange, minDate, maxDate }: {
           return (
             <Pressable
               key={dIso}
+              testID={testIds.calendarPicker.dayCell(dIso, scopeId)}
               disabled={disabled}
               onPress={() => onChange(day)}
               style={[styles.cell, selected && styles.cellSel, !selected && today && styles.cellToday]}
@@ -61,7 +68,7 @@ export function MonthCalendar({ value, onChange, minDate, maxDate }: {
 }
 
 // 弹窗版日期选择(PM:选择日期用弹窗)。居中卡片 + 月历;选中即回调并关闭。
-export function DatePickerModal({ visible, value, onPick, onClose, minDate, maxDate, title }: {
+export function DatePickerModal({ visible, value, onPick, onClose, minDate, maxDate, title, scopeId }: {
   visible: boolean;
   value: Date | null;
   onPick: (d: Date) => void;
@@ -69,13 +76,14 @@ export function DatePickerModal({ visible, value, onPick, onClose, minDate, maxD
   minDate?: Date;
   maxDate?: Date;
   title?: string;
+  scopeId?: string;
 }) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.dpBackdrop} onPress={onClose}>
         <Pressable style={styles.dpCard} onPress={() => {}}>
           <Text className="font-serif" style={styles.dpTitle}>{title ?? '选择日期'}</Text>
-          <MonthCalendar value={value} minDate={minDate} maxDate={maxDate} onChange={(d) => { onPick(d); onClose(); }} />
+          <MonthCalendar value={value} minDate={minDate} maxDate={maxDate} onChange={(d) => { onPick(d); onClose(); }} scopeId={scopeId} />
           <Pressable style={styles.dpCancel} onPress={onClose}><Text style={{ fontSize: 14, fontWeight: '700', color: INK3 }}>取消</Text></Pressable>
         </Pressable>
       </Pressable>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { AdminButton } from '@/components/ui/admin-kit';
+import { AdminButton, AdminDateField } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
 import { confirmAsync, notify } from '@/lib/dialog';
 import { useSwitchPrimaryCohort, useUpdateMemberRole } from '@/lib/mutations/classes';
@@ -169,13 +169,13 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
           <AdminButton testID={testIds.students.promoteButton} variant="secondary" size="sm" disabled={promote.isPending} onPress={onPromote}>旁听转正</AdminButton>
         ) : null}
         {memberships.length > 1 ? (
-          <AdminButton variant="secondary" size="sm" onPress={() => setSwitchOpen(true)}>切主班</AdminButton>
+          <AdminButton testID={testIds.students.switchCohortButton} variant="secondary" size="sm" onPress={() => setSwitchOpen(true)}>切主班</AdminButton>
         ) : null}
         {!isPending ? (
-          <AdminButton variant="secondary" size="sm" onPress={() => { setGraceVowId(null); setGraceDate(''); setDailyTargetPick(null); setGraceOpen(true); }}>设宽限 / 暂停 / 纠错</AdminButton>
+          <AdminButton testID={testIds.students.graceButton} variant="secondary" size="sm" onPress={() => { setGraceVowId(null); setGraceDate(''); setDailyTargetPick(null); setGraceOpen(true); }}>设宽限 / 暂停 / 纠错</AdminButton>
         ) : null}
         {!isPending ? (
-          <AdminButton variant="secondary" size="sm" onPress={() => { resetProxyForm(); setProxyOpen(true); }}>代行</AdminButton>
+          <AdminButton testID={testIds.students.proxyButton} variant="secondary" size="sm" onPress={() => { resetProxyForm(); setProxyOpen(true); }}>代行</AdminButton>
         ) : null}
         {!isPending && memberships.length === 0 ? (
           <Text style={styles.hint}>未入班:入班/调班在「班级管理 → 班级详情 → 添加学员」操作。</Text>
@@ -192,6 +192,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
               {memberships.map((m) => (
                 <Pressable
                   key={m.cohortId}
+                  testID={testIds.students.switchCohortOption(m.cohortId)}
                   style={[styles.opt, m.isPrimary && styles.optOn]}
                   disabled={m.isPrimary || switchPrimary.isPending}
                   onPress={() => switchPrimary.mutate(
@@ -228,11 +229,12 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                     const paused = v.status === 'paused';
                     return (
                       <View key={v.id} style={[styles.opt, graceVowId === v.id && styles.optPick]}>
-                        <Pressable style={{ flex: 1 }} onPress={() => { setGraceVowId(v.id); setGraceDate(v.currentEndDate ?? ''); setMinSessionInput(v.minSessionMinutes != null ? String(v.minSessionMinutes) : ''); setDailyTargetPick(v.dailyTarget); }}>
+                        <Pressable testID={testIds.students.graceVowRow(v.id)} style={{ flex: 1 }} onPress={() => { setGraceVowId(v.id); setGraceDate(v.currentEndDate ?? ''); setMinSessionInput(v.minSessionMinutes != null ? String(v.minSessionMinutes) : ''); setDailyTargetPick(v.dailyTarget); }}>
                           <Text style={{ fontSize: 14, fontWeight: '600', color: INK }}>{v.practiceName}{paused ? '(已暂停)' : ''}</Text>
                           <Text style={{ fontSize: 11, color: INK3, marginTop: 1 }}>现截止 {v.currentEndDate ?? '—'}{v.originalEndDate && v.originalEndDate !== v.currentEndDate ? `(原 ${v.originalEndDate})` : ''}</Text>
                         </Pressable>
                         <Pressable
+                          testID={testIds.students.gracePauseToggle(v.id)}
                           style={[styles.pauseBtn, paused && styles.pauseBtnResume]}
                           disabled={pauseVow.isPending || resumeVow.isPending}
                           onPress={() => onTogglePause(v.id, v.practiceName, paused)}
@@ -244,22 +246,15 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                   })}
                   {graceVowId ? (
                     <View style={{ gap: 6 }}>
-                      <TextInput
-                        value={graceDate}
-                        onChangeText={setGraceDate}
-                        placeholder="新截止日 YYYY-MM-DD"
-                        placeholderTextColor={INK3}
-                        autoCapitalize="none"
-                        maxLength={10}
-                        style={styles.dateInput}
-                      />
-                      <AdminButton variant="primary" size="sm" disabled={!graceDateValid || extend.isPending} onPress={onGraceSubmit}>
+                      <AdminDateField testID={testIds.students.graceDateInput} value={graceDate} onChange={setGraceDate} placeholder="选择新截止日" />
+                      <AdminButton testID={testIds.students.graceExtendButton} variant="primary" size="sm" disabled={!graceDateValid || extend.isPending} onPress={onGraceSubmit}>
                         {extend.isPending ? '保存中…' : '延长到该日'}
                       </AdminButton>
                       {isAdmin ? (
                         <>
                           <Text style={[styles.hint, { marginTop: 6 }]}>座次门槛(仅系统管理员可改·比宽限更紧):</Text>
                           <TextInput
+                            testID={testIds.students.graceMinSessionInput}
                             value={minSessionInput}
                             onChangeText={setMinSessionInput}
                             placeholder="分钟数,≥30(留空视为沿用当前值)"
@@ -270,7 +265,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                           {minSessionInput.trim() && !minSessionValid ? (
                             <Text style={{ fontSize: 11, color: '#a13c2e' }}>门槛不能低于 30 分钟(大纲底线)</Text>
                           ) : null}
-                          <AdminButton variant="secondary" size="sm" disabled={!minSessionValid || updateMinSession.isPending} onPress={onMinSessionSubmit}>
+                          <AdminButton testID={testIds.students.graceMinSessionButton} variant="secondary" size="sm" disabled={!minSessionValid || updateMinSession.isPending} onPress={onMinSessionSubmit}>
                             {updateMinSession.isPending ? '保存中…' : '更新门槛(只影响新打卡)'}
                           </AdminButton>
                         </>
@@ -281,7 +276,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                           {graceVow.allowedDailyTargets && graceVow.allowedDailyTargets.length > 0 ? (
                             <View style={styles.chipRow}>
                               {graceVow.allowedDailyTargets.map((t) => (
-                                <Pressable key={t} style={[styles.chip, dailyTargetPick === t && styles.chipOn]} onPress={() => setDailyTargetPick(t)}>
+                                <Pressable key={t} testID={testIds.students.graceDailyTargetChip(t)} style={[styles.chip, dailyTargetPick === t && styles.chipOn]} onPress={() => setDailyTargetPick(t)}>
                                   <Text style={[styles.chipTxt, dailyTargetPick === t && styles.chipTxtOn]}>{t}</Text>
                                 </Pressable>
                               ))}
@@ -290,6 +285,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                             <Text style={{ fontSize: 11, color: '#a13c2e' }}>该修法已锁定但未配置白名单值,无法纠错(请先在功课配置里补白名单)。</Text>
                           )}
                           <AdminButton
+                            testID={testIds.students.graceDailyTargetButton}
                             variant="secondary" size="sm"
                             disabled={dailyTargetPick == null || dailyTargetPick === graceVow.dailyTarget || updateDailyTarget.isPending}
                             onPress={onDailyTargetSubmit}
@@ -319,7 +315,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
               <Text style={styles.fieldLabel}>类型</Text>
               <View style={styles.chipRow}>
                 {(Object.keys(ACTION_TYPE_LABEL) as ProxyActionType[]).map((t) => (
-                  <Pressable key={t} style={[styles.chip, proxyType === t && styles.chipOn]} onPress={() => setProxyType(t)}>
+                  <Pressable key={t} testID={testIds.students.proxyTypeChip(t)} style={[styles.chip, proxyType === t && styles.chipOn]} onPress={() => setProxyType(t)}>
                     <Text style={[styles.chipTxt, proxyType === t && styles.chipTxtOn]}>{ACTION_TYPE_LABEL[t]}</Text>
                   </Pressable>
                 ))}
@@ -328,7 +324,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
               <Text style={styles.fieldLabel}>对象</Text>
               <View style={styles.chipRow}>
                 {(Object.keys(TARGET_KIND_LABEL) as ProxyTargetKind[]).map((k) => (
-                  <Pressable key={k} style={[styles.chip, proxyKind === k && styles.chipOn]} onPress={() => { setProxyKind(k); setProxyVowId(null); }}>
+                  <Pressable key={k} testID={testIds.students.proxyKindChip(k)} style={[styles.chip, proxyKind === k && styles.chipOn]} onPress={() => { setProxyKind(k); setProxyVowId(null); }}>
                     <Text style={[styles.chipTxt, proxyKind === k && styles.chipTxtOn]}>{TARGET_KIND_LABEL[k]}</Text>
                   </Pressable>
                 ))}
@@ -340,7 +336,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                 ) : (
                   <View style={{ gap: 6, marginTop: 4 }}>
                     {autoVows.map((v) => (
-                      <Pressable key={v.id} style={[styles.opt, proxyVowId === v.id && styles.optPick]} onPress={() => setProxyVowId(v.id)}>
+                      <Pressable key={v.id} testID={testIds.students.proxyVowRow(v.id)} style={[styles.opt, proxyVowId === v.id && styles.optPick]} onPress={() => setProxyVowId(v.id)}>
                         <Text style={{ fontSize: 13, fontWeight: '600', color: INK }}>{v.practiceName}</Text>
                       </Pressable>
                     ))}
@@ -348,6 +344,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                 )
               ) : (
                 <TextInput
+                  testID={testIds.students.proxyNoteInput}
                   value={proxyNote}
                   onChangeText={setProxyNote}
                   placeholder={`说明具体${TARGET_KIND_LABEL[proxyKind]}(如课节/考试名称)`}
@@ -362,13 +359,14 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 6 }}>
                     <View style={{ flexDirection: 'row', gap: 6 }}>
                       {practices.map((p) => (
-                        <Pressable key={p.id} style={[styles.chip, proxyPracticeId === p.id && styles.chipOn]} onPress={() => setProxyPracticeId(p.id)}>
+                        <Pressable key={p.id} testID={testIds.students.proxyPracticeChip(p.id)} style={[styles.chip, proxyPracticeId === p.id && styles.chipOn]} onPress={() => setProxyPracticeId(p.id)}>
                           <Text style={[styles.chipTxt, proxyPracticeId === p.id && styles.chipTxtOn]}>{p.name}</Text>
                         </Pressable>
                       ))}
                     </View>
                   </ScrollView>
                   <TextInput
+                    testID={testIds.students.proxyCountInput}
                     value={proxyCount}
                     onChangeText={setProxyCount}
                     placeholder="代替数量(如遍数)"
@@ -381,6 +379,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
 
               <Text style={styles.fieldLabel}>理由(必填)</Text>
               <TextInput
+                testID={testIds.students.proxyReasonInput}
                 value={proxyReason}
                 onChangeText={setProxyReason}
                 placeholder="如:病假期间由他人代打卡 92 修法 30 遍"
@@ -390,6 +389,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
               />
               <Text style={styles.fieldLabel}>依据(选填)</Text>
               <TextInput
+                testID={testIds.students.proxyBasisInput}
                 value={proxyBasis}
                 onChangeText={setProxyBasis}
                 placeholder="如:教务口头同意 / 医院证明编号"
@@ -398,7 +398,7 @@ export function StudentAdminActions({ userId, name, status, memberships, isAdmin
               />
 
               <View style={{ marginTop: 14 }}>
-                <AdminButton variant="primary" disabled={!proxyValid || recordProxy.isPending} onPress={onProxySubmit}>
+                <AdminButton testID={testIds.students.proxySubmitButton} variant="primary" disabled={!proxyValid || recordProxy.isPending} onPress={onProxySubmit}>
                   {recordProxy.isPending ? '记录中…' : '确认记录'}
                 </AdminButton>
               </View>

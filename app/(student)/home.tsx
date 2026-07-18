@@ -1,8 +1,8 @@
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
-import { Bell, BookOpen, ClipboardCheck, Flower2, Plus, User } from 'lucide-react-native';
-import { useState, type ReactNode } from 'react';
+import { Bell, BookOpen, ClipboardCheck, Flower2, Plus, User, type LucideIcon } from 'lucide-react-native';
+import { useState } from 'react';
 import { ImageBackground, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -18,6 +18,7 @@ import { usePrimaryContext, useSelfStudyPlan } from '@/lib/queries/self-study-pr
 import { testIds } from '@/lib/testids';
 import { todayUTC8 } from '@/lib/tibetan';
 import { useTibetanLookup } from '@/lib/queries/tibetan-db';
+import { hexToRgba, readableTextTone } from '@/lib/utils';
 
 // 首页(按觉学真实首页·画报日历风):满屏月度画报照片(无则金色藏地天空渐变兜底)。
 // 覆盖层规范(参考觉学,2026-06-18 定):顶部覆盖图标=圆形磨砂玻璃+白图标;覆盖文字(日期/藏历)=白+轻阴影;
@@ -54,6 +55,11 @@ export default function StudentHome() {
   const qcItems = myVows.filter((v) => v.measurement === 'count').map((v) => ({ id: v.vowId, name: v.name }));
   const insets = useSafeAreaInsets();
   const onImage = !!poster?.imageUrl;
+  // 画报强调色/透明度(2026-07-18):管理员手动定,未设置(null)时4张卡片维持原来的固定配色,
+  // 不受影响。设置了才叠加强调色 + 按颜色亮度切文字/图标深浅(lib/utils.ts readableTextTone)。
+  const cardAccent = poster?.accentColor ?? null;
+  const cardOpacity = poster?.overlayOpacity ?? 0.55;
+  const cardTone = readableTextTone(cardAccent);
 
   // "每日功课"卡副文案接真实本周课数(2026-07-11 补做·数据同 daily.tsx 这套):
   //   班级=各在读班本周课(主班优先)/自学=按节奏本周计划;都没有或还没算出来时,退回原通用文案。
@@ -124,14 +130,14 @@ export default function StudentHome() {
             {/* 续学定位(C6·2026-07-10 核实):/daily 内部已按 usePrimaryContext() 真实定位(班级多班
                 扇出取本周课/自学按节奏取本周计划),点进来就是"该学的那节"。副文案(2026-07-11 补做)
                 同一套数据算出真实本周课数,不再是死文案 */}
-            <BigCard href="/daily" icon={<BookOpen size={22} color={INK2} />} title="每日功课" sub={dailySub} />
-            <BigCard href="/activities" icon={<Flower2 size={22} color={INK2} />} title="共修法会" sub={activitiesSub} />
+            <BigCard href="/daily" Icon={BookOpen} title="每日功课" sub={dailySub} accentColor={cardAccent} overlayOpacity={cardOpacity} textTone={cardTone} />
+            <BigCard href="/activities" Icon={Flower2} title="共修法会" sub={activitiesSub} accentColor={cardAccent} overlayOpacity={cardOpacity} textTone={cardTone} />
           </View>
           <View className="flex-row gap-2.5">
-            <BigCard href="/speech" icon={<ClipboardCheck size={22} color={INK2} />} title="大学演讲" sub="自学读物 · 随时读" />
+            <BigCard href="/speech" Icon={ClipboardCheck} title="大学演讲" sub="自学读物 · 随时读" accentColor={cardAccent} overlayOpacity={cardOpacity} textTone={cardTone} />
             {/* useMyVows 查询失败时别显"今日 0 项功课"——对已发愿师兄是假空态(全文件审计 2026-07-12);
                 本卡低调提示,不做整页阻断式报错(首页其余卡片仍应可用)。 */}
-            <BigCard testID={testIds.home.quickCountCard} onPress={() => setQcOpen(true)} icon={<Plus size={22} color={INK2} />} title="快速计数" sub={vowsError ? '加载失败,请稍后重试' : `今日 ${qcItems.length} 项功课`} accent />
+            <BigCard testID={testIds.home.quickCountCard} onPress={() => setQcOpen(true)} Icon={Plus} title="快速计数" sub={vowsError ? '加载失败,请稍后重试' : `今日 ${qcItems.length} 项功课`} accent accentColor={cardAccent} overlayOpacity={cardOpacity} textTone={cardTone} />
           </View>
         </View>
       </SafeAreaView>
@@ -154,17 +160,26 @@ export default function StudentHome() {
   );
 }
 
-function BigCard({ href, onPress, icon, title, sub, accent, testID }: { href?: string; onPress?: () => void; icon: ReactNode; title: string; sub?: string; accent?: boolean; testID?: string }) {
+export function BigCard({ href, onPress, Icon, title, sub, accent, testID, accentColor, overlayOpacity, textTone }: {
+  href?: string; onPress?: () => void; Icon: LucideIcon; title: string; sub?: string; accent?: boolean; testID?: string;
+  accentColor?: string | null; overlayOpacity?: number; textTone?: 'light' | 'dark';
+}) {
+  const light = textTone === 'light' && !!accentColor;
+  const titleColor = light ? '#fff' : INK;
+  const subColor = light ? 'rgba(255,255,255,0.9)' : (accent ? SAFFRON_DARK : INK3);
+  const iconColor = light ? '#fff' : INK2;
   const inner = (
     <BlurView intensity={24} tint="light" style={styles.card}>
+      {/* 画报强调色叠色(2026-07-18):accentColor 未设置时不渲染这层,卡片维持原来的固定配色 */}
+      {accentColor ? <View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: hexToRgba(accentColor, overlayOpacity ?? 0.55) }]} /> : null}
       <View className="flex-row items-center gap-2">
-        {icon}
-        <Text className="font-serif" numberOfLines={1} style={{ flexShrink: 1, fontSize: 16, fontWeight: '700', color: INK, letterSpacing: 2 }}>
+        <Icon size={22} color={iconColor} />
+        <Text className="font-serif" numberOfLines={1} style={[{ flexShrink: 1, fontSize: 16, fontWeight: '700', color: titleColor, letterSpacing: 2 }, light && styles.shadowText]}>
           {title}
         </Text>
       </View>
       {sub ? (
-        <Text numberOfLines={1} style={{ paddingLeft: 30, fontSize: 12, fontWeight: '600', color: accent ? SAFFRON_DARK : INK3, letterSpacing: 1 }}>
+        <Text numberOfLines={1} style={[{ paddingLeft: 30, fontSize: 12, fontWeight: '600', color: subColor, letterSpacing: 1 }, light && styles.shadowText]}>
           {sub}
         </Text>
       ) : null}
@@ -204,4 +219,5 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     justifyContent: 'center',
   },
+  shadowText: { textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 },
 });

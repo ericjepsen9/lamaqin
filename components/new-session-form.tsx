@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { AdminButton, SegmentedControl } from '@/components/ui/admin-kit';
+import { AdminButton, AdminDateField, AdminTimeField, SegmentedControl } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
 import { notify } from '@/lib/dialog';
 import { useCreateSession } from '@/lib/mutations/attendance';
@@ -126,10 +126,10 @@ export function NewSessionForm({ cohortId, cohortName, programId, onDone }: {
 
       <View style={styles.section}>
         <Text style={styles.label}>日期与起止时间</Text>
-        <TextInput style={styles.input} placeholder="日期 2026-07-06" placeholderTextColor={INK4} value={date} onChangeText={setDate} keyboardType="numbers-and-punctuation" maxLength={10} />
+        <AdminDateField value={date} onChange={setDate} placeholder="点击选择日期" />
         <View style={styles.timeRow}>
-          <TextInput style={[styles.input, { flex: 1 }]} placeholder="开始 19:30" placeholderTextColor={INK4} value={startTime} onChangeText={setStartTime} keyboardType="numbers-and-punctuation" maxLength={5} />
-          <TextInput style={[styles.input, { flex: 1 }]} placeholder="结束 21:00" placeholderTextColor={INK4} value={endTime} onChangeText={setEndTime} keyboardType="numbers-and-punctuation" maxLength={5} />
+          <View style={{ flex: 1 }}><AdminTimeField value={startTime} onChange={setStartTime} placeholder="开始时间" /></View>
+          <View style={{ flex: 1 }}><AdminTimeField value={endTime} onChange={setEndTime} placeholder="结束时间" /></View>
         </View>
         <Text style={styles.fieldNote}>按班级本地时间填(可填过去日期补录场次)。</Text>
       </View>

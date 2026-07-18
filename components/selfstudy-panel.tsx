@@ -5,6 +5,7 @@ import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, St
 import { Text } from '@/components/ui/text';
 import { notify } from '@/lib/dialog';
 import { useAddSelfStudyRestWeek, useRemoveSelfStudyRestWeek, useSetPrimarySelfStudyProgram, useSetSelfStudyPace } from '@/lib/mutations/self-study';
+import { useLessonStatusMap } from '@/lib/queries/courses';
 import { TextInput } from '@/components/ui/text-input';
 import {
   useMySelfStudyPrograms,
@@ -61,7 +62,11 @@ function PrimaryCard({ program, onRest }: { program: SelfStudyProgramRow; onRest
   const { data: rests = [] } = useSelfStudyRestWeeks(program.programId);
   const [paceOpen, setPaceOpen] = useState(false);
   const lessons = plan?.lessons ?? [];
-  const cont = lessons[0];
+  // "继续学习"跳本周计划里第一节还没圆满的(同 course/[id].tsx 的 currentLessonId 那套判法);
+  // 全圆满则退到最后一节。此前写死 lessons[0],已学完第1节在学第2节时,这颗按钮会把人带回
+  // 已经学完的第1节(2026-07-18 PM 反馈确认)。
+  const { data: statusMap } = useLessonStatusMap(lessons.map((l) => l.lessonId));
+  const cont = lessons.find((l) => statusMap?.get(l.lessonId) !== 'complete') ?? lessons[lessons.length - 1];
 
   return (
     <View style={styles.card}>

@@ -163,7 +163,7 @@ export default function Practice() {
                         累计 {v.currentSessions} 座{v.targetCount ? ` / ${v.targetCount}` : ''}
                       </Text>
                     </Pressable>
-                    <Pressable hitSlop={6} style={styles.daka} onPress={() => router.push(`/vow/${v.vowId}`)}><Text style={styles.dakaTxt}>记录</Text></Pressable>
+                    <Pressable hitSlop={6} style={styles.dakaCircle} onPress={() => router.push(`/vow/${v.vowId}`)}><Plus size={16} color={SAFFRON_DARK} /></Pressable>
                   </View>
                 ))}
               </Section>
@@ -472,9 +472,7 @@ const styles = StyleSheet.create({
   tx: { flex: 1, minWidth: 0 },
   gName: { fontSize: 15, fontWeight: '700', color: INK },
   statusDot: { width: 7, height: 7, borderRadius: 3.5, flexShrink: 0 },
-  daka: { flexShrink: 0, borderWidth: 1, borderColor: SAFFRON, borderRadius: 9999, paddingHorizontal: 9, paddingVertical: 3 },
-  dakaTxt: { color: SAFFRON_DARK, fontSize: 11, fontWeight: '700' },
-  // 计数型卡片"添加"改圆形加号按钮(PM 2026-07-17);观修卡片"记录"药丸暂不动(下一轮跟卡片布局一起改)。
+  // 计数型/观修卡片的圆形加号按钮统一样式(PM 2026-07-17:两类卡片行动按钮视觉一致)。
   dakaCircle: { flexShrink: 0, width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: SAFFRON, alignItems: 'center', justifyContent: 'center' },
 
   njGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },

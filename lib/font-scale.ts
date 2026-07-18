@@ -33,8 +33,10 @@ type FontScaleState = {
 export const useFontScale = create<FontScaleState>()(
   persist(
     (set) => ({
-      level: '标准',
-      scale: SCALE['标准'], // ⚠️ 必须用算出来的默认值,而非写死 1,否则默认档渲染不出缩放效果
+      // 默认档改回"小"(PM 2026-07-17,推翻上面 06-28 那次"默认调大"的决定)。
+      // 只影响新用户/本地还没存过这项设置的场景——已经存了"标准"/"大"偏好的老用户不受影响。
+      level: '小',
+      scale: SCALE['小'], // ⚠️ 必须用算出来的默认值,而非写死 1(虽然这里刚好等于 1)
       setLevel: (level) => set({ level, scale: SCALE[level] ?? 1 }),
     }),
     {

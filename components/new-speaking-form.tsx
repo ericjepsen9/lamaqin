@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { AdminButton } from '@/components/ui/admin-kit';
+import { AdminButton, AdminDateField, AdminTimeField } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
 import { notify } from '@/lib/dialog';
 import { useCreateSpeakingSession } from '@/lib/mutations/speaking';
@@ -129,8 +129,8 @@ export function NewSpeakingForm({ cohortId, cohortName, programId, onDone }: {
 
       <View style={styles.section}>
         <Text style={styles.label}>截止日期(+可选时刻)</Text>
-        <TextInput testID={testIds.speaking.dateInput} style={styles.input} placeholder="日期 2026-07-12" placeholderTextColor={INK4} value={date} onChangeText={setDate} keyboardType="numbers-and-punctuation" maxLength={10} />
-        <TextInput style={styles.input} placeholder="截止时刻 20:00(可空=当天末)" placeholderTextColor={INK4} value={endTime} onChangeText={setEndTime} keyboardType="numbers-and-punctuation" maxLength={5} />
+        <AdminDateField testID={testIds.speaking.dateInput} value={date} onChange={setDate} placeholder="点击选择日期" />
+        <AdminTimeField value={endTime} onChange={setEndTime} placeholder="截止时刻(可空=当天末)" />
         <Text style={styles.fieldNote}>可填过去日期补录历史讲考。</Text>
       </View>
 

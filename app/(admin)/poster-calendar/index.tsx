@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   AdminButton,
+  AdminDateField,
   AdminModal,
   Badge,
   FilterChips,
@@ -12,13 +13,17 @@ import {
   ModalField,
   ModalFootnote,
   SCREEN_BG,
+  SegmentedControl,
   ErrorState,
 } from '@/components/ui/admin-kit';
+import { PosterThemePreview } from '@/components/admin/poster-theme-preview';
 import { Text } from '@/components/ui/text';
+import { TextInput } from '@/components/ui/text-input';
 import { confirmAsync, notify } from '@/lib/dialog';
 import { useDeleteEventPoster, useUploadEventPosterImage, useUploadPosterImage, useUpsertEventPoster, useUpsertPoster } from '@/lib/mutations/posters';
 import { useCurrentUser } from '@/lib/queries/profile';
 import { useAdminEventPosters, useAdminPosters, type AdminEventPoster } from '@/lib/queries/posters';
+import { testIds } from '@/lib/testids';
 import { CRIMSON, GOLD_DARK as GOLD, GOLD_PALE, INK, INK3, INK4, SAFFRON, SAFFRON_DARK, SAFFRON_LIGHT, SAGE_DARK, SAGE_PALE } from '@/lib/theme';
 import { addMonths, buddhaEvents, isCeremony, monthCells, todayUTC8, WEEKDAYS, type TibetanDay } from '@/lib/tibetan';
 import { useTibetanLookup } from '@/lib/queries/tibetan-db';
@@ -37,9 +42,88 @@ type Tab = 'posters' | 'event' | 'special' | 'calendar';
 //   命中时【替代】当月画报作首页背景(PM 2026-07-11)，特别日优先于法会期(lib/queries/home.ts)。
 //   无固定数量，做列表(新增/编辑/删除)而非月度那种固定 12 格。
 // ─────────────────────────────────────────────────────────────────────
-type Poster = { month: number; imageUrl: string | null; caption: string | null; isActive: boolean };
+type Poster = { month: number; imageUrl: string | null; caption: string | null; isActive: boolean; accentColor: string | null; overlayOpacity: number | null };
 
 const MONTH_LABEL = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+
+// ─── 画报强调色/透明度(2026-07-18):底部tab栏+首页4张卡片共用这一组值,不做图片自动分析
+//   (画报月更一次的低频内容,人工挑色比自动检测可靠)。文字该配浅色/深色由 App 端按选中的
+//   颜色亮度自动算(lib/utils.ts readableTextTone),这里不用管理员另外操心。 ───
+const ACCENT_PRESETS = [
+  { label: '暖金', value: '#cfa978' },
+  { label: '藏红', value: SAFFRON },
+  { label: '竹绿', value: '#4d6e3d' },
+  { label: '藏青', value: '#2b3a67' },
+  { label: '绛红', value: '#7a2e2e' },
+  { label: '墨色', value: '#2b2218' },
+];
+const OPACITY_LEVELS: { key: string; label: string; value: number }[] = [
+  { key: 'light', label: '浅', value: 0.35 },
+  { key: 'mid', label: '中', value: 0.55 },
+  { key: 'deep', label: '深', value: 0.75 },
+];
+function opacityKeyOf(v: number | null): string {
+  if (v == null) return 'mid';
+  return OPACITY_LEVELS.reduce((best, cur) => (Math.abs(cur.value - v) < Math.abs(best.value - v) ? cur : best)).key;
+}
+function isValidHex(s: string): boolean {
+  return /^#[0-9a-fA-F]{6}$/.test(s);
+}
+
+// 强调色+透明度选择(月度/法会期/特别日三个表单共用)。accentColor=''表示"不设置",
+// 保存时上层转成 null(维持 App 端默认样式)。
+// imageUrl 传入给下方实时预览窗(2026-07-18·PM"先做预览窗"),没有的话预览窗走纯色兜底。
+function PosterThemeFields({ imageUrl, accentColor, onAccentChange, overlayOpacity, onOpacityChange }: {
+  imageUrl: string;
+  accentColor: string;
+  onAccentChange: (v: string) => void;
+  overlayOpacity: number | null;
+  onOpacityChange: (v: number) => void;
+}) {
+  const valid = accentColor === '' || isValidHex(accentColor);
+  // 预览窗跟保存逻辑同一套门槛:正在打字打到一半的无效色值不在预览里生效,视同"未设置"
+  // (跟下方"透明度"控件的显隐门槛valid一致,不单独另起一套判断)。
+  const previewAccent = accentColor !== '' && valid ? accentColor : null;
+  return (
+    <View style={styles.formSection}>
+      <PosterThemePreview imageUrl={imageUrl} accentColor={previewAccent} overlayOpacity={overlayOpacity ?? 0.55} />
+      <Text style={styles.formLabel}>强调色(用于底部tab栏 + 首页4张卡片,不设置则用默认配色)</Text>
+      <View style={styles.swatchRow}>
+        <Pressable
+          onPress={() => onAccentChange('')}
+          style={[styles.swatchNone, accentColor === '' && styles.swatchSelected]}
+        >
+          <Text style={{ fontSize: 10, color: INK4, fontWeight: '600' }}>默认</Text>
+        </Pressable>
+        {ACCENT_PRESETS.map((p) => (
+          <Pressable
+            key={p.value}
+            onPress={() => onAccentChange(p.value)}
+            style={[styles.swatch, { backgroundColor: p.value }, accentColor.toLowerCase() === p.value.toLowerCase() && styles.swatchSelected]}
+          />
+        ))}
+      </View>
+      <TextInput
+        testID={testIds.posterTheme.hexInput}
+        style={[styles.modalFieldInputPlain, !valid && { borderColor: CRIMSON }]}
+        value={accentColor}
+        onChangeText={onAccentChange}
+        placeholder="或直接输入色值,如 #2b3a67"
+        placeholderTextColor={INK4}
+        autoCapitalize="none"
+        maxLength={7}
+      />
+      {!valid ? <Text style={{ fontSize: 11, color: CRIMSON, marginTop: 4 }}>需为 # 加 6 位十六进制,如 #2b3a67</Text> : null}
+      {accentColor !== '' && valid ? (
+        <>
+          <Text style={[styles.formLabel, { marginTop: 12 }]}>透明度</Text>
+          <SegmentedControl items={OPACITY_LEVELS.map((l) => ({ key: l.key, label: l.label }))} value={opacityKeyOf(overlayOpacity)}
+            onChange={(key) => onOpacityChange(OPACITY_LEVELS.find((l) => l.key === key)!.value)} />
+        </>
+      ) : null}
+    </View>
+  );
+}
 
 // ─────────────────────────────────────────────────────────────────────
 // 藏历日历（决策137/172）：读 lib/tibetan(觉学 2026 全年·UTC+8 全球同观),与学员端同源。
@@ -244,7 +328,7 @@ export default function CalendarAdmin() {
         year={year}
         onClose={() => setEditingPoster(null)}
         onSave={(next) => upsertPoster.mutate(
-          { year, month: next.month, imageUrl: next.imageUrl, caption: next.caption, isActive: next.isActive },
+          { year, month: next.month, imageUrl: next.imageUrl, caption: next.caption, isActive: next.isActive, accentColor: next.accentColor, overlayOpacity: next.overlayOpacity },
           { onError: (e) => notify('保存失败', (e as Error)?.message ?? '请重试,或确认有管理员权限。') },
         )}
       />
@@ -257,12 +341,17 @@ function PosterEditModal({ poster, year, onClose, onSave }: { poster: Poster | n
   const [imageUrl, setImageUrl] = useState('');
   const [caption, setCaption] = useState('');
   const [isActive, setIsActive] = useState(true);
+  const [accentColor, setAccentColor] = useState('');
+  const [overlayOpacity, setOverlayOpacity] = useState<number | null>(null);
   const uploadImg = useUploadPosterImage();
   // 渲染期间比对上一次的poster(react-hooks/set-state-in-effect·2026-07-17 lint债清理)
   const [prevPoster, setPrevPoster] = useState(poster);
   if (poster !== prevPoster) {
     setPrevPoster(poster);
-    if (poster) { setImageUrl(poster.imageUrl ?? ''); setCaption(poster.caption ?? ''); setIsActive(poster.isActive); }
+    if (poster) {
+      setImageUrl(poster.imageUrl ?? ''); setCaption(poster.caption ?? ''); setIsActive(poster.isActive);
+      setAccentColor(poster.accentColor ?? ''); setOverlayOpacity(poster.overlayOpacity);
+    }
   }
   if (!poster) return null;
 
@@ -295,16 +384,18 @@ function PosterEditModal({ poster, year, onClose, onSave }: { poster: Poster | n
       </View>
       <ModalField label="或粘贴图片链接" value={imageUrl} onChangeText={setImageUrl} placeholder="https://…" />
       <ModalField label="诗句 / 标题（可选）" value={caption} onChangeText={setCaption} placeholder="如：萨嘎达瓦 · 普门共修" />
+      <PosterThemeFields imageUrl={imageUrl} accentColor={accentColor} onAccentChange={setAccentColor} overlayOpacity={overlayOpacity} onOpacityChange={setOverlayOpacity} />
       <View style={styles.switchRow}>
         <Text style={styles.formLabel}>启用为当月首页背景</Text>
         <Switch value={isActive} onValueChange={setIsActive} trackColor={{ true: SAFFRON, false: INK4 }} />
       </View>
       <ModalActions>
         <AdminButton variant="negative" onPress={onClose} style={{ flex: 1 }}>取消</AdminButton>
-        <AdminButton variant="primary" onPress={async () => {
+        <AdminButton variant="primary" disabled={accentColor !== '' && !isValidHex(accentColor)} onPress={async () => {
           // 清空链接=移除当月画报(破坏性),二次确认(审计 P2)
           if (poster.imageUrl && !imageUrl.trim() && !(await confirmAsync(`移除 ${poster.month} 月画报?`, '保存后当月首页恢复默认背景;可随时重新上传。', '移除'))) return;
-          onSave({ ...poster, imageUrl: imageUrl.trim() || null, caption: caption.trim() || null, isActive });
+          const accent = accentColor.trim();
+          onSave({ ...poster, imageUrl: imageUrl.trim() || null, caption: caption.trim() || null, isActive, accentColor: accent || null, overlayOpacity: accent ? overlayOpacity : null });
           onClose();
         }} style={{ flex: 1 }}>保存</AdminButton>
       </ModalActions>
@@ -424,6 +515,8 @@ function EventPosterEditModal({ posterType, editing, onClose }: {
   const [isActive, setIsActive] = useState(initial?.isActive ?? true);
   const [startDate, setStartDate] = useState(initial?.startDate ?? '');
   const [endDate, setEndDate] = useState(initial?.endDate ?? '');
+  const [accentColor, setAccentColor] = useState(initial?.accentColor ?? '');
+  const [overlayOpacity, setOverlayOpacity] = useState<number | null>(initial?.overlayOpacity ?? null);
   const uploadImg = useUploadEventPosterImage();
   const upsert = useUpsertEventPoster();
   const { data: existing = [] } = useAdminEventPosters(posterType); // 复用列表同一 queryKey,不重复请求
@@ -432,7 +525,8 @@ function EventPosterEditModal({ posterType, editing, onClose }: {
   if (!editing) return null;
 
   const rangeValid = isValidYmd(startDate) && isValidYmd(endDate) && startDate <= endDate;
-  const canSave = !!imageUrl.trim() && rangeValid;
+  const accentValid = accentColor === '' || isValidHex(accentColor);
+  const canSave = !!imageUrl.trim() && rangeValid && accentValid;
   // 日期重叠提醒(2026-07-11 打磨):非阻断,只警示——重叠期间按起始日期较晚的那条生效(见 home.ts)。
   const selfId = editing !== 'new' ? editing.id : null;
   const overlapping = rangeValid
@@ -467,8 +561,8 @@ function EventPosterEditModal({ posterType, editing, onClose }: {
         {imageUrl && !uploadImg.isPending ? <Text style={styles.uploadReplace}>点图可替换</Text> : null}
       </View>
       <ModalField label="或粘贴图片链接" value={imageUrl} onChangeText={setImageUrl} placeholder="https://…" />
-      <ModalField label="开始日期" value={startDate} onChangeText={setStartDate} placeholder="YYYY-MM-DD" />
-      <ModalField label="结束日期" value={endDate} onChangeText={setEndDate} placeholder="YYYY-MM-DD" />
+      <AdminDateField label="开始日期" value={startDate} onChange={setStartDate} />
+      <AdminDateField label="结束日期" value={endDate} onChange={setEndDate} minDate={isValidYmd(startDate) ? new Date(startDate + 'T00:00:00') : undefined} />
       {(startDate || endDate) && !rangeValid ? (
         <Text style={{ fontSize: 11, color: CRIMSON, marginTop: -8, marginBottom: 8 }}>日期需为 YYYY-MM-DD 格式,且开始 ≤ 结束。</Text>
       ) : null}
@@ -479,6 +573,7 @@ function EventPosterEditModal({ posterType, editing, onClose }: {
         </Text>
       ) : null}
       <ModalField label="诗句 / 标题(可选)" value={caption} onChangeText={setCaption} placeholder={posterType === 'event' ? '如:萨嘎达瓦月 · 共修回向' : '如:上师诞辰 · 特别共修'} />
+      <PosterThemeFields imageUrl={imageUrl} accentColor={accentColor} onAccentChange={setAccentColor} overlayOpacity={overlayOpacity} onOpacityChange={setOverlayOpacity} />
       <View style={styles.switchRow}>
         <Text style={styles.formLabel}>启用</Text>
         <Switch value={isActive} onValueChange={setIsActive} trackColor={{ true: SAFFRON, false: INK4 }} />
@@ -489,6 +584,7 @@ function EventPosterEditModal({ posterType, editing, onClose }: {
           variant="primary"
           disabled={!canSave}
           onPress={() => {
+            const accent = accentColor.trim();
             upsert.mutate(
               {
                 id: editing !== 'new' ? editing.id : undefined,
@@ -498,6 +594,8 @@ function EventPosterEditModal({ posterType, editing, onClose }: {
                 imageUrl: imageUrl.trim(),
                 caption: caption.trim() || null,
                 isActive,
+                accentColor: accent || null,
+                overlayOpacity: accent ? overlayOpacity : null,
               },
               { onSuccess: onClose, onError: (e) => notify('保存失败', (e as Error)?.message ?? '请重试,或确认有管理员权限。') },
             );
@@ -604,4 +702,11 @@ const styles = StyleSheet.create({
   uploadReplace: { fontSize: 11, color: INK4, textAlign: 'center', marginTop: 4 },
   switchRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
   importHint: { fontSize: 12, color: INK3, lineHeight: 18 },
+
+  // 画报强调色/透明度(2026-07-18)
+  swatchRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 10 },
+  swatch: { width: 34, height: 34, borderRadius: 17, borderWidth: 2, borderColor: 'transparent' },
+  swatchNone: { width: 34, height: 34, borderRadius: 17, borderWidth: 2, borderColor: 'rgba(43,34,24,0.15)', backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+  swatchSelected: { borderColor: SAFFRON_DARK },
+  modalFieldInputPlain: { backgroundColor: '#fff', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9, fontSize: 14, color: INK, borderWidth: 1, borderColor: 'rgba(43,34,24,0.15)' },
 });

@@ -233,11 +233,13 @@ export default function Daily() {
                 );
               })}
 
-              {/* 修持 · 观修 */}
+              {/* 修持 · 观修(2026-07-17 修:此前"去观修"跳的是修持整个 tab,还要自己找到这条
+                  功课;时长型愿没有像计数型那样的就地弹层,直接进该愿详情页——"记一笔"入口就在那,
+                  同 app/(student)/practice.tsx 观修卡片点按的落点) */}
               {durationVows.map((v) => (
                 <Node key={v.vowId} num={nextStep()} state="todo" tag="正行 · 观修" title={v.name}
                   sub={`累计 ${v.currentSessions} 座${v.targetCount ? ` / ${v.targetCount}` : ''}`}
-                  actionLabel="去观修" onPress={() => router.push('/practice' as never)} />
+                  actionLabel="去观修" onPress={() => router.push(`/vow/${v.vowId}` as never)} />
               ))}
 
               {/* 结行 · 回向(底) */}

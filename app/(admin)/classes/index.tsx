@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AdminButton, AdminModal, Badge, EmptyState, ModalActions, ModalField, ModalFootnote, SCREEN_BG, type BadgeTone } from '@/components/ui/admin-kit';
+import { AdminButton, AdminDateField, AdminModal, Badge, EmptyState, ModalActions, ModalField, ModalFootnote, SCREEN_BG, type BadgeTone } from '@/components/ui/admin-kit';
 import { Text } from '@/components/ui/text';
 import { useAdminCohorts, type AdminCohort } from '@/lib/queries/classes';
 import { useAdminPrograms } from '@/lib/queries/scheduling';
@@ -132,7 +132,7 @@ function CreateCohortModal({ visible, onClose, onCreated }: {
 
       <ModalField label="班级名称 *" value={name} onChangeText={setName} placeholder="如:22 加行班" />
       <ModalField label="班级编号 *(全局唯一)" value={code} onChangeText={setCode} placeholder="如:jiaxing-22 / TST_JX_2026" />
-      <ModalField label="开班日期 *" value={startDate} onChangeText={setStartDate} placeholder="YYYY-MM-DD,如 2026-03-01" />
+      <AdminDateField label="开班日期 *" value={startDate} onChange={setStartDate} />
 
       {/* 时区(预设 + 其他自填) */}
       <View style={{ gap: 6 }}>

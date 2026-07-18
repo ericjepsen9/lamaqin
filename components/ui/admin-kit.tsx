@@ -6,8 +6,9 @@
 // 色彩铁律见 theme.ts：实心底→白字，浅底→同族深色字，禁止浅底配近黑。
 // 规范说明：docs/ui_spec_v2.md §6 / §9。
 // ════════════════════════════════════════════════════════════════════
+import { format } from 'date-fns';
 import { ChevronLeft, X } from 'lucide-react-native';
-import { type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   KeyboardAvoidingView,
   Modal,
@@ -22,6 +23,8 @@ import {
 } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
+import { DatePickerModal } from '@/components/month-calendar';
+import { TimePickerModal } from '@/components/time-picker';
 import { Text } from '@/components/ui/text';
 import { TextInput } from '@/components/ui/text-input';
 import {
@@ -349,6 +352,71 @@ export function ModalField({ label, value, onChangeText, placeholder, multiline,
   );
 }
 
+// 弹窗内日期选择字段(点日历选,而非手打 YYYY-MM-DD·2026-07-18 后台日期录入体验审计统一改造)。
+// value 为空串 = 未选;onChange 回传 yyyy-MM-dd 字符串,跟原来 ModalField 手打的格式一致,
+// 调用方不用改后续的校验/写库逻辑。
+export function AdminDateField({ label, value, onChange, minDate, maxDate, placeholder = '点击选择日期', testID }: {
+  label?: string; // 不传则不渲染标签行(调用处已有别的上下文文字说明这个字段是什么时用,如"现截止…"那一行)
+  value: string;
+  onChange: (v: string) => void;
+  minDate?: Date;
+  maxDate?: Date;
+  placeholder?: string;
+  testID?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const parsed = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(value + 'T00:00:00') : null;
+  const dateValue = parsed && !Number.isNaN(parsed.getTime()) ? parsed : null;
+  return (
+    <View style={styles.modalFieldWrap}>
+      {label ? <Text style={styles.modalFieldLabel}>{label}</Text> : null}
+      <Pressable testID={testID} style={styles.dateFieldBtn} onPress={() => setOpen(true)}>
+        <Text style={{ fontSize: 14, color: value ? INK : INK4 }}>{value || placeholder}</Text>
+      </Pressable>
+      <DatePickerModal
+        visible={open}
+        value={dateValue}
+        minDate={minDate}
+        maxDate={maxDate}
+        onPick={(d) => onChange(format(d, 'yyyy-MM-dd'))}
+        onClose={() => setOpen(false)}
+        title={label}
+        scopeId={testID}
+      />
+    </View>
+  );
+}
+
+// 弹窗内时间选择字段(点时间网格选,而非手打 HH:mm·同上日期字段一并做的体验审计改造)。
+// value 为空串 = 未设置,onChange 回传 'HH:mm' 字符串,与原 ModalField 手打格式一致。
+export function AdminTimeField({ label, value, onChange, placeholder = '点击选择时间', allowClear = true, testID }: {
+  label?: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  allowClear?: boolean;
+  testID?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <View style={styles.modalFieldWrap}>
+      {label ? <Text style={styles.modalFieldLabel}>{label}</Text> : null}
+      <Pressable testID={testID} style={styles.dateFieldBtn} onPress={() => setOpen(true)}>
+        <Text style={{ fontSize: 14, color: value ? INK : INK4 }}>{value || placeholder}</Text>
+      </Pressable>
+      <TimePickerModal
+        visible={open}
+        value={value}
+        allowClear={allowClear}
+        onPick={onChange}
+        onClose={() => setOpen(false)}
+        title={label}
+        scopeId={testID}
+      />
+    </View>
+  );
+}
+
 // ─── Screen 页面骨架（SafeAreaView + 背景 + 可选固定头 / 滚动区）────────
 // 新页面统一用它起头：<Screen scroll header={<DetailHeader .../>}>...</Screen>
 // header 固定不滚，children 进滚动区；scroll=false 时 children 直接铺满（自管滚动）。
@@ -476,6 +544,7 @@ const styles = StyleSheet.create({
   modalFieldLabel: { fontSize: 13, color: INK2, fontWeight: '500' },
   modalFieldInput: { backgroundColor: SURFACE, borderRadius: RADIUS.input, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: INK, borderWidth: 1, borderColor: BORDER },
   modalFieldInputMultiline: { minHeight: 100, textAlignVertical: 'top' },
+  dateFieldBtn: { backgroundColor: SURFACE, borderRadius: RADIUS.input, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1, borderColor: BORDER },
   // Screen
   screen: { flex: 1, backgroundColor: SURFACE },
   screenScroll: { padding: 16, gap: 12, paddingBottom: 40 },
